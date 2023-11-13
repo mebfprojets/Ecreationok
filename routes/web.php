@@ -43,6 +43,9 @@ Route::get('/api', function () {
 Route::get('/facture', function () {
     return view('pdf.facture');
 });
+Route::get('/dash', function () {
+    return view('backend.adminlte.home');
+});
  
 // Ajout BARRO
 Route::get('/show/demande', [DemandeController::class,'liste'])->name('demande.liste');
