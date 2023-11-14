@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="{{asset('adminlte/plugins/fontawesome-free/css/all.min.css')}}">
+  
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <!-- Tempusdominus Bootstrap 4 -->
@@ -25,6 +26,11 @@
   <link rel="stylesheet" href="{{asset('adminlte/plugins/daterangepicker/daterangepicker.css')}}">
   <!-- summernote -->
   <link rel="stylesheet" href="{{asset('adminlte/plugins/summernote/summernote-bs4.min.css')}}">
+  <!-- For Backend -->
+  <link rel="stylesheet" href="{{asset('adminlte/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
+  <link rel="stylesheet" href="{{asset('adminlte/plugins/datatables-responsive/css/responsive.bootstrap4.min.css')}}">
+  <link rel="stylesheet" href="{{asset('adminlte/plugins/datatables-buttons/css/buttons.bootstrap4.min.css')}}">
+  <!-- End Backend -->
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -177,7 +183,7 @@
     <!-- Brand Logo -->
     <a href="index3.html" class="brand-link">
       <img src="{{asset('adminlte/dist/img/AdminLTELogo.png')}}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">AdminLTE 3</span>
+      <span class="brand-text font-weight-light">Admin</span>
     </a>
 
     <!-- Sidebar -->
@@ -210,14 +216,14 @@
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
           <li class="nav-item menu-open">
-            <a href="#" class="nav-link active">
+            <a href="{{route('dashboard')}}" class="nav-link active">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>
-                Dashboard
-                <i class="right fas fa-angle-left"></i>
+                Tableau De Bord
+                <!-- <i class="right fas fa-angle-left"></i> -->
               </p>
             </a>
-            <ul class="nav nav-treeview">
+            <!-- <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="./index.html" class="nav-link active">
                   <i class="far fa-circle nav-icon"></i>
@@ -236,27 +242,35 @@
                   <p>Dashboard v3</p>
                 </a>
               </li>
-            </ul>
+            </ul> -->
           </li>
           <li class="nav-item">
-            <a href="pages/widgets.html" class="nav-link">
+            <a href="{{ route('list') }}" class="nav-link">
               <i class="nav-icon fas fa-th"></i>
               <p>
-                Widgets
-                <span class="right badge badge-danger">New</span>
+                Liste des Demandes
+                <!-- <span class="right badge badge-danger">New</span> -->
               </p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
+          <a href="{{route('list.rejet')}}" class="nav-link">
               <i class="nav-icon fas fa-copy"></i>
               <p>
-                Layout Options
-                <i class="fas fa-angle-left right"></i>
-                <span class="badge badge-info right">6</span>
+                Demandes Validées
+                <!-- <i class="fas fa-angle-left right"></i>
+                <span class="badge badge-info right">6</span> -->
               </p>
             </a>
-            <ul class="nav nav-treeview">
+            <a href="{{route('list.rejet')}}" class="nav-link">
+              <i class="nav-icon fas fa-copy"></i>
+              <p>
+                Demandes Rejétées
+                <!-- <i class="fas fa-angle-left right"></i>
+                <span class="badge badge-info right">6</span> -->
+              </p>
+            </a>
+            <!-- <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="pages/layout/top-nav.html" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
@@ -305,13 +319,13 @@
                   <p>Collapsed Sidebar</p>
                 </a>
               </li>
-            </ul>
+            </ul> -->
           </li>
           <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-chart-pie"></i>
               <p>
-                Charts
+                Adminstration
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
@@ -319,30 +333,36 @@
               <li class="nav-item">
                 <a href="pages/charts/chartjs.html" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>ChartJS</p>
+                  <p>Gestion des Utilisateurs</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="pages/charts/flot.html" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Flot</p>
+                  <p>Gestion des Rôles</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="pages/charts/inline.html" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Inline</p>
+                  <p>Gestion des Permissions</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="pages/charts/uplot.html" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>uPlot</p>
+                  <p>Paramètres</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="pages/charts/uplot.html" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Valeurs</p>
                 </a>
               </li>
             </ul>
           </li>
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-tree"></i>
               <p>
@@ -400,8 +420,8 @@
                 </a>
               </li>
             </ul>
-          </li>
-          <li class="nav-item">
+          </li> -->
+          <!-- <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-edit"></i>
               <p>
@@ -435,8 +455,8 @@
                 </a>
               </li>
             </ul>
-          </li>
-          <li class="nav-item">
+          </li> -->
+          <!-- <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-table"></i>
               <p>
@@ -464,8 +484,8 @@
                 </a>
               </li>
             </ul>
-          </li>
-          <li class="nav-header">EXAMPLES</li>
+          </li> -->
+          <!-- <li class="nav-header">EXAMPLES</li>
           <li class="nav-item">
             <a href="pages/calendar.html" class="nav-link">
               <i class="nav-icon far fa-calendar-alt"></i>
@@ -839,7 +859,7 @@
               <i class="nav-icon far fa-circle text-info"></i>
               <p>Informational</p>
             </a>
-          </li>
+          </li> -->
         </ul>
       </nav>
       <!-- /.sidebar-menu -->

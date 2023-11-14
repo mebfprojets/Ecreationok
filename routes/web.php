@@ -44,8 +44,11 @@ Route::get('/facture', function () {
     return view('pdf.facture');
 });
 Route::get('/dash', function () {
-    return view('backend.adminlte.home');
+    return view('backend.adminlte.dashboard');
 });
+// Route::get('/backend/detail', function () {
+//     return view('backend.adminlte.detail');
+// });
  
 // Ajout BARRO
 Route::get('/show/demande', [DemandeController::class,'liste'])->name('demande.liste');
@@ -90,6 +93,13 @@ Route::post('reset-password', [AccountController::class, 'resetPassword'])->name
 Route::get('forget-password/{token}', [AccountController::class, 'showForgetPasswordForm'])->name('reset.password.get');
 Route::get('/test', [TestController::class,'syncrodata']);
 Route::get('/loginss',[AccountController::class, 'getlogin']);
+
+//Ajout BARRO
+Route::get('/backend/liste', [DemandeController::class, 'liste_demande'])->name("list");
+Route::get('/backend/liste/rejet', [DemandeController::class, 'liste_demande_rejet'])->name("list.rejet");
+Route::get('/backend/detail/{id}', [DemandeController::class,'detail_backend'])->name('detail.demande');
+Route::get('/backend/valider/demande/{id}', [DemandeController::class, 'valider_demande'])->name("valider.demande");
+Route::get('/home', [DemandeController::class, 'index_admin'])->name("dashboard");
 
 // Route::middleware([
 //     'auth:sanctum',

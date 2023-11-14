@@ -30,7 +30,8 @@ class DemandeController extends Controller
      public function __construct()
     {
         //$this->middleware('auth', ['except' => ['verifier_nom_commercial']]);
-        $this->middleware('auth')->except(['verifier_nom_commercial','index','test']);
+        $this->middleware('auth')->except(['verifier_nom_commercial','index','test','liste_demande',
+        'liste_demande_rejet','detail_backend','update_etat_demande']);
     }
 
     public function test()
@@ -314,7 +315,7 @@ class DemandeController extends Controller
                  'objet_social' => $request['objet_social'],
                  'avecCPC' =>  $avecCPC,
                 'montant' =>  $montant,
-                'etat'=>0,
+                //'etat'=>0,
                 'numero_demande'=>$numero,
                 'paye'=>0,
                 'montant_total'=>$montant_total
@@ -737,5 +738,83 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             //$demande->sigle=$request->objet_social;
             $demande->update();
             return redirect()->back();
+        }
+
+        public function index_admin(){
+            $demandes=Demande::all();
+            $paye=Demande::where('paye', 1)->get();
+            $nbr_paye=count($paye);
+            $nonpaye=Demande::where('paye', 0)->get();
+            $rejet=Demande::where('etat', 0)->get();
+            $nbr_rejet=count($rejet);
+            $nbr_nonpaye=count($nonpaye);
+            $nbr=count($demandes);
+            return view('backend.adminlte.dashboard', compact('demandes','nbr','nbr_paye','nbr_nonpaye','nbr_rejet'));
+        }
+
+        public function liste_demande(){
+            $demandes=Demande::all();
+            return view('backend.adminlte.liste', compact('demandes'));
+        }
+        public function liste_demande_rejet(){
+            $demandes=Demande::where('etat', 0)->get();
+            return view('backend.adminlte.liste_rejet', compact('demandes'));
+        }
+
+        public function detail_backend($id)
+        {
+            // $usager= Usager::where('user_id',Auth::user()->id)->first();
+            
+            $demandes=Demande::where('id', $id)->first();
+            $usager=Usager::where('id', $demandes->usager_id)->first();
+           $activites= DB::table('activites')->where('Code', $demandes->primary_activity)->first();
+           $forme_juridiques= DB::table('forme_juridiques')->where('code', $demandes->forme_juridique)->first();
+           $professions= Valeur::where('code', $usager->IdFonction)->first();
+           $regions=DB::table('regions')->where('id', $demandes->region_code)->first();
+           $provinces=DB::table('provinces')->where('id', $demandes->province_code)->first();
+           $communes=DB::table('commune_departements')->where('id', $demandes->commune_departement_code)->first();
+           $arrondissements=DB::table('arrondissements')->where('id', $demandes->arrondissement_code)->first();
+           $secteurs=DB::table('secteur_villages')->where('code', $demandes->code_secteur_village)->first();
+           $terrains=DB::table('terrains')->where('id', $demandes->id_terrain)->first();
+           $piecejointes= PieceJointe::where('usager_id',$usager->id)->where('demande_id', $demandes->id)->get();
+            $secteur_usager=DB::table('secteur_villages')->where('code', $usager->Code_Secteur_Village)->first();
+            $province_usager=DB::table('provinces')->where('id', $usager->Province_Code)->first();
+            $region_usager=DB::table('regions')->where('id', $usager->Region_Code)->first();
+           //$nationalite= Valeur::where('parametre_id', 5)->where('code', $usager->Nationality_No_)->first();
+        
+           //    DB::table('activites')->where('id', $demandes->primary_activity)->first();
+           $demande=Demande::where('usager_id', $usager->id)->orderby('created_at','desc')->get();
+           $c=count($demande);
+           $cefore=DB::table('organisations')->where('CodeOrganisation',$demandes->organisation_code)->first();
+            $cefore_code=$cefore->Ville;
+            return view('backend.adminlte.detail', compact('demandes','usager','activites','forme_juridiques',
+            'professions','regions','provinces','communes','arrondissements','secteurs','terrains','piecejointes',
+        'secteur_usager','province_usager','region_usager','c','cefore_code'));       
+        
+        }
+
+        public function valider_demande(Request $request , $id){
+            $demandes=Demande::find($id);
+            $etat=$request->etat;
+            $motif=$request->motif;
+            $date=new \DateTime();
+            $date_validation= $date->format("d-m-Y H:i:s");
+            if($etat=="oui"){                
+                $demandes->update([
+                    'etat'=>1,
+                    'Date_etat_validation'=>$date_validation,
+                    'User_ayant_valide'=>Auth::user()->id
+                   ]);
+                   return redirect()->route('list');
+            }
+            else{
+                $demandes->update([
+                    'etat'=>0,
+                    'motif'=>$motif,
+                    'Date_etat_validation'=>$date_validation,
+                    'User_ayant_valide'=>Auth::user()->id
+                   ]);
+                   return redirect()->route('list');
+            }
         }
 }
