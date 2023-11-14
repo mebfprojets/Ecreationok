@@ -1,21 +1,19 @@
-@extends("layouts.admin")
-@section('administration', 'active')
+@extends("backend.adminlte.home")
+{{-- @section('administration', 'active')
 @section('administration-parametre', 'active')
     @section('blank')
         <li>Accueil</li>
         <li>Roles</li>
         <li><a href="">Modifier</a></li>
-    @endsection
+    @endsection --}}
     @section('content')
     <div class="container">
         <div class="row">
-            <div class="col-md-8 col-md-offset-2">
-                <!-- Form Validation Example Block -->
-                <div class="block">
-                    <!-- Form Validation Example Title -->
-                    <div class="block-title">
-                        <h2><strong>Modifier le </strong>Role</h2>
-                    </div>
+            <div class="card card-success col-md-8 col-md-offset-2">
+                <div class="card-header">
+                  <h3 class="card-title">Modifier un role</h3>
+                </div>
+                <div class="card-body">
                     <form id="form-validation" method="POST"  action="{{route('role.update', $role)}}" class="form-horizontal form-bordered">
 
                         {{ csrf_field() }}
@@ -99,9 +97,11 @@
                             <a href="{{ route('role.index') }}" class="btn btn-sm btn-warning"><i class="fa fa-repeat"></i> Annuler</a>
                         </div>
                     </div>
-                    </form>
+                </form>
                 </div>
-            </div>
+                <!-- /.card-body -->
+              </div>
+           
         </div>
     </div>
 @endsection

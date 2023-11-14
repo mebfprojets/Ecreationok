@@ -10,6 +10,10 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\DemandeController;
 use App\Http\Controllers\CreaController;
 use App\Http\Controllers\TestsController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RoleController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -45,7 +49,7 @@ Route::get('/facture', function () {
 });
 Route::get('/dash', function () {
     return view('backend.adminlte.home');
-});
+})->name('backend');
  
 // Ajout BARRO
 Route::get('/show/demande', [DemandeController::class,'liste'])->name('demande.liste');
@@ -90,16 +94,9 @@ Route::post('reset-password', [AccountController::class, 'resetPassword'])->name
 Route::get('forget-password/{token}', [AccountController::class, 'showForgetPasswordForm'])->name('reset.password.get');
 Route::get('/test', [TestController::class,'syncrodata']);
 Route::get('/loginss',[AccountController::class, 'getlogin']);
-
-// Route::middleware([
-//     'auth:sanctum',
-//     config('jetstream.auth_session'),
-//     'verified'
-// ])->group(function () {
-//     Route::get('/dashboard', function () {
-//         return view('dashboard');
-//     })->name('dashboard');
-// });
+Route::resource('user', UserController::class);
+Route::resource('permissions', PermissionController::class);
+Route::resource("role",RoleController::class);
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard',[AccueilController::class, 'page_accueil'])->name('page_accueil');
 Route::post('logout', [UserController::class, 'logout'])->name('logout');
