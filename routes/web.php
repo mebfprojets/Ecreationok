@@ -10,6 +10,10 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\DemandeController;
 use App\Http\Controllers\CreaController;
 use App\Http\Controllers\TestsController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RoleController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -44,11 +48,8 @@ Route::get('/facture', function () {
     return view('pdf.facture');
 });
 Route::get('/dash', function () {
-    return view('backend.adminlte.dashboard');
-});
-// Route::get('/backend/detail', function () {
-//     return view('backend.adminlte.detail');
-// });
+    return view('backend.adminlte.home');
+})->name('backend');
  
 // Ajout BARRO
 Route::get('/show/demande', [DemandeController::class,'liste'])->name('demande.liste');
@@ -93,6 +94,9 @@ Route::post('reset-password', [AccountController::class, 'resetPassword'])->name
 Route::get('forget-password/{token}', [AccountController::class, 'showForgetPasswordForm'])->name('reset.password.get');
 Route::get('/test', [TestController::class,'syncrodata']);
 Route::get('/loginss',[AccountController::class, 'getlogin']);
+Route::resource('user', UserController::class);
+Route::resource('permissions', PermissionController::class);
+Route::resource("role",RoleController::class);
 
 //Ajout BARRO
 Route::get('/backend/liste', [DemandeController::class, 'liste_demande'])->name("list");

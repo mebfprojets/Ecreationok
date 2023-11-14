@@ -7,10 +7,10 @@ use Illuminate\Http\Request;
 
 class PermissionController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+     public function __construct()
+     {
+         $this->middleware('auth');
+     }
     /**
      * Display a listing of the resource.
      *
@@ -66,10 +66,8 @@ class PermissionController extends Controller
      */
     public function edit(Permission $permission)
     {
-       // $permission= Permission::findOrfail($permission);
+       $permission= Permission::findOrfail($permission);
         return view('permissions.update', compact('permission'));
-
-
     }
 
 
@@ -98,6 +96,6 @@ class PermissionController extends Controller
      */
     public function destroy(Permission $permission)
     {
-        //
+        
     }
 }

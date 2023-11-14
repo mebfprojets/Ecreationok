@@ -1,12 +1,12 @@
-@extends("layouts.admin")
-@section('administration', 'active')
+@extends("backend.adminlte.home")
+{{-- @section('administration', 'active')
 @section('administration-parametre', 'active')
 @section('content')
 @section('blank')
     <li>Accueil</li>
     <li>Permissions</li>
     <li><a href="">liste</a></li>
-@endsection
+@endsection --}}
 @section('content')
 
 <div class="block full">
