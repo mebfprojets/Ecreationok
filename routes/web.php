@@ -48,7 +48,7 @@ Route::get('/facture', function () {
     return view('pdf.facture');
 });
 Route::get('/dash', function () {
-    return view('backend.adminlte.home');
+    return view('backend.adminlte.main');
 })->name('backend');
  
 // Ajout BARRO

@@ -1,4 +1,4 @@
-@extends("backend.adminlte.home")
+@extends("backend.adminlte.main")
 {{-- @section('administration', 'active')
 @section('administration-parametre', 'active') --}}
 {{-- @section('blank')

@@ -12,10 +12,10 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-   public function __construct()
-   {
-    $this->middleware('auth');
-   }
+//    public function __construct()
+//    {
+//     $this->middleware('auth');
+//    }
     /**
      * Display a listing of the resource.
      *
@@ -23,14 +23,14 @@ class UserController extends Controller
      */
     public function index()
     {
-     if (Auth::user()->can('user.create')) {
+    //  if (Auth::user()->can('user.create')) {
         $users= User::with("roles")->where('isadmin','!=',null)->orderBy('updated_at', 'desc')->get();
         return view('users.index', compact("users"));
-     }
-     else{
-         flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
-         return redirect()->back();
-     }
+    //  }
+    //  else{
+    //      flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
+    //      return redirect()->back();
+    //  }
     }
     public function store_user(){
         dd('oko');
