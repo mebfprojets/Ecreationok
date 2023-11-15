@@ -1,23 +1,15 @@
-@extends("backend.adminlte.home")
-{{-- @section('administration', 'active')
-@section('administration-parametre', 'active')
-@section('blank')
-    <li>Accueil</li>
-    <li>Roles</li>
-    <li><a href="">Liste</a></li>
-@endsection --}}
+@extends("backend.adminlte.main")
+ @section('administration', 'menu-open')
+@section('administration-role', 'active')
+
 @section('content')
-        <div class="block full">
-            <div class="block-title">
-                <div class="row">
-                    <div class="col-md-12">
-                    <h2>Liste des <strong>Roles</strong></h2>
-                    {{-- @can('role.create', Auth::user()) --}}
-                        <a href="{{ route('role.create') }}" class="btn btn-success pull-right"><span><i class="fa fa-plus"></i></span>  Role</a>
-                    {{-- @endcan --}}
-                </div>
-                </div>
-            </div>
+<div class="card card-success col-md-12 col-md-offset-2">
+    <div class="card-header">
+      <h3 class="card-title">Lister les rôles</h3>
+    </div>
+    @can('user.create', Auth::user()) 
+     <a href="{{ route('role.create') }}" class="btn btn-success col-md-2 pull-right"><span><i class="fa fa-plus"></i></span> Rôle</a>
+   @endcan
 <div class="table-responsive">
 <table class="table table-vcenter table-condensed table-bordered listepdf">
         <thead>

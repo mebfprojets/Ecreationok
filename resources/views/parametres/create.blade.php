@@ -1,5 +1,5 @@
-@extends('layouts.admin')
-@section('administration', 'active')
+@extends("backend.adminlte.main")
+@section('administration', 'menu-open')
 @section('administration-parametre', 'active')
 @section('content')
     <div class="col-md-10">

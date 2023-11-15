@@ -32,7 +32,7 @@ class RolePolicy
      */
     public function view(User $user)
     {
-        return $this->getPermission($user,10);
+        return $this->getPermission($user,4);
     }
 
     /**

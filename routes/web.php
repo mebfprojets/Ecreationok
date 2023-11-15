@@ -12,6 +12,9 @@ use App\Http\Controllers\CreaController;
 use App\Http\Controllers\TestsController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\ParametreController;
+
+
 
 
 
@@ -119,9 +122,11 @@ Route::get('/liste/filtre', [DemandeController::class, 'liste_filtre'])->name("l
 //         return view('dashboard');
 //     })->name('dashboard');
 // });
-
+Route::get('/listeval', [ValeurController::class,"listevakeur"])->name("valeur.listeval");
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard',[AccueilController::class, 'page_accueil'])->name('page_accueil');
 Route::post('logout', [UserController::class, 'logout'])->name('logout');
+Route::resource("parametres",ParametreController::class);
+Route::resource("valeurs", ValeurController::class);
 //Route::get('login', [UserController::class, 'login'])->name('login');
 
 

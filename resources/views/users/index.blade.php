@@ -1,11 +1,7 @@
 @extends("backend.adminlte.main")
-{{-- @section('administration', 'active')
-@section('administration-parametre', 'active') --}}
-{{-- @section('blank')
-    <li>Accueil</li>
-    <li>Utilisateurs</li>
-    <li><a href="{{ route('user.index') }}">Liste</a></li>
-@endsection --}}
+@section('administration', 'menu-open')
+@section('administration-user', 'active') 
+
 @section('content')
         <div class="row">
                     <div class="card card-success col-md-12 col-md-offset-2">

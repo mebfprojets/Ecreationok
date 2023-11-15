@@ -1,11 +1,7 @@
 @extends("backend.adminlte.main")
-{{-- @section('administration', 'active')
-@section('administration-parametre', 'active') --}}
-{{-- @section('blank')
-    <li>Accueil</li>
-    <li>Utilisateurs</li>
-    <li><a href="">Modifier</a></li>
-@endsection --}}
+@section('administration', 'menu-open')
+@section('administration-user', 'active')
+
 @section('content')
 <div class="container">
     <div class="row">
@@ -47,7 +43,32 @@
                                 @endif
                             </div>
                     </div>
+                    <div class="form-group{{ $errors->has('organisation') ? ' has-error' : '' }}">
+                        <label class="col-md-4 control-label" for="organisation">Cefore </label>
+                        <div class="col-md-6">
+                                <div class=" col-md-12 input-group ">
+                                    <select  id="organisation" name="organisation" class="form-control">
+                                    <option value="">Sélectionner une zone</option>
+                                        <option value="001000"@if ($user->organisation=="001000")
+                                            selected
+                                        @endif>Central</option>
+                                            @foreach ($organisations as $organisation)
+                                                <option value="{!!old('organisation') ?? $organisation->CodeOrganisation!!}"
+                                                    @if ($organisation->CodeOrganisation==$user->organisation)
+                                                        selected
+                                                    @endif>{{ $organisation->Ville}}
+                                                </option>
+                                                @endforeach
+                                            </select>
+                                </div>
+                                    @if ($errors->has('organisation'))
+                                    <span class="help-block">
+                                    <strong>{{ $errors->first('organisation') }}</strong>
+                                    </span>
+                                    @endif
 
+                        </div>
+                    </div>
                     <div class="form-group{{ $errors->has('telephone') ? ' has-error' : '' }}">
                             <label class="col-md-4 control-label" for="telephone">Telephone<span class="text-success">*</span></label>
                             <div class="col-md-6">

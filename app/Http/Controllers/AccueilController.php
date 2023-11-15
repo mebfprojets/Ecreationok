@@ -12,7 +12,7 @@ class AccueilController extends Controller
             return redirect()->route('index');
         }
         else{
-            return redirect()->route('backend');
+            return redirect()->route('dashboard');
         }
     }
 }

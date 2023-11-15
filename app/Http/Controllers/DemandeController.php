@@ -796,8 +796,6 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
 
         public function detail_backend($id)
         {
-            // $usager= Usager::where('user_id',Auth::user()->id)->first();
-            
             $demandes=Demande::where('id', $id)->first();
             $usager=Usager::where('id', $demandes->usager_id)->first();
            $activites= DB::table('activites')->where('Code', $demandes->primary_activity)->first();
@@ -813,9 +811,6 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             $secteur_usager=DB::table('secteur_villages')->where('code', $usager->Code_Secteur_Village)->first();
             $province_usager=DB::table('provinces')->where('id', $usager->Province_Code)->first();
             $region_usager=DB::table('regions')->where('id', $usager->Region_Code)->first();
-           //$nationalite= Valeur::where('parametre_id', 5)->where('code', $usager->Nationality_No_)->first();
-        
-           //    DB::table('activites')->where('id', $demandes->primary_activity)->first();
            $demande=Demande::where('usager_id', $usager->id)->orderby('created_at','desc')->get();
            $c=count($demande);
            $cefore=DB::table('organisations')->where('CodeOrganisation',$demandes->organisation_code)->first();
@@ -823,8 +818,7 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             return view('backend.adminlte.detail', compact('demandes','usager','activites','forme_juridiques',
             'professions','regions','provinces','communes','arrondissements','secteurs','terrains','piecejointes',
         'secteur_usager','province_usager','region_usager','c','cefore_code'));       
-        
-        }
+    }
 
         public function valider_demande(Request $request , $id){
             $demandes=Demande::find($id);
