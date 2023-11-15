@@ -11,6 +11,14 @@
                     Entreprise Sociétaire
                     @endif
                     - {{$cefore_code}}</h4></center>
+                    <div class="mb-3">
+                          <label class="form-label" style="color:red; font-size:16px;" for="progress-basicpill-vatno-input">
+                              @if($demandes->paye==1 && $demandes->etat==2)
+                              Motif du Rejet : {{$demandes->motif}}
+                              @endif
+                           </label>
+                    </div>    
+            <a style="margin-left:10px;" href="{{route('update.promoteur', $demandes->id)}}" data-toggle="modal" class="btn btn-md btn-success"  > <i class="fa fa-check-circle"></i> Envoyer Pour Traitement</a>
   <form action="{{ route('demande.update',$demandes->id)}}" method="post">
                   {{ csrf_field() }}
                   {{ method_field('PUT') }}
@@ -67,16 +75,13 @@
                   <!-- <input class="form-control" disabled="disabled" type="text" value="">          -->
                 </div>
                 <div class="form-group">
-                  <label>Activité Principale</label>
-                  <textarea class="form-control" disabled="disabled" rows="2" placeholder="{{$activites->description}}"></textarea>
+                  <label>Secteur d'activité</label>
+                  <input class="form-control edit_demande" disabled="disabled" type="text" value="{{$demandes->activity_sector}}">
                 </div>
                 <div class="form-group">
-                  <label>Objet Social</label>
-                  <textarea class="form-control edit_demande" disabled="disabled" rows="6" value="{{$demandes->objet_social}}" placeholder="{{$demandes->objet_social}}"></textarea>
-                  <textarea class="form-control save_demande" name="objet_social" style="display:none" rows="6" value="@php echo $demandes->objet_social @endphp"></textarea>
-                  <!-- <input class="form-control" disabled="disabled" type="text" value="{{$demandes->objet_social}}">                   -->
-                </div>
-                
+                  <label>Activité Principale</label>
+                  <textarea class="form-control" disabled="disabled" rows="2" placeholder="{{$activites->description}}"></textarea>
+                </div>            
                 <!-- /.form-group -->
               </div>
               <div class="col-md-4">
@@ -93,6 +98,12 @@
                   <label>Date Création</label>
                   <input class="form-control" disabled="disabled" type="text" value="{{ date("d-m-Y à H:i", strtotime($demandes->created_at)) }}">         
                 </div>
+                <div class="form-group">
+                  <label>Objet Social</label>
+                  <textarea class="form-control edit_demande" disabled="disabled" rows="6" value="{{$demandes->objet_social}}" placeholder="{{$demandes->objet_social}}"></textarea>
+                  <textarea class="form-control save_demande" name="objet_social" style="display:none" rows="6">{{$demandes->objet_social}}</textarea>
+                  <!-- <input class="form-control" disabled="disabled" type="text" value="{{$demandes->objet_social}}">                   -->
+                </div>
                 <!-- /.form-group -->
               </div>
               <!-- /.col -->
@@ -101,8 +112,17 @@
               <div class="col-md-4">
                 
                 <div class="form-group">
-                  <label>Région</label>
-                  <input class="form-control" disabled="disabled" type="textarea" value="{{$regions->name}}">         
+                  <label class="edit_demande">Région</label>
+                  <input class="form-control edit_demande" disabled="disabled" type="textarea" value="{{$regions->name}}">
+                    <div class="mb-3 save_demande" style="display:none;">
+                        <label class="form-label" for="progress-basicpill-cstno-input">Région (<font color="red">*</font>)</label>                                                                    
+                            <select id="region_usager" name="region_entreprise" placeholder="{{$regions->name}}" class="form-control select" style="width: 100%;"  onchange="changeValue('region_usager', 'province_usager', 'provinces','region_usager');">
+                                 <option></option>
+                                    @foreach ($regions_all as $region )
+                                 <option value="{{ $region->id }}">{{ $region->name }}</option>
+                                    @endforeach                                                                         
+                            </select>                                                
+                    </div>         
                 </div>
                 <div class="form-group">
                   <label>Province</label>
@@ -172,14 +192,14 @@
                          
               <!-- /.col -->
             </div>         <br>   
-            <center><a  style="margin-left:10px;" id="declaration_edit"  data-toggle="modal" class="btn btn-md btn-success declaration edit_demande" onclick="editdemande()" > <i class="fas fa-pen"></i> Corriger </a>
+            @if($demandes->paye==1 && $demandes->etat==2)                      
+          <center>
+            <a  style="margin-left:10px;" id="declaration_edit"  data-toggle="modal" class="btn btn-md btn-success declaration edit_demande" onclick="editdemande()" > <i class="fas fa-pen"></i> Corriger </a>
             <button type="submit" style="margin-left:10px;display:none" id="declaration_edit"  data-toggle="modal" class="btn btn-md btn-success save_demande" > <i class="fas fa-pen"></i> Enregistrer </button>
-            <a  style="margin-left:10px;" id="declaration_edit"  data-toggle="modal" style="display:none" class="btn btn-md btn-danger declaration save_demande" onclick="editdemande()" > <i class="fa fa-window-close"></i> Annuler </a>
+            <!-- <a  style="margin-left:10px;" id="declaration_edit"  data-toggle="modal" style="display:none" class="btn btn-md btn-danger declaration save_demande" onclick="editdemande()" > <i class="fa fa-window-close"></i> Annuler </a> -->
           </center>
-
+          @endif
             <!-- /.row -->
-
-           
             <!-- /.row -->
           </div>
           <!-- /.card-body -->
@@ -188,17 +208,16 @@
         <!-- /.card -->
 </form>
         <!-- SELECT2 EXAMPLE -->
+        <form action="{{ route('usager.update',$usager->id)}}" method="post">
+                  {{ csrf_field() }}
+                  {{ method_field('PUT') }}
         <div class="card card-default">
           <div class="card-header">
             <h3 class="card-title">Dirigeant</h3>
-
             <div class="card-tools">
               <button type="button" class="btn btn-tool" data-card-widget="collapse">
                 <i class="fas fa-minus"></i>
               </button>
-              <!-- <button type="button" class="btn btn-tool" data-card-widget="remove">
-                <i class="fas fa-times"></i>
-              </button> -->
             </div>
           </div>
           <!-- /.card-header -->
@@ -207,11 +226,13 @@
               <div class="col-md-4">
                 <div class="form-group">
                   <label>Nom</label>
-                  <input class="form-control" disabled="disabled" type="text" value="{{$usager->NomRaisonSociale}}">
+                  <input class="form-control edit_usager" disabled="disabled" type="text" value="{{$usager->NomRaisonSociale}}">
+                  <input class="form-control save_usager" style="display:none" name="nom" type="text" value="{{$usager->NomRaisonSociale}}">
                 </div>
                 <div class="form-group">
                   <label>Prénom</label>
-                  <input class="form-control" disabled="disabled" type="text" value="{{$usager->Prenom}}">
+                  <input class="form-control edit_usager" disabled="disabled" type="text" value="{{$usager->Prenom}}">
+                  <input class="form-control save_usager" style="display:none" name="prenom" type="text" value="{{$usager->Prenom}}">
                 </div>
                 <div class="form-group">
                   <label>Genre</label>
@@ -224,16 +245,19 @@
                 </div>
                 <div class="form-group">
                   <label>Lieu de naissance</label>
-                  <input class="form-control" disabled="disabled" type="text" value="{{$usager->LieuNaissance}}">                  
+                  <input class="form-control edit_usager" disabled="disabled" type="text" value="{{$usager->LieuNaissance}}">
+                  <input class="form-control save_usager" style="display:none" name="lieu_naissance" type="text" value="{{$usager->LieuNaissance}}">
                 </div>
                 <div class="form-group">
                   <label>Téléphone mobile</label>
-                  <input class="form-control" disabled="disabled" type="text" value="{{$usager->Phone_No_}}">         
+                  <input class="form-control edit_usager" disabled="disabled" type="text" value="{{$usager->Phone_No_}}">
+                  <input class="form-control save_usager" style="display:none" name="tel_mobile" type="text" value="{{$usager->Phone_No_}}">                      
                 </div>
                 <!-- /.form-group -->
                 <div class="form-group">
                   <label>Téléphone bureau</label>
-                  <input class="form-control" disabled="disabled" type="text" value="{{$usager->Tel_Bureau}}">         
+                  <input class="form-control edit_usager" disabled="disabled" type="text" value="{{$usager->Tel_Bureau}}">
+                  <input class="form-control save_usager" style="display:none" name="tel_bureau" type="text" value="{{$usager->Tel_Bureau}}">
                 </div>
                 <!-- /.form-group -->
               </div>
@@ -262,11 +286,13 @@
                 </div>   
                 <div class="form-group">
                   <label>Boite Postale</label>
-                  <input class="form-control" disabled="disabled" type="text" value="{{$usager->Boite_postale}}">         
+                  <input class="form-control edit_usager" disabled="disabled" type="text" value="{{$usager->Boite_postale}}">
+                  <input class="form-control save_usager" style="display:none" name="boite_postale" type="text" value="{{$usager->Boite_postale}}">
                 </div>  
                 <div class="form-group">
                   <label>E-mail</label>
-                  <input class="form-control" disabled="disabled" type="text" value="{{$usager->E_Mail}}">         
+                  <input class="form-control edit_usager" disabled="disabled" type="text" value="{{$usager['E-Mail']}}">
+                  <input class="form-control save_usager" style="display:none" name="mail" type="text" value="{{$usager['E-Mail']}}">
                 </div>          
                 <!-- /.form-group -->
               </div>
@@ -301,12 +327,19 @@
               </div>       
               <!-- /.col -->
             </div>
+            @if($demandes->paye==1 && $demandes->etat==2)                      
+          <center><a  style="margin-left:10px;" id="declaration_edit"  data-toggle="modal" class="btn btn-md btn-success declaration edit_usager" onclick="editusager()" > <i class="fas fa-pen"></i> Corriger </a>
+            <button type="submit" style="margin-left:10px;display:none" id="declaration_edit"  data-toggle="modal" class="btn btn-md btn-success save_usager" > <i class="fas fa-pen"></i> Enregistrer </button>
+            <!-- <a  style="margin-left:10px;" id="declaration_edit"  data-toggle="modal" style="display:none;" class="btn btn-md btn-danger save_usager" onclick="editusager()" > <i class="fa fa-window-close"></i> Annuler </a> -->
+          </center>
+          @endif
             <!-- /.row -->
           </div>
           
           <!-- /.card-body -->
           
         </div>
+      </form>
 
         <div class="card card-default">
           <div class="card-header">

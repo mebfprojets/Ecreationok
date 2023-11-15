@@ -67,6 +67,10 @@ Route::post('/storetest', [TestsController::class, 'store'])->name("testdemande"
 Route::get('/email/existe', [UserController::class,'email_existe'])->name('email_existe');
 // Demande update
 Route::put('demande/update/{id}', [DemandeController::class, 'update_demande'])->name('demande.update');
+Route::put('demande/update/promoteur/{id}', [DemandeController::class, 'update_rejet'])->name('update.promoteur');
+
+// Usager update
+Route::put('usager/update/{id}', [DemandeController::class, 'update_usager'])->name('usager.update');
 
 //Facture
 Route::get('/facture/demande/{id}', [DemandeController::class,'facture'])->name('demande.facture');
@@ -104,6 +108,7 @@ Route::get('/backend/liste/rejet', [DemandeController::class, 'liste_demande_rej
 Route::get('/backend/detail/{id}', [DemandeController::class,'detail_backend'])->name('detail.demande');
 Route::get('/backend/valider/demande/{id}', [DemandeController::class, 'valider_demande'])->name("valider.demande");
 Route::get('/home', [DemandeController::class, 'index_admin'])->name("dashboard");
+Route::get('/liste/filtre', [DemandeController::class, 'liste_filtre'])->name("liste.filtre");
 
 // Route::middleware([
 //     'auth:sanctum',

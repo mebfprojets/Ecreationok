@@ -2,9 +2,7 @@
 @section('content')
 <div class="card">
               <div class="card-header">
-               <strong><h3 class="card-title">
-                Liste des Demandes
-              </h3></strong>
+               <strong><h3 class="card-title">Liste des Demandes</h3></strong>
               </div>
               <form action="">
                 <select name="" id="">
@@ -49,7 +47,7 @@
                   </thead>
                   <tbody>
                   @php
-                    $i=0; 
+                    $i=0;
                   @endphp
                    @foreach ($demandes as $demande)
                         @php
