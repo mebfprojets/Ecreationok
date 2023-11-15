@@ -16,9 +16,11 @@
   <form action="{{ route('demande.update',$demandes->id)}}" method="post">
                   {{ csrf_field() }}
                   {{ method_field('PUT') }}
-                  <center><a  style="margin-left:10px;" href="#modal-confirm" data-toggle="modal" data-dismiss="modal" id="declaration_edit"  class="btn btn-md btn-success declaration edit_demande" > <i class="fa fa-check-circle"></i> Valider </a>
+        @if($demandes->organisation_code== Auth::user()->organisation)
+            <center><a  style="margin-left:10px;" href="#modal-confirm" data-toggle="modal" data-dismiss="modal" id="declaration_edit"  class="btn btn-md btn-success declaration edit_demande" > <i class="fa fa-check-circle"></i> Valider </a>
             <a  style="margin-left:10px;" id="declaration_edit" href="#modal-confirm-rejet" data-toggle="modal" data-dismiss="modal" style="display:none" class="btn btn-md btn-danger declaration save_demande" > <i class="fa fa-window-close"></i> Rejéter </a>
           </center>
+        @endif
         <div class="card card-default">            
           <div class="card-header">
             <h2 class="card-title btn btn-tool" data-card-widget="collapse">Entreprise</h2>

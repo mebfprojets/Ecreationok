@@ -1,4 +1,5 @@
 @extends('backend.adminlte.main')
+@section('dashboard', 'active')
 @section('content')
     <!-- Main content -->
     <section class="content">
@@ -10,7 +11,6 @@
             <div class="small-box bg-info">
               <div class="inner">
                 <h3>{{$nbr}}</h3>
-
                 <p>Demandes</p>
               </div>
               <div class="icon">
@@ -66,9 +66,7 @@
           </div>          
           <!-- ./col -->
         </div>
-        <!-- /.row -->
-        <!-- Main row -->
-        <!-- /.row (main row) -->
+        
       </div><!-- /.container-fluid -->
     </section>
     <div class="card">                           

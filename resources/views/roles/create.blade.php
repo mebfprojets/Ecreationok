@@ -1,6 +1,6 @@
-@extends("backend.adminlte.home")
-{{-- @section('administration', 'active')
-@section('administration-parametre', 'active') --}}
+@extends("backend.adminlte.main")
+@section('administration', 'menu-open')
+@section('administration-role', 'active') 
 {{-- @section('blank')
     <li>Accueil</li>
     <li>Roles</li>
@@ -11,7 +11,7 @@
         <div class="row">
             <div class="card card-success col-md-8 col-md-offset-2">
                 <div class="card-header">
-                  <h3 class="card-title">Modifier une permission</h3>
+                  <h3 class="card-title">Créer un rôle</h3>
                 </div>
                 <div class="card-body">
                     <form id="form-validation" method="POST"  action="{{route('role.store')}}" class="form-horizontal form-bordered">

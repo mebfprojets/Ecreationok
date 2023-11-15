@@ -14,7 +14,7 @@ class AddColumnOrganisationToUsers extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->bigInteger("organisation")->nullable();
+            $table->string("organisation")->nullable();
         });
     }
 

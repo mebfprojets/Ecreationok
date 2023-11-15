@@ -28,9 +28,9 @@ class ValeurPolicy
      * @param  \App\Models\Valeur  $valeur
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, Valeur $valeur)
+    public function view(User $user)
     {
-        //
+        return $this->getPermission($user,12);
     }
 
     /**
@@ -41,29 +41,28 @@ class ValeurPolicy
      */
     public function create(User $user)
     {
-        //
+        return $this->getPermission($user,11);
     }
 
     /**
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Valeur  $valeur
+     * @param  \App\Models\Permission  $permission
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, Valeur $valeur)
+    public function update(User $user)
     {
-        //
+        return $this->getPermission($user,5);
     }
-
     /**
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Valeur  $valeur
+     * @param  \App\Models\Permission  $permission
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, Valeur $valeur)
+    public function delete(User $user)
     {
         //
     }
@@ -72,10 +71,10 @@ class ValeurPolicy
      * Determine whether the user can restore the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Valeur  $valeur
+     * @param  \App\Models\Permission  $permission
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, Valeur $valeur)
+    public function restore(User $user)
     {
         //
     }
@@ -84,11 +83,21 @@ class ValeurPolicy
      * Determine whether the user can permanently delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Valeur  $valeur
+     * @param  \App\Models\Permission  $permission
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, Valeur $valeur)
+    public function forceDelete(User $user)
     {
-        //
+
     }
+public function getPermission($user,$permission_id){
+        foreach($user->roles as $user_role){
+            foreach($user_role->permissions as $permission_role){
+                if($permission_role->id == $permission_id){
+                    return true;
+                }
+        }
+    }
+    return false;
+}
 }

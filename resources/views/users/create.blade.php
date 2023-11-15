@@ -1,11 +1,7 @@
 @extends("backend.adminlte.main")
-{{-- @section('administration', 'active')
-@section('administration-user', 'active') --}}
-{{-- @section('blank')
-    <li>Accueil</li>
-    <li>Utilisateurs</li>
-    <li><a href="">Creer</a></li>
-@endsection --}}
+@section('administration', 'menu-open')
+@section('administration-user', 'active') 
+
 @section('content')
 <div class="container">
     <div class="row">
@@ -54,7 +50,7 @@
                                                 <option value="">Sélectionner une zone</option>
                                                     <option value="001000">Central</option>
                                                         @foreach ($organisations as $organisation)
-                                                            <option value="{!!old('organisation') ?? $organisation->id!!}">{{ $organisation->Ville}}
+                                                            <option value="{!!old('organisation') ?? $organisation->CodeOrganisation!!}">{{ $organisation->Ville}}
                                                             </option>
                                                             @endforeach
                                                         </select>

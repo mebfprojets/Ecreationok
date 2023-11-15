@@ -1,12 +1,8 @@
-@extends("backend.adminlte.home")
-{{-- @section('administration', 'active')
-@section('administration-parametre', 'active') --}}
+@extends("backend.adminlte.main")
+@section('administration', 'menu-open')
+@section('administration-permission', 'active') 
 @section('content')
-    {{-- @section('blank')
-    <li>Accueil</li>
-    <li>Permissions</li>
-    <li><a href="">Nouveau</a></li>
-@endsection  --}}
+
     <div class="container">
         <div class="row">
             <div class="card card-success col-md-8 col-md-offset-2">

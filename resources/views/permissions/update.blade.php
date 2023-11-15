@@ -1,8 +1,8 @@
-@extends("backend.adminlte.home")
-{{-- @section('administration', 'active')
-@section('administration-parametre', 'active')
+@extends("backend.adminlte.main")
+@section('administration', 'menu-open')
+@section('administration-permission', 'active')
 @section('content')
-@section('blank')
+{{--@section('blank')
     <li>Accueil</li>
     <li>Permissions</li>
     <li><a href="">Modifier</a></li>

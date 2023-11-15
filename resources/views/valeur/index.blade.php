@@ -1,18 +1,16 @@
-@extends('layouts.admin')
-@section('administration', 'active')
+@extends("backend.adminlte.main")
+@section('administration', 'menu-open')
 @section('administration-valeur', 'active')
 @section('content')
-<div class="block full">
-    <div class="block-title">
-        <h2><strong>Liste</strong> des valeur</h2>
-        <a href="{{ route('valeurs.create') }}" class="btn btn-success pull-right"><span><i class="fa fa-plus"></i></span>valeurs</a>
+<div class="card card-success col-md-12 col-md-offset-2">
+    <div class="card-header">
+      <h3 class="card-title">Liste des valeurs</h3>
     </div>
-    <div class="row">
+    <a href="{{ route('valeurs.create') }}" class="btn btn-success col-md-2 pull-right"><span><i class="fa fa-plus"></i></span>Parametres</a>
 
-        <div class="row">
-        <div class="form-group">
-            <label  class="col-md-3 control-label" for="parametre">Parametre concerné <span class="text-danger">*</span> :</label>
-            <div class="col-md-9">
+        <div class="form-group mt-2 row" >
+            <label  class="col-md-4 control-label" for="parametre">Parametre concerné <span class="text-danger">*</span> :</label>
+            <div class="col-md-8">
                 <select   id="parametre" name="parametre"  class="form-control select-select2" onchange="changelistevale();">
                     <option></option>
 
@@ -21,9 +19,9 @@
                     @endforeach
                 </select>
             </div>
-        </div>
+        
     </div>
-    </div>
+
 
     <div class="table-responsive">
         <table id="listepdf" class="table table-vcenter table-condensed table-bordered listepdf">
