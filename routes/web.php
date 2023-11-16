@@ -112,6 +112,9 @@ Route::get('/backend/detail/{id}', [DemandeController::class,'detail_backend'])-
 Route::get('/backend/valider/demande/{id}', [DemandeController::class, 'valider_demande'])->name("valider.demande");
 Route::get('/home', [DemandeController::class, 'index_admin'])->name("dashboard");
 Route::get('/liste/filtre', [DemandeController::class, 'liste_filtre'])->name("liste.filtre");
+Route::get('/piecejointe/liste/{piecejointe}', [DemandeController::class, 'showpj'])->name("show.pj");
+Route::get('/piecejointe/edit/{piecejointe}', [DemandeController::class, 'editpj'])->name("edit.pj");
+Route::post('/piecejointe/update/{piecejointe}', [DemandeController::class, 'updatepj'])->name("update.pj");
 
 // Route::middleware([
 //     'auth:sanctum',

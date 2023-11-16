@@ -318,14 +318,10 @@
         <div class="card card-default">
           <div class="card-header">
             <h3 class="card-title">Pièces Jointes</h3>
-
             <div class="card-tools">
               <button type="button" class="btn btn-tool" data-card-widget="collapse">
                 <i class="fas fa-minus"></i>
               </button>
-              <!-- <button type="button" class="btn btn-tool" data-card-widget="remove">
-                <i class="fas fa-times"></i>
-              </button> -->
             </div>
           </div>
           <!-- /.card-header -->
@@ -336,8 +332,8 @@
                 <div class="input-group">
                 <!-- <label>Nom Pièce</label> -->
                 <input class="form-control"  disabled="disabled" type="text" value="{{$piecejointe->type_piece}}">
-                <a href="#updatepiecejointe" style="margin-left:10px;" id="declaration_edit"  data-toggle="modal" class="btn btn-md btn-success declaration" onclick="editpiecejointe('declaration')" > <i class="fas fa-pen"></i> </a>
-                <a href="{{ route('detaildocument') }}?categoriepiece=declaration" style="margin-left:10px;" id="declaration_view"   class="btn btn-md btn-success declaration_view"> <i class="fas fa-eye"></i> </a>
+                <a href="{{ route('edit.pj',$piecejointe) }}" style="margin-left:10px;"  class="btn btn-md btn-success declaration" > <i class="fas fa-pen"></i> </a>
+                <a href="{{ route('show.pj',$piecejointe) }}" style="margin-left:10px;" target="_blank"   class="btn btn-md btn-success "> <i class="fas fa-eye"></i> </a>
                 
                 <!-- <a href="{{ route('detaildocument',$piecejointe->id)}}"title="Visualiser le document" class="btn btn-xs btn-default" ><i class="fa fa-eye"></i> </a> -->
                   <!-- <label>Nom et Prénom</label>

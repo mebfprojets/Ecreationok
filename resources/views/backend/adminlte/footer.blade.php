@@ -58,12 +58,28 @@
 <script src="{{asset('adminlte/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js')}}"></script>
 
 
+
+
+
 <!-- AdminLTE App -->
 <script src="{{asset('adminlte/dist/js/adminlte.js')}}"></script>
 <!-- AdminLTE for demo purposes -->
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 <script src="{{asset('adminlte/dist/js/pages/dashboard.js')}}"></script>
+<script src="{{asset('backend/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js')}}"></script>
 
+
+<script>
+  $(function(){
+      $('.date_piecejointe').datepicker({
+              autoclose: true,
+              endDate: new Date(),
+              language: 'fr',
+              dateFormat: 'dd-mm-yy',
+             
+  });
+  });
+</script>
 <script>
   $(function () {
     $("#example1").DataTable({

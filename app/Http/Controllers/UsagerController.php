@@ -82,7 +82,6 @@ class UsagerController extends Controller
             'LieuNaissance' => $request['lieu_de_naissance'], 
             'IdFonction' => $request['profession'],
             'SituationMatrimoniale' => $request['situation_matrimoniale'],
-            //'RegimeMatrimoniale' => $request['regime_matrimoniale'],
             'IdCategorieUsager' => 4,
             "Nationality_No_"=>$request['nationalite_usager'],
             "Country_Code"=>$request['pays_usager'],
@@ -121,7 +120,6 @@ class UsagerController extends Controller
         {
             $date = new \DateTime();
             $pj= PieceJointe::create([
-                
                 'usager_id'=>$usager->id,
                 'type_piece'=> 'acte_mariage',
                 'url'=> $file_url,
@@ -200,7 +198,7 @@ class UsagerController extends Controller
         }
         //Ce controle permet de savoir si c'est un usager qui est créer pour une demande ou un usager creer pour completer mles information d'un autre usager 
         //tel que le conjoint ou autre
-    if( $request['lieu_de_naissance'] != null){             
+    if( $request ['province_usager'] != null){             
         return redirect()->route('create.demande');      
     }
    

@@ -82,4 +82,7 @@ class PieceJointeController extends Controller
     {
         //
     }
+    public function detaildocument(Piecejointe $piecejointe){
+        return view("document.show", compact('piecejointe'));
+    }
 }
