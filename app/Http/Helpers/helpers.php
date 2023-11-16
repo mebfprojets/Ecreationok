@@ -10,12 +10,12 @@ if (!function_exists('returnpieceinfos')) {
         {
             $usager= Usager::where('user_id',Auth::user()->id)->first();
             //$piecejointe= PieceJointe::where('usager_id',$usager->id)->where('categorie_piece', $categorie_piece )->first();
-            if($categorie_piece != 'piece_didentite'){
+            // if($categorie_piece != 'piece_didentite'){
                 $piecejointe= PieceJointe::where('usager_id',$usager->id)->where('demande_id',null)->where('categorie_piece', $categorie_piece )->first();
-            }
-            else{
-                $piecejointe= PieceJointe::where('usager_id',$usager->id)->where('categorie_piece', $categorie_piece )->first();
-            }
+            // }
+            // else{
+            //     $piecejointe= PieceJointe::where('usager_id',$usager->id)->where('categorie_piece', $categorie_piece )->first();
+            // }
             if($piecejointe){
                 return true;
             }

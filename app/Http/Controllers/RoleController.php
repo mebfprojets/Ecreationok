@@ -21,14 +21,14 @@ class RoleController extends Controller
      */
     public function index()
     {
-             if (Auth::user()->can('role.view')) {
+            //  if (Auth::user()->can('role.view')) {
                 $roles=Role::orderBy('updated_at', 'desc')->get();
                 return view('roles.index',compact('roles'));
-             }
-             else{
-                 flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
-                 return redirect()->back();
-             }
+            //  }
+            //  else{
+            //      flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
+            //      return redirect()->back();
+            //  }
        
     }
 
@@ -90,7 +90,7 @@ class RoleController extends Controller
      */
     public function edit(Role $role)
     {
-         if (Auth::user()->can('role.create')) {
+         if (Auth::user()->can('role.update')) {
             $permissions=Permission::all()->where('supprimer', '!=', 1 );
             return view('roles.update', compact('role', 'permissions'));
          }
@@ -114,7 +114,7 @@ class RoleController extends Controller
             'nom'=>$request['nom'],
         ]);
         $role->permissions()->sync($request->permissions);
-        flash("Role modifié avec success!!!")->error();
+        flash("Role modifié avec success!!!")->success();
         return redirect(route('role.index'));
      }
      else{

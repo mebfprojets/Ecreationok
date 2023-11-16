@@ -98,6 +98,7 @@ class DemandeController extends Controller
             $FJ_GIE= DB::table('forme_juridiques')->where('company_type','GIE')->get();
             $usage_terrains= DB::table('usage_terrains')->get();
             $all_usagers= Usager::all();
+            $civilites=DB::table('valeurs')->where('parametre_id',15)->get();
     
             $prestation_PPs= Prestation::where('type_demande','P1')->get();
             $prestation_PPs= $prestation_PPs->unique('type');
@@ -107,12 +108,12 @@ class DemandeController extends Controller
             $demandes=Demande::where('usager_id', $usager->id)->orderby('created_at','desc')->get();
             $c=count($demandes);
             return view('demande.test' ,compact('piecejointe_enrs','regions', 'pays','fonctions','activites','prestation_PPs','prestation_PMs',
-            'FJ_EI','FJ_ES','FJ_GIE','usager','activites_secondaires','pays','all_usagers','usage_terrains','c','nbr_demande_pp'));
+            'FJ_EI','FJ_ES','FJ_GIE','usager','activites_secondaires','pays','all_usagers','usage_terrains','c','nbr_demande_pp','civilites'));
         }
         else{
             $c=0;
             return view('demande.test' ,compact('piecejointe_enrs','regions', 'pays','fonctions','activites','prestation_PPs','prestation_PMs',
-            'FJ_EI','FJ_ES','FJ_GIE','usager','activites_secondaires','pays','all_usagers','usage_terrains','c','nbr_demande_pp'));
+            'FJ_EI','FJ_ES','FJ_GIE','civilites','usager','activites_secondaires','pays','all_usagers','usage_terrains','c','nbr_demande_pp'));
         }
         }
         //$usager= Usager::where('user_id',Auth::user()->id)->first();
@@ -164,7 +165,7 @@ class DemandeController extends Controller
        // $num=$request->type_request.
         //Pour la signature        
             //$path = 'C:\wamp64/www/Zip Ecreation/Ecreation_sanou/storage/app/public/files/Signature/';
-            $path='C:\wamp64/www/Ecreationok/storage/app/public/files/'.$usager->id.'/';
+            $path='C:\xampp/htdocs/Ecreationok/storage/app/public/files/'.$usager->id.'/';
          //$request->signed->store('public','upload');
         // $path = Storage::putFile('photos', new File('public/upload/'));
         // $path = $request->file('signed')->store('upload', 'public');
@@ -325,7 +326,7 @@ class DemandeController extends Controller
         ]);
         //dd($demande);
         // Mise à jour de la table pièce jointe
-        $pieces= PieceJointe::where('usager_id',$usager->id)->where('demande_id',null)->where('categorie_piece', '!=' ,'piece_didentite')->get();
+        $pieces= PieceJointe::where('usager_id',$usager->id)->where('demande_id',null)->get();
             foreach($pieces as $piece){
                 $piece->update([
                     'demande_id'=> $demande->id
@@ -548,7 +549,6 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             if($type_doc==null){
                 $type_doc=$piecejointe->type_piece;
             }
-            
             $file = $request->file('piece_jointe_u');
             $extension=$file->getClientOriginalExtension();
             $fileName = $type_doc.'.'.$extension;
@@ -872,4 +872,31 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
                ]);
                return redirect()->back();            
         }
+        public function showpj(Piecejointe $piecejointe){
+            //dd($piecejointe);
+            return view("demande.showPj", compact('piecejointe'));
+        }
+        public function editpj(Piecejointe $piecejointe){
+            return view("demande.editPj", compact('piecejointe'));
+        }
+        public function updatepj(Piecejointe $piecejointe, Request $request){
+            $type_doc=$piecejointe->type_piece;
+            $usager= $piecejointe->demande->usager;
+            $file = $request->file('piece_jointe_u');
+            $extension=$file->getClientOriginalExtension();
+            $fileName = $type_doc.'.'.$extension;
+            $emplacement='public/files/'.$usager->id;
+            $file_url= $request['piece_jointe_u']->storeAs($emplacement, $fileName);
+            $url_local=$usager->id.'/'.$fileName;
+           
+            $pj= $piecejointe->update([
+                'url'=> $file_url,
+                'numero'=> $request->numero_ref,
+                'date_etablissement'=> $request->date_detablissment,
+                'lieu_etablissement' => $request->lieu_etablissment,
+                'url_local'=>$url_local
+            ]);
+            return redirect()->route("detail.demande", ['id'=>$piecejointe->demande->id]);
+        }
+        
 }

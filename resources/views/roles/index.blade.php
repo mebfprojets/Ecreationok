@@ -8,7 +8,7 @@
       <h3 class="card-title">Lister les rôles</h3>
     </div>
     @can('user.create', Auth::user()) 
-     <a href="{{ route('role.create') }}" class="btn btn-success col-md-2 pull-right"><span><i class="fa fa-plus"></i></span> Rôle</a>
+     <a href="{{ route('role.create') }}" class="btn btn-success col-md-2 pull-right mt-2"><span><i class="fa fa-plus"></i></span> Rôle</a>
    @endcan
 <div class="table-responsive">
 <table class="table table-vcenter table-condensed table-bordered listepdf">
@@ -25,7 +25,7 @@
                     <td class="text-center">
                             <div class="btn-group">
                              {{-- @can('role.update', Auth::user()) --}}
-                                <a href="{{ route('role.edit',$role) }}" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
+                                <a href="{{ route('role.edit',$role) }}" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-default"><i class="fa fa-edit"></i></a>
                             {{-- @endcan --}}
                             @can('role.delete',Auth::user())
                                 <a href="#modal-confirm-delete" onclick="delConfirm({{ $role->id }});" data-toggle="modal" title="Supprimer" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>

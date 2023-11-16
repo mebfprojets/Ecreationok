@@ -84,7 +84,6 @@
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="val_username">N° Pièce d'identitié (<font color="red">*</font>)</label>
                                                                     <input type="text" id="" name="numero_piece" class="form-control"  placeholder="Numéro NIP de la CNIB ou N°Passport .." value="{{old('numero_piece')}}" required>
-                                                                   
                                                                 </div>
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="val_username">Situation matrimoniale (<font color="red">*</font>)</label>
@@ -429,7 +428,7 @@
                         <div class="col-lg-6">
                             <div class="mb-3">
                             <label class="form-label" for="example-chosen" >Genre</label>
-                            <select id="genre" name="genre_usager" class="form-control select2" data-placeholder="Choisir le genre" style="width: 100%;" required="Ce champ est obligatoire" title="Ce champ est obligatoire" required>
+                            <select id="genre" name="genre_usager" class="form-control" data-placeholder="Choisir le genre" style="width: 100%;" required="Ce champ est obligatoire" title="Ce champ est obligatoire" required>
                                     <option></option>
                                     <option value="1" {{ old('genre') == 1 ? 'selected' : '' }}>Féminin</option>
                                     <option value="2" {{ old('genre') == 2 ? 'selected' : '' }}>Masculin</option>
@@ -441,16 +440,8 @@
                             <div class="mb-3">
                                 <label class="form-label" for="val_username">Prénom (s)</label>
                                     <input type="text" id="prenom" name="prenom_usager" class="form-control" value="{{old('prenom')}}"placeholder="Entrez le prenom.." required="Ce champ est obligatoire" onchange="this.value = this.value.charAt(0).toUpperCase()+ this.value.substr(1);">
-                                <!-- <input type="text" name="prenom_usager" class="form-control" id="progress-basicpill-vatno-input" > -->
                             </div>
                         </div>   
-                        {{-- <div class="col-lg-6">
-                            <div class="mb-3" id="datepicker1">
-                                <label class="form-label" for="progress-basicpill-vatno-input">Date de naissance</label>
-                                <input type="text" name="date_de_naissance" value="{{old('date_de_formalisation')}}" required class="form-control" placeholder="dd-mm-yyyy"
-                                    data-date-format="dd-mm-yyyy" data-date-container='#datepicker1' data-provide="datepicker">
-                            </div>
-                        </div> --}}
                         <div class="col-lg-6">
                             <div class="mb-3">
                                 <label class="form-label" for="val_username">Civilité</label>
@@ -462,12 +453,30 @@
                                 </select>
                             </div>
                         </div> 
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="val_username">Date de naissance</label>
+                                <input type="text" name="date_de_naissance" value="{{old('date_de_naissance')}}" required class="form-control date_nais_usager" placeholder="dd-mm-yyyy"
+                                data-date-format="dd-mm-yyyy">
+                            </div>
+                        </div>  
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="val_username">Lieu de naissance</label>
+                                <input type="text" id="lieu_de_naissance" name="lieu_de_naissance" class="form-control" value="{{old('lieu_de_naissance')}}"placeholder="Entrez le lieu de naissance .." required="Ce champ est obligatoire">
+                            </div>
+                        </div> 
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label class="form-label" for="val_username">N° Pièce d'identitié (<font color="red">*</font>)</label>
+                            <input type="text" id="" name="numero_piece" class="form-control"  placeholder="Numéro NIP de la CNIB ou N°Passport .." value="{{old('numero_piece')}}" required>
+                        </div>
+                    </div>
                     </div>
                  </fieldset> <br><br><br>  
                  <fieldset style="width:100%;  margin-top:30px;">
                     <legend><span class="legend-fieldest">Adresse</span></legend>
                     <div class="row">
-                    
                         <div class="col-lg-6">
                             <div class="mb-3">                                                                    
                             <label class=" control-label" for="example-chosen">Nationalité (<font color="red">*</font>)</label>

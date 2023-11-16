@@ -6,12 +6,13 @@
         <div class="row">
                     <div class="card card-success col-md-12 col-md-offset-2">
                         <div class="card-header">
-                          <h3 class="card-title">Créer un utilisateur</h3>
+                          <h3 class="card-title">Liste des utilisateurs</h3>
                         </div>
-                        <h2>Liste des <strong>Utilisateur</strong></h2>
                         @can('user.create', Auth::user()) 
-                          <a href="{{ route('user.create') }}" class="btn btn-success col-md-2 pull-right"><span><i class="fa fa-plus"></i></span> Utilisateur</a>
-                         @endcan
+                        <button href="{{ route('user.create') }}" class="btn btn-block btn-success col-md-2 mt-2" type="button"><span><i class="fa fa-plus"></i></span>User</button>
+                       @endcan
+                        
+                       
             
     
 <div class="table-responsive">
@@ -50,7 +51,7 @@
                     <td class="text-center">
                          @can('user.update',Auth::user()) 
                             <div class="btn-group">
-                                <a href="{{ route('user.edit',$user) }}" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-primary"><i class="fa fa-pencil"></i></a>
+                                <a href="{{ route('user.edit',$user) }}" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-primary"><i class="fa fa-edit"></i></a>
                             </div>
                          @endcan 
                     </td>

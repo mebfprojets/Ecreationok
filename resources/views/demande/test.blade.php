@@ -367,15 +367,34 @@ input {
                         </div> --}}
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label" for="val_username">Civilité</label>
+                                <label class="form-label" for="val_username">Civilités</label>
                                 <select id="single-select-field" name="civilite" class="form-control"  data-placeholder="Selectionnez la civilité" style="width: 100%;" required="Ce champ est obligatoire" title="Ce champ est obligatoire">
-                                    <option></option>
-                                    <option value="1" {{ old('civilite') == 1 ? 'selected' : '' }}>Monsieur</option>
-                                    <option value="2" {{ old('civilite') == 1 ? 'selected' : '' }}>Madame</option>
-                                    <option value="3" {{ old('civilite') == 2 ? 'selected' : '' }}>Mademoiselle</option>
+                                <option></option>
+                                    @foreach ($civilites as $civilite )
+                                           <option value="{{ $civilite->code }}">{{ $civilite->libelle }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div> 
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="val_username">Date de naissance</label>
+                                <input type="text" name="date_de_naissance" value="{{old('date_de_naissance')}}" required class="form-control date_nais_usager" placeholder="dd-mm-yyyy"
+                                data-date-format="dd-mm-yyyy">
+                            </div>
+                        </div>  
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="val_username">Lieu de naissance</label>
+                                    <input type="text" id="prenom" name="lieu_de_naissance" class="form-control" value="{{old('lieu_de_naissance')}}"placeholder="Entrez le lieu de naissance.." required="Ce champ est obligatoire" onchange="this.value = this.value.charAt(0).toUpperCase()+ this.value.substr(1);">
+                            </div>
+                        </div> 
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label class="form-label" for="val_username">N° Pièce d'identitié (<font color="red">*</font>)</label>
+                            <input type="text" id="" name="numero_piece" class="form-control"  placeholder="Numéro NIP de la CNIB ou N°Passport .." value="{{old('numero_piece')}}" required>
+                        </div>
+                    </div> 
                     </div>
                  </fieldset> <br><br><br>  
                  <fieldset style="width:100%;  margin-top:30px;">
