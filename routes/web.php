@@ -70,7 +70,7 @@ Route::post('/storetest', [TestsController::class, 'store'])->name("testdemande"
 Route::get('/email/existe', [UserController::class,'email_existe'])->name('email_existe');
 // Demande update
 Route::put('demande/update/{id}', [DemandeController::class, 'update_demande'])->name('demande.update');
-Route::put('demande/update/promoteur/{id}', [DemandeController::class, 'update_rejet'])->name('update.promoteur');
+Route::post('demande/update/promoteur/{id}', [DemandeController::class, 'update_rejet'])->name('update.promoteur');
 
 // Usager update
 Route::put('usager/update/{id}', [DemandeController::class, 'update_usager'])->name('usager.update');

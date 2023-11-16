@@ -1,30 +1,10 @@
 @extends('backend.adminlte.main')
+@section('dashboard', 'active')
 @section('content')
 <div class="card">
               <div class="card-header">
                <strong><h3 class="card-title">Liste des Demandes</h3></strong>
-              </div>
-              <form action="">
-                <select name="" id="">
-                <option value="" class="form-control">Statut</option>
-                <option value="1" class="form-control">Attente de Paiement</option>
-                <option value="2" class="form-control">En Traitement</option>
-                <option value="3" class="form-control">Traitement Terminé</option>
-                <option value="4" class="form-control">Demande Payée</option>
-                </select>
-                <select name="" id="">
-                <option value="" class="form-control">Type</option>
-                <option value="1" class="form-control">Personne Physique</option>
-                <option value="2" class="form-control">Personne Morale</option>
-                </select>
-                 <select name="" id="">
-                <option value="" class="form-control">Secteur d'activité</option>
-                <option value="1" class="form-control">COMMERCE</option>
-                <option value="2" class="form-control">INDUSTIRE</option>
-                <option value="1" class="form-control">ARTISANAT</option>
-                <option value="2" class="form-control">SERVICES</option>
-                </select>
-              </form>
+              </div>              
               <!-- /.card-header -->
               <div class="card-body">
                 <table id="example1" class="table table-bordered table-striped">

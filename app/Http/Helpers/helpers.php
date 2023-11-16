@@ -54,6 +54,15 @@ if (!function_exists('returnpieceinfos')) {
                     return $libelle;
             }
         }
+
+        if (!function_exists('getfonction')) {
+            function getfonction($id)
+                {
+                    $record = Valeur::where('code', $id)->where('parametre_id', 8)->first();
+                    $libelle = isset($record['libelle']) ? $record['libelle'] : "";
+                        return $libelle;
+                }
+            }
     
         if (!function_exists('getpays')) {
             function getpays($code)

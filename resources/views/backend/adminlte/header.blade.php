@@ -109,7 +109,7 @@
           <img src="{{asset('frontend/images/CEFORE.jpg')}}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block">Alexander Pierce</a>
+          <a href="#" class="d-block">{{Auth::user()->name}} {{Auth::user()->prenom}}</a>
         </div>
       </div>
       <!-- SidebarSearch Form -->
@@ -139,22 +139,24 @@
             
           </li>
           <li class="nav-item">
-            <a href="{{ route('list') }}?etat=0" class="nav-link @yield("liste-demande")">
+            <a href="{{ route('list') }}?etat=0" class="nav-link @yield("demande_a_valider")">
               <i class="nav-icon fas fa-th"></i>
               <p>
-                Liste des Demandes
+                Demandes à Valider
                 <!-- <span class="right badge badge-danger">New</span> -->
               </p>
             </a>
           </li>
           <li class="nav-item">
-          <a href="{{route('list.rejet')}}" class="nav-link">
+            <a href="{{route('list')}}?etat=1" class="nav-link @yield("demande_valider")">
               <i class="nav-icon fas fa-copy"></i>
               <p>
                 Demandes Validées
                 
               </p>
             </a>
+          </li>
+          <li class="nav-item">
             <a href="{{route('list.rejet')}}" class="nav-link @yield("liste-rejetee")">
               <i class="nav-icon fas fa-copy"></i>
               <p>

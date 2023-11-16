@@ -36,7 +36,7 @@
                                                                  <label class="form-label" style="color:red;" for="progress-basicpill-vatno-input">
                                                                  @if($demande->paye==0)
                                                                  Attente de paiement
-                                                                 @elseif($demande->paye==1 && $demande->etat==1)
+                                                                 @elseif($demande->paye==1 && $demande->etat==1 || $demande->etat==0 )
                                                                  Payée, En Traitement
                                                                  @elseif($demande->paye==1 && $demande->etat==2)
                                                                  Demande Rejétée

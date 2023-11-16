@@ -34,7 +34,7 @@ class DemandeController extends Controller
     {
         //$this->middleware('auth', ['except' => ['verifier_nom_commercial']]);
         $this->middleware('auth')->except(['verifier_nom_commercial','index','test','liste_demande',
-        'liste_demande_rejet','detail_backend','update_etat_demande']);
+        'liste_demande_rejet','detail_backend','update_etat_demande','update_rejet']);
     }
 
     public function test()
@@ -678,15 +678,25 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             $province_usager=DB::table('provinces')->where('id', $usager->Province_Code)->first();
             $region_usager=DB::table('regions')->where('id', $usager->Region_Code)->first();
            //$nationalite= Valeur::where('parametre_id', 5)->where('code', $usager->Nationality_No_)->first();
-        $regions_all=DB::table('regions')->get();
+            $regions_all=DB::table('regions')->get();
+            $FJ_EI= DB::table('forme_juridiques')->where('company_type','EI')->get();
+            $FJ_ES= DB::table('forme_juridiques')->where('company_type','ES')->get();
+            $FJ_GIE= DB::table('forme_juridiques')->where('company_type','GIE')->get();
            //    DB::table('activites')->where('id', $demandes->primary_activity)->first();
+           $activites_all= DB::select('select secteur_activite from activites group by secteur_activite');
+           $usage_terrains= DB::table('usage_terrains')->get();
+           $civilites=DB::table('valeurs')->where('parametre_id',15)->get();
            $demande=Demande::where('usager_id', $usager->id)->orderby('created_at','desc')->get();
+           $professions= DB::table('valeurs')->where('parametre_id',8)->orderby('libelle','asc')->get();
+           $nationalites= DB::table('valeurs')->where('parametre_id',6)->orderby('libelle','asc')->get();
+           $pays= DB::table('valeurs')->where('parametre_id',5)->orderby('libelle','asc')->get();
            $c=count($demande);
            $cefore=DB::table('organisations')->where('CodeOrganisation',$demandes->organisation_code)->first();
             $cefore_code=$cefore->Ville;
             return view('demande.detailtest', compact('demandes','usager','activites','forme_juridiques',
             'professions','regions','provinces','communes','arrondissements','secteurs','terrains','piecejointes',
-        'secteur_usager','province_usager','region_usager','c','cefore_code','regions_all'));       
+        'secteur_usager','province_usager','region_usager','c','cefore_code','regions_all','FJ_EI','FJ_ES','FJ_GIE',
+    'activites_all','usage_terrains','civilites','professions','nationalites','pays'));       
         
         }
 
@@ -746,12 +756,36 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             }
             $demande->chiffre_daffaire_previsionel=$request->chiffre_daffaire;
             $demande->objet_social=$request->objet_social;
+            if($request->forme_juridique_pp!=null){
+                $forme_juridique=$request->forme_juridique_pp;
+            }
+            elseif($request->forme_juridique_es!=null){
+                $forme_juridique=$request->forme_juridique_es;
+            }
+            elseif($request->forme_juridique_gie!=null){
+                $forme_juridique=$request->forme_juridique_gie;
+            }
+            $demande->forme_juridique=$forme_juridique;
+            $demande->activity_sector=$request->secteur_activite;
+            $demande->primary_activity=$request->activite_principale;
+            //$demande->region_code=$request->region_entreprise;
+            //Mise à jour du terrain
+            //dd($request->id_terrain);
+            $terrain=Terrain::find($request->id_terrain);
+            $terrain->numero_lot=$request->lot;
+            $terrain->numero_section=$request->section;
+            $terrain->numero_parcelle=$request->parcelle;
+            $terrain->id_usage_terrain=$request->usage;
+            $terrain->update();
+
             $demande->update();
             return redirect()->back();
+           
         }
 
         public function update_usager(Request $request, $id)
         {//
+            //dd($request->province_usager);
             $usager=Usager::find($id);                       
             $usager->update([
                 'NomRaisonSociale'=>$request->nom,
@@ -760,9 +794,17 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
                 'Phone_No_'=>$request->tel_mobile,
                 'Tel_Bureau'=>$request->tel_bureau,
                 'E-Mail'=>$request->mail,
-                'Boite_postale'=>$request->boite_postale
+                'Boite_postale'=>$request->boite_postale,
+                'titre' => $request->civilite,
+                'Civility' => $request->civilite,
+                'IdFonction'=>$request->profession,
+                'Nationality_No_'=>$request->nationalite_usager,
+                'Country_Code'=>$request->pays_usager,
+                'DateNaissance'=>$request->date_de_naissance,
+                'SituationMatrimoniale'=>$request->situation_matrimoniale,
+                // 'Region_Code'=>$request->region_usager,
+                // 'Province_Code'=>$request->province_usager
                ]);
-
             return redirect()->back();
         }
 
@@ -781,13 +823,16 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
         public function liste_demande(Request $request){
             $etat=$request->etat;
             if($etat==0){
+                $dem="demande_a_valider";
                 $demandes=Demande::where('paye', 1)->where('etat', 0)->get();
+            return view('backend.adminlte.liste', compact('demandes','dem'));
             }
             else{
+                $dem="demande_valider";
                 $demandes=Demande::where('paye', 1)->where('etat', 1)->get();
+            return view('backend.adminlte.liste', compact('demandes','dem'));
+
             }
-            //dd($demandes);
-            return view('backend.adminlte.liste', compact('demandes'));
         }
         public function liste_demande_rejet(){
             $demandes=Demande::where('etat', 2)->get();
@@ -855,17 +900,17 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
                    ]);
 //dd($details);
              Mail::to($email)->send(new NotifyRejet($details));
-
                    return redirect()->route('list');
             }
         }
         public function liste_filtre(Request $request){
             $statut=$request->paye;
             $demandes=Demande::where('paye', $statut)->get();
-            return view('backend.adminlte.liste', compact('demandes'));
+            return view('backend.adminlte.liste_demande', compact('demandes'));
         }
 
         public function update_rejet(Request $request, $id){
+            //dd($id);
             $demande=Demande::find($id);
             $demande->update([
                 'etat'=>0,             

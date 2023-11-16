@@ -18,8 +18,14 @@
                   {{ method_field('PUT') }}
         @if($demandes->organisation_code== Auth::user()->organisation)
             <center><a  style="margin-left:10px;" href="#modal-confirm" data-toggle="modal" data-dismiss="modal" id="declaration_edit"  class="btn btn-md btn-success declaration edit_demande" > <i class="fa fa-check-circle"></i> Valider </a>
-            <a  style="margin-left:10px;" id="declaration_edit" href="#modal-confirm-rejet" data-toggle="modal" data-dismiss="modal" style="display:none" class="btn btn-md btn-danger declaration save_demande" > <i class="fa fa-window-close"></i> Rejéter </a>
-          </center>
+            <a  style="margin-left:10px;" id="declaration_edit" href="#modal-confirm-rejet" data-toggle="modal" data-dismiss="modal" style="display:none" class="btn btn-md btn-danger declaration save_demande" > <i class="fa fa-window-close"></i> Rejéter </a><br></center>
+            @if($demandes->motif!="")
+            <label class="form-label" style="color:red; font-size:16px;" for="progress-basicpill-vatno-input">                              
+                              Motif du Rejet : {{$demandes->motif}}   <br>
+                              Envoyée Pour Traitement                           
+            </label>
+            @endif
+          
         @endif
         <div class="card card-default">            
           <div class="card-header">
