@@ -45,8 +45,8 @@
                     <td>{{$demande->primary_activity}}</td>
                     <td>{{$demande->objet_social}}</td>
                     <td>{{$demande->organisation_code}}</td>
-                    <td>{{$demande->created_at}}</td>
-                    <td>{{$demande->date_paiement}}</td>
+                    <td>{{format_date($demande->created_at)}}</td>
+                    <td>{{format_date($demande->date_paiement)}}</td>
                   </tr>
                   @endforeach
                   </tbody>

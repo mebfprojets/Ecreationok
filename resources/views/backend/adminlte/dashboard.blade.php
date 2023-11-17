@@ -2,6 +2,11 @@
 @section('dashboard', 'active')
 @section('content')
     <!-- Main content -->
+    <div class="block-title" style="margin-top:-50px;">
+                    <center><h2><strong>Tableau de Board</strong></h2></center>
+                    
+                </div>
+
     <section class="content">
       <div class="container-fluid">
         
@@ -73,7 +78,7 @@
               <div class="card-body">
                 <table id="example1" class="table table-bordered table-striped">
                   <thead>
-                  <tr>
+                  <tr style="background-color:#0b9e44; color:white">
                     <th>N°</th>
                     <th>Numero Demande</th>
                     <th>Promoteur</th>

@@ -81,7 +81,7 @@
                     <div class="mb-3 save_demande" style="display:none;">
                       <label class="form-label" for="progress-basicpill-cstno-input">Forme Juridique</label>
                       @if($demandes->request_type=="P1")
-                          <select id="forme_juridique_pp" name="forme_juridique_pp" data-placeholder="Choisir la forme juridique ..." class="form-control select" style="width: 100%;">
+                          <select id="forme_juridique_pp" name="forme_juridique_pp" data-placeholder="Choisir la forme juridique ..." class="form-control select2" style="width: 100%;">
                                <option value="{{$forme_juridiques->code}}">{{$forme_juridiques->libelle}}</option>
                                     @foreach ($FJ_EI as $FJ_PP )
                                <option value="{{ $FJ_PP->code }}">{{ $FJ_PP->libelle }}</option>
@@ -89,7 +89,7 @@
                           </select>
                       @endif
                       @if($demandes->request_type=="M1")
-                          <select id="forme_juridique_pp" name="forme_juridique_es" data-placeholder="Choisir la forme juridique ..." class="form-control select" style="width: 100%;">
+                          <select id="forme_juridique_pp" name="forme_juridique_es" data-placeholder="Choisir la forme juridique ..." class="form-control select2" style="width: 100%;">
                                <option value="{{$forme_juridiques->code}}">{{$forme_juridiques->libelle}}</option>
                                     @foreach ($FJ_ES as $FJ_PM )
                                <option value="{{ $FJ_PM->code }}">{{ $FJ_PM->libelle }}</option>
@@ -97,7 +97,7 @@
                           </select>
                       @endif
                       @if($demandes->request_type=="G1")
-                          <select id="forme_juridique_pp" name="forme_juridique_gie" data-placeholder="Choisir la forme juridique ..." class="form-control select" style="width: 100%;">
+                          <select id="forme_juridique_pp" name="forme_juridique_gie" data-placeholder="Choisir la forme juridique ..." class="form-control select2" style="width: 100%;">
                                <option value="{{$forme_juridiques->code}}">{{$forme_juridiques->libelle}}</option>
                                     @foreach ($FJ_GIE as $FJ_GI )
                                <option value="{{ $FJ_GI->code }}">{{ $FJ_GI->libelle }}</option>
@@ -110,7 +110,7 @@
                   <label>Secteur d'activité</label>
                   <input class="form-control edit_demande" disabled="disabled" type="text" value="{{$demandes->activity_sector}}">
                   <div class="mb-3 save_demande" style="display:none;">
-                      <select id="secteur_activite" name="secteur_activite"  class="form-control select" data-placeholder="Choisir le secteur ..." style="width: 100%;" onchange="changeActivite('secteur_activite','activite_principale');" required>                                                                          
+                      <select id="secteur_activite" name="secteur_activite"  class="form-control select2" data-placeholder="Choisir le secteur ..." style="width: 100%;" onchange="changeActivite('secteur_activite','activite_principale');">                                                                          
                           <option value="{{$demandes->activity_sector}}">{{$demandes->activity_sector}}</option>
                               @foreach ($activites_all as $activite )
                                 <option value="{{ $activite->secteur_activite }}">{{ $activite->secteur_activite }}</option>
@@ -123,7 +123,7 @@
                   <textarea class="form-control edit_demande" disabled="disabled" rows="2" placeholder="{{$activites->description}}"></textarea>
                   <div class="mb-3 save_demande" style="display:none;">
                       <!-- <label class="form-label" for="progress-basicpill-vatno-input">Activité Principale (<font color="red">*</font>)</label> -->
-                           <select id="activite_principale" name="activite_principale" data-placeholder="Choisir l'activité ..." class="form-control select activite_principale" style="width: 100%;">
+                           <select id="activite_principale" name="activite_principale" data-placeholder="Choisir l'activité ..." class="form-control select2 activite_principale" style="width: 100%;">
                                <option value="{{$activites->Code}}">{{$activites->description}}</option>                                                                            
                            </select>                                                                   
                   </div>
@@ -201,7 +201,7 @@
                   <label>Usage Terrain</label>
                   <input class="form-control edit_demande" disabled="disabled" type="text" value="{{$terrains->id_usage_terrain}}">
                     <div class="col-md-3 save_demande" style="display:none;">                     
-                               <select id="usage" name="usage" data-placeholder="Choisir l'usage" class="form-control select" style="width: 100%;" required>
+                               <select id="usage" name="usage" data-placeholder="Choisir l'usage" class="form-control select2" style="width: 100%;" required>
                                      <option value="{{$terrains->id_usage_terrain}}">{{$terrains->id_usage_terrain}}</option>
                                           @foreach ($usage_terrains as $usage_terrain )
                                      <option value="{{ $usage_terrain->Code }}">{{ $usage_terrain->Libelle }}</option>
@@ -257,7 +257,7 @@
         <!-- /.card -->
 </form>
         <!-- SELECT2 EXAMPLE -->
-        <form action="{{ route('usager.update',$usager->id)}}" method="post">
+    <form action="{{ route('usager.update',$usager->id)}}" method="post">
                   {{ csrf_field() }}
                   {{ method_field('PUT') }}
         <div class="card card-default">
@@ -444,6 +444,7 @@
           
         </div>
       </form>
+
         <div class="card card-default">
           <div class="card-header">
             <h3 class="card-title">Pièces Jointes</h3>

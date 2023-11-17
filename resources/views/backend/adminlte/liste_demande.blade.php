@@ -8,7 +8,7 @@
               <!-- /.card-header -->
               <div class="card-body">
                 <table id="example1" class="table table-bordered table-striped">
-                  <thead>
+                  <thead style="background-color:#0b9e44; color:white">
                   <tr>
                     <th>N°</th>
                     <th>Numero Demande</th>
@@ -45,8 +45,8 @@
                     <td>{{$demande->primary_activity}}</td>
                     <td>{{$demande->objet_social}}</td>
                     <td>{{$demande->organisation_code}}</td>
-                    <td>{{$demande->created_at}}</td>
-                    <td>{{$demande->date_paiement}}</td>
+                    <td>{{format_date($demande->created_at)}}</td>
+                    <td>{{format_date($demande->date_paiement)}}</td>
                   </tr>
                   @endforeach
                   </tbody>

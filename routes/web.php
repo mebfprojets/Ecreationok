@@ -111,6 +111,7 @@ Route::resource("role",RoleController::class);
 
 //Ajout BARRO
 Route::get('/backend/liste', [DemandeController::class, 'liste_demande'])->name("list");
+Route::get('/backend/statistique', [DemandeController::class, 'statistique'])->name("statistique");
 Route::get('/backend/liste/rejet', [DemandeController::class, 'liste_demande_rejet'])->name("list.rejet");
 Route::get('/backend/detail/{id}', [DemandeController::class,'detail_backend'])->name('detail.demande');
 Route::get('/backend/valider/demande/{id}', [DemandeController::class, 'valider_demande'])->name("valider.demande");

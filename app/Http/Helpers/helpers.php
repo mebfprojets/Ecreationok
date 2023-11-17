@@ -30,6 +30,11 @@ if (!function_exists('returnpieceinfos')) {
             return  date('d-m-Y', strtotime($date));
         }
     }
+    if(!function_exists('format_date2')){
+        function format_date2($date){
+            return  date('Y-m-d', strtotime($date));
+        }
+    }
     if(!function_exists('nbr_demande')){
         function nbr_demande(){
             $c=0;
