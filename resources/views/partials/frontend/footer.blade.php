@@ -169,6 +169,67 @@
         </div>
     </div>
 </div>
+<div id='updatepiecejointe_correction'class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg ">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" >Modifier une pièce jointe</h5>
+              <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <form action="{{ route('update.pjcorrect') }}" method="POST"  class="form-horizontal form-bordered" enctype="multipart/form-data">
+                  {{ csrf_field() }}
+                  <input type="hidden" id='piece_id_correct' name="piece_id_correct"  > 
+          <div class="row">
+              <div class="form-group col-md-6">
+                  <label class=" control-label" for="val_username">Numéro référence pièce</label>
+                      <div class="input-group" >
+                          <div class="input-group">
+                              <input type="text" id="reference_correct_piece_u" name="numero_ref"  class="form-control" required>
+                          </div>
+                      </div>
+              </div>
+              <div class="form-group col-md-6">
+                  <label class=" control-label" for="val_username">Date d'établissement</label>
+                      <div class="input-group" id="datepicker2">
+                          <!-- <input type="date" id="" name="date_detablissment" class="form-control " data-date-format="dd-mm-yyyy" placeholder="Date de naissance .." value="{{old('date_etablissment')}}" required > -->
+                          <input type="text" id="date_etablissement_correct_u" name="date_detablissment" required class="form-control date_piecejointe" placeholder="dd-mm-yyyy"
+                           data-date-format="dd-mm-yyyy"  data-provide="datepicker">
+                      </div>
+              </div>
+              <div class="form-group col-md-6">
+                  <label class=" control-label" for="val_username">Lieu d'établissment</label>
+                      <div class="input-group" >
+                          <!-- <input type="date" id="" name="date_detablissment" class="form-control " data-date-format="dd-mm-yyyy" placeholder="Date de naissance .." value="{{old('date_etablissment')}}" required > -->
+                          <div class="input-group">
+                              <input type="text" id="lieu_etablissement_correct_u" name="lieu_etablissment" class="form-control"  required>
+                          </div>
+                      </div>
+              </div>
+              
+          </div>
+          <div class="row">
+              <div class="form-group{{ $errors->has('piece_jointe') ? ' has-error' : '' }}">
+                  <label class=" control-label" for="piece_contractuelle">Joindre la piece<span class="text-success">*</span></label>
+                  <input class="form-control" type="file" id='piece_jointe_u' name="piece_jointe" id="piece_jointe" accept=".pdf, .jpeg, .png"   placeholder="Joindre une copie de l'ordre de service" >  
+                      @if ($errors->has('piece_jointe'))
+                      <span class="help-block">
+                          <strong>{{ $errors->first('piece_jointe') }}</strong>
+                      </span>
+                      
+                      @endif
+              </div>
+          </div> 
+          </div>
+          <div class="panel-footer text-center">
+              <input type="button" data-dismiss="modal"  class="btn btn-sm btn-warning"  value="Annuler">
+              <input  type="submit"   class="btn btn-sm btn-success"  value="Modifier">
+          </div>
+          
+      </form>
+      </div>
+  </div>
+</div>
   <div id="modal-piece_pp" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -486,9 +547,44 @@
       }
   </script>
   <script>
+      function editpiecejointes(categoriepiece){
+       // var id=id;     
+        console.log("categoriepiece")
+        var url = "{{ route('piecejointe.correct_piece') }}";
+                $.ajax({
+                    url: url,
+                    type:'GET',
+                    dataType:'json',
+                    data: {categoriepiece: categoriepiece} ,
+                    error:function(){alert('error');},
+                    success:function(data){
+                     $("#piece_name_update").html(data.categorie_piece);
+                        $("#piece_id_u").val(data.id);
+                        $("#piece_id_correct").val(data.id);
+                        
+                       $("#reference_piece_u").val(data.reference);
+                       $("#reference_correct_piece_u").val(data.reference); 
+                       $("#date_etablissement_correct_u").val(data.date_etablissement); 
+                       $("#lieu_etablissement_correct_u").val(data.lieu_etablissement);
+                       $("#date_etablissement_u").val(data.date_etablissement);
+                       $("#lieu_etablissement_u").val(data.lieu_etablissement);
+                       $('.type_document_u').val('');
+                       $('.type_document_u').val(data.type_piece);
+                       //alert($('.type_document_u').val());
+                       if(data.categorie_piece=='declaration')
+                       $('#type_piece_declaration_u').show()
+                       else
+                       $('#type_piece_declaration_u').hide()
+                       if(data.categorie_piece=='piece_didentite')
+                       $('#type_piece_identite_u').show()
+                       else
+                       $('#type_piece_identite_u').hide()
+                    }
+                });
+      }
       function editpiecejointe(categoriepiece){
-        var id=id;
-                
+       // var id=id;     
+        console.log("categoriepiece")
         var url = "{{ route('piecejointe.modif') }}";
                 $.ajax({
                     url: url,
@@ -497,10 +593,14 @@
                     data: {categoriepiece: categoriepiece} ,
                     error:function(){alert('error');},
                     success:function(data){
-                     // alert(data.reference);
                      $("#piece_name_update").html(data.categorie_piece);
                         $("#piece_id_u").val(data.id);
+                        $("#piece_id_correct").val(data.id);
+                        
                        $("#reference_piece_u").val(data.reference);
+                       $("#reference_correct_piece_u").val(data.reference); 
+                       $("#date_etablissement_correct_u").val(data.date_etablissement); 
+                       $("#lieu_etablissement_correct_u").val(data.lieu_etablissement);
                        $("#date_etablissement_u").val(data.date_etablissement);
                        $("#lieu_etablissement_u").val(data.lieu_etablissement);
                        $('.type_document_u').val('');

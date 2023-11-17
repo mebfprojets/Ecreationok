@@ -80,6 +80,8 @@ Route::get('/facture/demande/{id}', [DemandeController::class,'facture'])->name(
 
 Route::post('/load/piecejointe', [DemandeController::class, 'laodpiecejointe'])->name("piecejointe.laod");
 Route::get('piece/detail/', [DemandeController::class,'detaildocument'])->name('detaildocument');
+Route::get('piecejointe/afficher/{id}', [DemandeController::class,'detaildocument_affiche'])->name('detaildocument_affiche');
+
 Route::post('/update/piecejointe', [DemandeController::class, 'updatepiecejointe'])->name("piecejointe.update");
 Route::post('/verifier/nom_commercial', [DemandeController::class, 'verifier_nom_commercial'])->name("verifier_nom_commercial");
 
@@ -95,6 +97,8 @@ Route::get('/Valider/Paiement{iddemande}', [DemandeController::class, 'valider_p
 Route::post('/user/store', [UserController::class, 'store_user'])->name("user.store");
 Route::get('/tour', [DemandeController::class, 'ourr']);
 Route::get('piecejointe/modif',[DemandeController::class, 'modifier'] )->name('piecejointe.modif');
+Route::get('piecejointe/correct',[DemandeController::class, 'correct_piece'] )->name('piecejointe.correct_piece');
+
 Route::get('piecejointe/getall', [DemandeController::class, 'getallpiecejointe'])->name('piecejointe.getall');
 Route::post('reset_password_without_token',[AccountController::class, 'validatePasswordRequest']);
 Route::post('reset-password', [AccountController::class, 'resetPassword'])->name('reset.password.post');
@@ -115,6 +119,7 @@ Route::get('/liste/filtre', [DemandeController::class, 'liste_filtre'])->name("l
 Route::get('/piecejointe/liste/{piecejointe}', [DemandeController::class, 'showpj'])->name("show.pj");
 Route::get('/piecejointe/edit/{piecejointe}', [DemandeController::class, 'editpj'])->name("edit.pj");
 Route::post('/piecejointe/update/{piecejointe}', [DemandeController::class, 'updatepj'])->name("update.pj");
+Route::post('/piecejointecorrect/update', [DemandeController::class, 'updatepj_correct'])->name("update.pjcorrect");
 
 // Route::middleware([
 //     'auth:sanctum',

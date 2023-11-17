@@ -439,6 +439,45 @@ class DemandeController extends Controller
      );
      return json_encode($data);
  }
+ public function correct_piece(Request $request){
+    $usager= Usager::where('user_id',Auth::user()->id)->first();
+    $piecejointe= PieceJointe::where('usager_id',$usager->id)->where('categorie_piece', $request->categoriepiece)->first();
+    $data = array(
+     'id'=>$piecejointe->id,
+     'type_piece'=>$piecejointe->type_piece,
+     'categorie_piece'=>$piecejointe->categorie_piece,
+     'reference'=>$piecejointe->numero,
+     'date_etablissement'=> format_date($piecejointe->date_etablissement),
+     'lieu_etablissement'=>$piecejointe->lieu_etablissement,
+ );
+ return json_encode($data);
+}
+public function updatepj_correct(Request $request){
+    $usager= Usager::where('user_id',Auth::user()->id)->first();
+    if ($request->hasFile('piece_jointe')) {
+        $piecejointe= PieceJointe::find($request->piece_id_correct);
+        $file = $request->file('piece_jointe');
+        $extension=$file->getClientOriginalExtension();
+        $fileName = $piecejointe->type_piece.'.'.$extension;
+        $emplacement='public/files/'.$usager->id;
+        $file_url= $request['piece_jointe']->storeAs($emplacement, $fileName);
+        $url_local=$usager->id.'/'.$fileName;
+        $pj= $piecejointe->update([
+            'url'=> $file_url,
+            'numero'=> $request->numero_ref,
+            'date_etablissement'=> $request->date_detablissment,
+            'lieu_etablissement' => $request->lieu_etablissment,
+            'url_local'=>$url_local
+           // 'categorie_piece'=> $request->categorie_piece
+        ]);
+    
+    }
+    if ($pj) {
+       // $data_json= array('data'=>'success','status'=>'201', 'type_doc'=>$type_doc);
+        return redirect()->back();
+    }
+    
+}
  public function verifier_nom_commercial(Request $request){
     if (isset($request['nom_commercial'])) {
         $nom_commercial = $request['nom_commercial'];
@@ -595,6 +634,11 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
         // ]);
        return $path = Storage::download($piecejointe->url);
        
+    }
+    public function detaildocument_affiche($id){
+        $piecejointe= PieceJointe::find($id);
+        return $path = Storage::download($piecejointe->url);
+
     }
     public function getallpiecejointe(){
         $usager= Usager::where('user_id',Auth::user()->id)->first();

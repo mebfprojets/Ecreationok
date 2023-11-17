@@ -116,7 +116,7 @@ $(document).ready(function () {
                 console.log(formData);
                 var url = '{{ route("piecejointe.update") }}';
                 $.ajax({
-                    url: 'http://127.0.0.1:8000/update/piecejointe',
+                    url: 'http://127.0.0.1:4000/update/piecejointe',
                     type: "POST",
                    // enctype: 'multipart/form-data',
                     data: formData,
