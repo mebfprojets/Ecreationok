@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Usager;
 use App\Models\User;
+use App\Models\Historique;
 use App\Models\Demande;
 use App\Models\DemandeDirigeant;
 use App\Models\Terrain;
@@ -34,7 +35,7 @@ class DemandeController extends Controller
     {
         //$this->middleware('auth', ['except' => ['verifier_nom_commercial']]);
         $this->middleware('auth')->except(['verifier_nom_commercial','index','test','liste_demande',
-        'liste_demande_rejet','detail_backend','update_etat_demande','update_rejet']);
+        'liste_demande_rejet','update_etat_demande','update_rejet']);
     }
 
     public function test()
@@ -809,33 +810,66 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
         }
 
         public function index_admin(){
-            $demandes=Demande::all();
-            $paye=Demande::where('paye', 1)->get();
-            $nbr_paye=count($paye);
-            $nonpaye=Demande::where('paye', 0)->get();
-            $rejet=Demande::where('etat', 2)->get();
-            $nbr_rejet=count($rejet);
-            $nbr_nonpaye=count($nonpaye);
-            $nbr=count($demandes);
+            if(Auth::user()->organisation!="001000"){
+                $demandes=Demande::where('organisation_code',Auth::user()->organisation)->get();
+                $paye=Demande::where('paye', 1)->where('organisation_code',Auth::user()->organisation)->get();
+                $nbr_paye=count($paye);
+                $nonpaye=Demande::where('paye', 0)->where('organisation_code',Auth::user()->organisation)->get();
+                $rejet=Demande::where('etat', 2)->where('organisation_code',Auth::user()->organisation)->get();
+                $nbr_rejet=count($rejet);
+                $nbr_nonpaye=count($nonpaye);
+                $nbr=count($demandes);
+            }
+            else{
+                $demandes=Demande::all();
+                $paye=Demande::where('paye', 1)->get();
+                $nbr_paye=count($paye);
+                $nonpaye=Demande::where('paye', 0)->get();
+                $rejet=Demande::where('etat', 2)->get();
+                $nbr_rejet=count($rejet);
+                $nbr_nonpaye=count($nonpaye);
+                $nbr=count($demandes);
+            }
             return view('backend.adminlte.dashboard', compact('demandes','nbr','nbr_paye','nbr_nonpaye','nbr_rejet'));
         }
 
         public function liste_demande(Request $request){
-            $etat=$request->etat;
+            if(Auth::user()->organisation!="001000"){
+                $etat=$request->etat;
             if($etat==0){
                 $dem="demande_a_valider";
-                $demandes=Demande::where('paye', 1)->where('etat', 0)->get();
+                $demandes=Demande::where('paye', 1)->where('etat', 0)->where('organisation_code',Auth::user()->organisation)->get();
             return view('backend.adminlte.liste', compact('demandes','dem'));
             }
             else{
                 $dem="demande_valider";
-                $demandes=Demande::where('paye', 1)->where('etat', 1)->get();
+                $demandes=Demande::where('paye', 1)->where('etat', 1)->where('organisation_code',Auth::user()->organisation)->get();
             return view('backend.adminlte.liste', compact('demandes','dem'));
 
             }
+            }
+            else{
+                $etat=$request->etat;
+                if($etat==0){
+                    $dem="demande_a_valider";
+                    $demandes=Demande::where('paye', 1)->where('etat', 0)->get();
+                return view('backend.adminlte.liste', compact('demandes','dem'));
+                }
+                else{
+                    $dem="demande_valider";
+                    $demandes=Demande::where('paye', 1)->where('etat', 1)->get();
+                return view('backend.adminlte.liste', compact('demandes','dem'));
+
+                }
+            }
         }
         public function liste_demande_rejet(){
-            $demandes=Demande::where('etat', 2)->get();
+            if(Auth::user()->organisation!="001000"){
+                $demandes=Demande::where('etat', 2)->where('organisation_code',Auth::user()->organisation)->get();
+                }
+            else{
+                $demandes=Demande::where('etat', 2)->get();
+                }
             return view('backend.adminlte.liste_rejet', compact('demandes'));
         }
 
@@ -844,6 +878,10 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             $demandes=Demande::where('id', $id)->first();
             $usager=Usager::where('id', $demandes->usager_id)->first();
            $activites= DB::table('activites')->where('Code', $demandes->primary_activity)->first();
+           $regions_all=DB::table('regions')->get();
+           $nationalites= DB::table('valeurs')->where('parametre_id',6)->orderby('libelle','asc')->get();
+           $civilites=DB::table('valeurs')->where('parametre_id',15)->get();
+           $pays= DB::table('valeurs')->where('parametre_id',5)->orderby('libelle','asc')->get();
            $forme_juridiques= DB::table('forme_juridiques')->where('code', $demandes->forme_juridique)->first();
            $professions= Valeur::where('code', $usager->IdFonction)->first();
            $regions=DB::table('regions')->where('id', $demandes->region_code)->first();
@@ -856,13 +894,20 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             $secteur_usager=DB::table('secteur_villages')->where('code', $usager->Code_Secteur_Village)->first();
             $province_usager=DB::table('provinces')->where('id', $usager->Province_Code)->first();
             $region_usager=DB::table('regions')->where('id', $usager->Region_Code)->first();
+            $FJ_EI= DB::table('forme_juridiques')->where('company_type','EI')->get();
+            $FJ_ES= DB::table('forme_juridiques')->where('company_type','ES')->get();
+            $FJ_GIE= DB::table('forme_juridiques')->where('company_type','GIE')->get();
+           $activites_all= DB::select('select secteur_activite from activites group by secteur_activite');
+           $professions= DB::table('valeurs')->where('parametre_id',8)->orderby('libelle','asc')->get();
+           $usage_terrains= DB::table('usage_terrains')->get();
            $demande=Demande::where('usager_id', $usager->id)->orderby('created_at','desc')->get();
            $c=count($demande);
            $cefore=DB::table('organisations')->where('CodeOrganisation',$demandes->organisation_code)->first();
             $cefore_code=$cefore->Ville;
             return view('backend.adminlte.detail', compact('demandes','usager','activites','forme_juridiques',
             'professions','regions','provinces','communes','arrondissements','secteurs','terrains','piecejointes',
-        'secteur_usager','province_usager','region_usager','c','cefore_code'));       
+        'secteur_usager','province_usager','region_usager','c','cefore_code','FJ_EI','FJ_ES','FJ_GIE','activites_all',
+    'usage_terrains','civilites','professions','pays','nationalites','regions_all'));       
     }
 
         public function valider_demande(Request $request , $id){
@@ -898,14 +943,25 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
                     'Date_etat_validation'=>$date_validation,
                     'User_ayant_valide'=>Auth::user()->id
                    ]);
+            $historique=Historique::create([
+                'id_demande'=>$demandes->id,
+                'id_user'=>Auth::user()->id,
+                'motif'=>$motif
+                ]);
 //dd($details);
              Mail::to($email)->send(new NotifyRejet($details));
                    return redirect()->route('list');
             }
         }
         public function liste_filtre(Request $request){
-            $statut=$request->paye;
-            $demandes=Demande::where('paye', $statut)->get();
+            if(Auth::user()->organisation!="001000"){
+                $statut=$request->paye;
+                $demandes=Demande::where('paye', $statut)->where('organisation_code', Auth::user()->organisation)->get();
+                }
+            else{
+                $statut=$request->paye;
+                $demandes=Demande::where('paye', $statut)->get();
+                }
             return view('backend.adminlte.liste_demande', compact('demandes'));
         }
 
@@ -915,6 +971,13 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             $demande->update([
                 'etat'=>0,             
                ]);
+
+               $historique=Historique::create([
+                'id_demande'=>$demande->id,
+                'id_user'=>Auth::user()->id,
+                'motif'=>"Envoyer Pour Traitement"
+                ]);
+
                return redirect()->back();            
         }
         public function showpj(Piecejointe $piecejointe){
@@ -932,8 +995,7 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             $fileName = $type_doc.'.'.$extension;
             $emplacement='public/files/'.$usager->id;
             $file_url= $request['piece_jointe_u']->storeAs($emplacement, $fileName);
-            $url_local=$usager->id.'/'.$fileName;
-           
+            $url_local=$usager->id.'/'.$fileName;           
             $pj= $piecejointe->update([
                 'url'=> $file_url,
                 'numero'=> $request->numero_ref,
@@ -942,6 +1004,40 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
                 'url_local'=>$url_local
             ]);
             return redirect()->route("detail.demande", ['id'=>$piecejointe->demande->id]);
+        }
+
+        public function statistique(Request $request)
+        {
+            
+            $cefores=DB::table('organisations')->get();
+            if($request->datedebut!="")
+            {
+                //dd($request->datedebut);
+                $date_debut=format_date($request->datedebut);
+               $demandes=Demande::where('id', 1)->first();
+               dd($demandes->created_at);
+               
+               for($i=0; $i<count($demandes); $i++){           
+                    $dates=format_date($demandes[$i]->created_at); 
+                    $date=date("Y-m-d", strtotime($dates));
+                    dd($date);                    
+                }
+            
+            //dd($date);
+               //dd($request->datedebut); 
+                           
+            }
+            if($request->cefore!=""){
+                               
+                $result=Demande::where('organisation_code',$request->cefore)->get();
+                $demandes=$result;
+                }
+            else{
+                if($request->reset=1){
+                    $demandes=Demande::all();
+                    }
+                }
+            return view('backend.adminlte.statistique', compact('demandes','cefores'));
         }
         
 }

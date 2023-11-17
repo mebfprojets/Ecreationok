@@ -97,17 +97,17 @@
   </nav>
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="index3.html" class="brand-link">
-      <img src="{{asset('frontend/images/CEFORE.jpg')}}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">Admin</span>
+    <a href="{{route('dashboard')}}" class="brand-link">
+      <img src="{{asset('frontend/images/logo-me.jpg')}}" width="50" height="50" alt="MEBF Logo" class="brand-image" style="opacity: .8">
+      <span class="brand-text font-weight-light">MEBF</span>
     </a>
     <!-- Sidebar -->
     <div class="sidebar">
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="{{asset('frontend/images/CEFORE.jpg')}}" class="img-circle elevation-2" alt="User Image">
-        </div>
+          <img src="{{asset('frontend/images/CEFORE.jpg')}}" class="brand-image" alt="User Image">
+        </div><br>
         <div class="info">
           <a href="#" class="d-block">{{Auth::user()->name}} {{Auth::user()->prenom}}</a>
         </div>
@@ -163,8 +163,15 @@
                 Demandes Rejétées
                
               </p>
-            </a>
-            
+            </a>            
+          </li>
+          <li class="nav-item">
+            <a href="{{route('statistique')}}" class="nav-link @yield("statistique")">
+              <i class="nav-icon fas fa-copy"></i>
+              <p>
+                Statistiques               
+              </p>
+            </a>            
           </li>
         @can('user.create', Auth::user())
           <li class="nav-item @yield("administration")" >
@@ -207,14 +214,7 @@
                 </a>
               </li>              
             </ul>
-          </li>
-          <li class="nav-item">
-              <a href="{{ route('logout') }}" class="nav-link"
-                    onclick="event.preventDefault();
-                             document.getElementById('logout-form').submit();"><i class="fa fa-ban fa-fw pull-right"></i>
-                    Se Deconnecter
-                </a>
-              </li>
+          </li>          
         @endcan
           <!-- <li class="nav-item">
             <a href="#" class="nav-link">

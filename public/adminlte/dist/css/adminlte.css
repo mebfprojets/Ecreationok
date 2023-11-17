@@ -53009,4 +53009,7 @@ a.text-muted:hover {
 .dark-mode .border-dark {
   border-color: #4b545c !important;
 }
+.style_table{
+  background-color:#0b9e44; color:white;
+}
 /*# sourceMappingURL=adminlte.css.map */

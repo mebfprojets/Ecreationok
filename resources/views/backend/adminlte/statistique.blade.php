@@ -1,16 +1,45 @@
 @extends('backend.adminlte.main')
-@section($dem, 'active')
+@section('statistique', 'active')
 @section('content')
 <div class="card">
               <div class="card-header">
                <strong><h3 class="card-title">
                 Liste des Demandes
               </h3></strong>
-              </div>              
+              </div>
+              <form action="{{route('statistique')}}">
+                <select name="cefore" id="">
+                    @foreach($cefores as $cefore)
+                    <option value="{{$cefore->CodeOrganisation}}">{{$cefore->CodeOrganisation}}</option>
+                    @endforeach
+                </select>
+                <div class="form-group">
+                  <label>Date de début</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <i class="far fa-calendar-alt"></i>
+                      </span>
+                    </div>
+                    <input type="date" name="datedebut" class="form-control float-right" id="reservation">
+                  </div>
+                  <label>Date de fin</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <i class="far fa-calendar-alt"></i>
+                      </span>
+                    </div>
+                    <input type="date" name="datefin" class="form-control float-right" id="reservation">
+                  </div>
+                </div>
+                <input type="submit" value="Valider">
+                <a href="{{route('statistique')}}?reset=1">Reset</a>
+              </form>        
               <!-- /.card-header -->
               <div class="card-body">
                 <table id="example1" class="table table-bordered table-striped">
-                  <thead style="background-color:#0b9e44; color:white">
+                  <thead>
                   <tr>
                     <th>N°</th>
                     <th>Numero Demande</th>
@@ -74,4 +103,23 @@
               <!-- /.card-body -->
 </div>
             <!-- /.card -->
+<script>
+    $('#daterange-btn').daterangepicker(
+      {
+        ranges   : {
+          'Today'       : [moment(), moment()],
+          'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+          'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
+          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+          'This Month'  : [moment().startOf('month'), moment().endOf('month')],
+          'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        startDate: moment().subtract(29, 'days'),
+        endDate  : moment()
+      },
+      function (start, end) {
+        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
+      }
+    )
+</script>
 @endsection

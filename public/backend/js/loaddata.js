@@ -15,7 +15,7 @@ $(document).ready(function () {
                 //form_data.append('file', document.getElementById('piece_jointe_1').files[0]);
                 console.log(formData);
                 $.ajax({
-                    url: 'http://127.0.0.1:4000/load/piecejointe',
+                    url: 'http://127.0.0.1:8000/load/piecejointe',
                     type: "POST",
                    // enctype: 'multipart/form-data',
                     data: formData,
@@ -215,7 +215,7 @@ $(document).ready(function () {
                 console.log(formData);
                 var url = '{{ route("usager.update") }}';
                 $.ajax({
-                    url: 'http://127.0.0.1:4000/usager-storing',
+                    url: 'http://127.0.0.1:8000/usager-storing',
                     type: "POST",
                    // enctype: 'multipart/form-data',
                     data: formData,

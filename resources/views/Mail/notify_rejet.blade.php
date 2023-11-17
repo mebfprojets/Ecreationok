@@ -9,7 +9,7 @@
         sous la dénomination <strong> {{ $details['nom_commercial'] }} </strong>
     </p>
     <strong><p>Motif Rejet: {{ $details['motif'] }}</p></strong>
-    <p>NB : Bien vouloir vous connecter sur la plateforme https://creerentreprise.me.bf/ afin de corriger pour un traitement de votre demande.<br>
+    <p>NB : Bien vouloir vous connecter sur la plateforme https://creerentreprise.me.bf/ afin d'apporter la correction demandée pour un traitement de votre demande.<br>
      Pour toutes informations veuillez contacter le (+226) 02 21 21 21 - 58 80 77 77 - 56 62 02 02 </p>
   </body>
 </html>
