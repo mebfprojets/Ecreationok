@@ -13,7 +13,7 @@
                 <h5>Demande N°: {{$demande->numero_demande}}</h5>
                 <div class="row">
                       
-                                                            <div class="col-lg-8">
+                                                            <div class="col-lg-7">
                                                                 <div class="mb-3">
                                                                     <!-- <label class="form-label" for="progress-basicpill-pancard-input">Type Etablissement</label> -->
                                                                     <label class="form-label" for="progress-basicpill-vatno-input">
@@ -31,13 +31,19 @@
                                                                     <label class="form-label" style="margin-left:40px" for="progress-basicpill-vatno-input">{{$demande->commercial_name}}</label> 
                                                                 </div>
                                                             </div>
-                                                            <div class="col-lg-1">
+                                                            <div class="col-lg-3">
                                                                 <div class="mb-3">
                                                                  <label class="form-label" style="color:red;" for="progress-basicpill-vatno-input">
                                                                  @if($demande->paye==0)
                                                                  Attente de paiement
-                                                                 @else
+                                                                 @elseif($demande->paye==1 && $demande->etat==0 )
                                                                  Payée, En Traitement
+                                                                 @elseif($demande->paye==1 && $demande->etat==1 )
+                                                                 Demande Validée, Veuillez apporter le dossier physique au CEFORE
+                                                                 @elseif($demande->paye==2 && $demande->etat==0 )
+                                                                 Attente de Validation du Paiement
+                                                                 @elseif($demande->paye==1 && $demande->etat==2)
+                                                                 Demande Rejétée, Consulter le motif pour corriger et renvoyer pour traitement
                                                                  @endif
                                                                 </label>
                                                                 </div>
@@ -50,11 +56,11 @@
                                                             <div class="col-lg-1">
                                                                 <div class="mb-2"> 
                                                                 @if($demande->paye==0)                                                           
-                                                                <button  onclick="calltouchpay('{{$demande->numero_demande}}','{{$demande->montant}}')" class="btn btn-success">Payer</button>
+                                                                <button  onclick="calltouchpay('{{$demande->numero_command}}','{{$demande->montant}}')" class="btn btn-success">Payer</button>
                                                                 <input type="hidden" name="" id="demande_montant" value="{{$demande->montant}}"> 
-                                                                <input type="hidden" name="" id="numero_demande" value="{{$demande->numero_demande}}"> 
+                                                                <input type="hidden" name="" id="numero_demande" value="{{$demande->numero_command}}"> 
                                                                 
-                                                                @else                                              
+                                                                @elseif($demande->paye==1)                                             
                                                                 <a href="{{ route('demande.facture',$demande->id)}}" class="btn btn-success">Facture</a>
                                                                 @endif
                                                                 </div>

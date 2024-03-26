@@ -19,7 +19,7 @@
           
             <div class="col-md-5 login-left">
                   <img src="{{ 'assets/img/user.png' }}" alt="" style="margin-bottom: 50px" width="150" height="150">
-                  <a  class="btn btn-danger"data-dismiss="modal"  href="#modal-create-compte" data-toggle="modal" style="background-color:rgb(224, 106, 106)"> Creer compte <i class="fa fa-unlock"></i></a>
+                  <!-- <a  class="btn btn-danger"data-dismiss="modal"  href="#modal-create-compte" data-toggle="modal" style="background-color:rgb(224, 106, 106)"> Creer compte <i class="fa fa-unlock"></i></a> -->
 
             </div>
               <div class="col-md-7">

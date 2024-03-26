@@ -57,7 +57,7 @@ class UsagerController extends Controller
             $code_village=null;
         }
 
-        if( $request['lieu_de_naissance'] != null){             
+        if( $request->situation_matrimoniale != null){             
             
             $user= Auth::user()->id;             
         }
@@ -65,12 +65,44 @@ class UsagerController extends Controller
             $user=null;  
         }
       
-        if($request->civilite==1){
+        if( $request->civilite=="M." || $request->civilite=="MR" || $request->civilite=="EL HADJ"){
             $genre=2;
         }
         else{
             $genre=1;
         }
+
+        $cin=Usager::where('CIN', $request->numero_piece)->first();
+        if ($cin){
+            //dd($cin->CIN);
+            return redirect()->route('create.demande');
+        }
+        else{
+
+            if($request->situation_matrimoniale==null){ 
+                $situation=1;
+                }
+                else{
+                    $situation=$request->situation_matrimoniale;
+                }            
+               if($request->boite_postale==null){
+                    $boite_postale="NP";
+                }
+                else{
+                    $boite_postale=$request->boite_postale;
+                }
+               if($request->email_usager==null){
+                $email="NP";
+                }
+                else{
+                    $email=$request->email_usager;
+                }
+                if($request->profession==null){
+                    $professions="110";
+                }
+                else{
+                    $professions=$request->profession;
+                }
 
         $usager= Usager::create([
             'Type' => 1,
@@ -80,9 +112,8 @@ class UsagerController extends Controller
             'Gender' => $genre,
             'DateNaissance' => $request['date_de_naissance'],
             'LieuNaissance' => $request['lieu_de_naissance'], 
-            'IdFonction' => $request['profession'],
-            'SituationMatrimoniale' => $request['situation_matrimoniale'],
-            //'RegimeMatrimoniale' => $request['regime_matrimoniale'],
+            'IdFonction' => $professions,
+            'SituationMatrimoniale' => $situation,
             'IdCategorieUsager' => 4,
             "Nationality_No_"=>$request['nationalite_usager'],
             "Country_Code"=>$request['pays_usager'],
@@ -91,14 +122,15 @@ class UsagerController extends Controller
             'Commun_Departement_Code' => $request ['commune_usager'],
             'Arrondissement_Code'=> $request ['arrondissement_usager'],
             'Code_Secteur_Village' => $code_village, 
-            'Boite_postale' => $request['boite_postale'],
+            'Boite_postale' => $boite_postale,
             'Phone_No_' => $request['telephone_mobile1'],
             'Tel_Bureau' => $request['telephone_bureau'],
             'IdAdresse' => $request['adresse'],
             'user_id' => $user,
-            'E-Mail'=>$request->email_usager,
+            'E-Mail'=>$email,
            // 'IdAdresse'=>$request['boite_postale'],
-            'CIN'=>$request->numero_piece
+            'CIN'=>$request->numero_piece,
+            'titre' => $request['civilite']
         ]);
 
         if($request->hasFile('piece_jointe_m')) {
@@ -112,7 +144,7 @@ class UsagerController extends Controller
 //dd($file);
             $emplacement='public/files/'.$usager->id;
             $file_url= $request['piece_jointe_m']->storeAs($emplacement, $fileName);
-            $url_local='C:\ECREATION\files/'.$usager->id.'/'.$fileName;
+            $url_local= $usager->id.'/'.$fileName;
             $docName = $type_doc;
            // $file = $request->file('piece_jointe_1')->storeAs('public/casier', $docName.'.'.$guessExtension);
             $piecejointe_enrs= PieceJointe::where('usager_id',$usager->id)->where('type_piece', $type_doc)->get();
@@ -121,7 +153,6 @@ class UsagerController extends Controller
         {
             $date = new \DateTime();
             $pj= PieceJointe::create([
-                
                 'usager_id'=>$usager->id,
                 'type_piece'=> 'acte_mariage',
                 'url'=> $file_url,
@@ -129,7 +160,8 @@ class UsagerController extends Controller
                 'date_etablissement'=> $date,
                 'lieu_etablissement' => 'test',
                 'categorie_piece'=> 'acte_mariage',
-                'url_local'=>$url_local
+                'url_local'=>$url_local,
+                'file_extension'=>$extension
             ]);
             // if ($pj) {
             //     $data_json= array('data'=>'success','status'=>'201', 'type_doc'=>'test');
@@ -153,7 +185,7 @@ class UsagerController extends Controller
 //dd($file);
             $emplacement='public/files/'.$usager->id;
             $file_url= $request['piece_jointe_c']->storeAs($emplacement, $fileName);
-            $url_local='C:\ECREATION\files/'.$usager->id;
+            $url_local= $usager->id.'/'.$fileName;
             $docName = $type_doc;
            // $file = $request->file('piece_jointe_1')->storeAs('public/casier', $docName.'.'.$guessExtension);
             $piecejointe_enrs= PieceJointe::where('usager_id',$usager->id)->where('type_piece', $type_doc)->get();
@@ -170,7 +202,8 @@ class UsagerController extends Controller
                 'date_etablissement'=> $date,
                 'lieu_etablissement' => 'test',
                 'categorie_piece'=> 'autorisation_de_commerce',
-                'url_local'=>$url_local
+                'url_local'=>$url_local,
+                'file_extension'=>$extension
             ]);
             // if ($pj) {
             //     $data_json= array('data'=>'success','status'=>'201', 'type_doc'=>'test');
@@ -200,7 +233,7 @@ class UsagerController extends Controller
         }
         //Ce controle permet de savoir si c'est un usager qui est créer pour une demande ou un usager creer pour completer mles information d'un autre usager 
         //tel que le conjoint ou autre
-    if( $request['lieu_de_naissance'] != null){             
+    if( $request ['province_usager'] != null){             
         return redirect()->route('create.demande');      
     }
    
@@ -212,6 +245,7 @@ class UsagerController extends Controller
                 return json_encode($data);
        }
      
+    }
     }
     
 }

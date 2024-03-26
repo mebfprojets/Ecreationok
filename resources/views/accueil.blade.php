@@ -6,12 +6,12 @@
     <div class="slider-content">
         <div class="container h-100">
           <div class="row align-items-center h-100">
-              <div class="col-md-12 text-center">
-                <!-- <h2 class="slide-title" data-animation-in="slideInLeft">Centre de Formalité des Entreprises</h2>
-                <h5 class="slide-title" data-animation-in="slideInRight">Bienvenue sur la plateforme de création d'entreprise en ligne</h5> -->
+              <div style="background:#FF0000;" class="col-md-12 text-center">
+              <h3 style="color:#FFF; margin-top: 30px;">             
+              LES DEMANDES DE CREATION D'ENTREPRISE REPRENDRONT LE 02 AVRIL 2024</h3>                
                 @auth
                 <p data-animation-in="slideInLeft" data-duration-in="1.2">
-                    <a href="{{ route('create.usager') }}" class="slider btn btn-primary">Créer mon entreprise</a>
+                    <!-- <a href="{{ route('create.usager') }}" class="slider btn btn-primary">Créer mon entreprise</a> -->
                     <!-- <a href="contact.html" class="slider btn btn-primary border">Contact Now</a> -->
                 </p>
                 @endauth
@@ -23,26 +23,6 @@
 
 
 </div>
-<!--
-<section class="call-to-action-box no-padding">
-  <div class="container">
-    <div class="action-style-box">
-        <div class="row align-items-center">
-          <div class="col-md-8 text-center text-md-left">
-              <div class="call-to-action-text">
-                <h3 class="action-title">Informations importantes</h3>
-              </div>
-          </div> Col end 
-          <div class="col-md-4 text-center text-md-right mt-3 mt-md-0">
-              <div class="call-to-action-btn">
-                <a class="btn btn-dark" href="#">Request Quote</a>
-              </div>
-          </div> col end 
-        </div><!-- row end 
-    </div> Action style box 
-  </div> Container end 
-</section> Action end -->
-
 <div class="row" style="margin-top:30px;">
 
 <div class="col-md-3 col-sm-6" >
@@ -65,7 +45,7 @@
                     <p>
                         <!-- <br class="mt-5"><br> -->
                         <a class="btn btn-success btn-block" data-toggle="modal" href="#modal-piece_pp">Pièces à fournir</a>
-                        <a class="btn btn-success btn-block"  href="https://www.me.bf/fr/file/134/download?token=DqQCiCeH">Formulaire de renseignement</a>
+                        <a class="btn btn-success btn-block" target="_blank" href="https://www.me.bf/wp-content/uploads/2024/01/Formalite-personne-physique.pdf">Formulaire de renseignement</a>
                         <!-- <a class="btn btn-success btn-block"  target="_blank" href="/documents/download-renseignements_po">Pièces à fournir</a> -->
                         <!-- <a class="btn btn-success btn-block"  href="http://me.bf/fr/file/2967/download?token=kziektSF">Déclaration sur honneur</a>
                         <a class="btn btn-success btn-block"  href="http://me.bf/fr/file/2893/download?token=P7jVe3E4">Démande de localisation</a> -->
@@ -80,7 +60,7 @@
                     <br class="mt-5"><br>
                     <p>
                         <a class="btn btn-success btn-block" data-toggle="modal" href="#modal-piece_pm">Pièces à fournir</a>
-                        <a class="btn btn-success btn-block"  href="https://www.me.bf/fr/file/3977/download?token=PZazTV3p">Formulaire de renseignement</a>
+                        <a class="btn btn-success btn-block" target="_blank" href="https://www.me.bf/wp-content/uploads/2024/01/Formalite-personne-morale.pdf">Formulaire de renseignement</a>
                         <!-- <a class="btn btn-success btn-block" target="_blank" href="/documents/download-renseignements_mo" style="margin-top: 22px;">Pièces à fournir</a> -->
                         <!-- <a class="btn btn-success btn-block"  href="http://me.bf/fr/file/3481/download?token=avSak-TP">Formulaire RCCM</a>
                         <a class="btn btn-success btn-block"  href="http://me.bf/fr/file/132/download?token=_Sx15V_e">Modèle Acte de dépôt</a> -->

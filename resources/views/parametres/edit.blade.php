@@ -1,16 +1,11 @@
-@extends('layouts.admin')
-@section('administration', 'active')
-    @section('administration-parametre', 'active')
+@extends("backend.adminlte.main")
+@section('administration', 'menu-open')
+@section('administration-parametre', 'active')
 @section('content')
-    <div class="col-md-10">
-        <div class="block">
-            <!-- Basic Form Elements Title -->
-            <div class="block-title">
-                <div class="block-options pull-right">
-                    <a href="javascript:void(0)" class="btn btn-alt btn-sm btn-default toggle-bordered enable-tooltip" data-toggle="button" title="Toggles .form-bordered class">No Borders</a>
-                </div>
-                <h2><strong>Creation</strong> de parametre</h2>
-            </div>
+<div class="card card-success col-md-12 col-md-offset-2">
+    <div class="card-header">
+      <h3 class="card-title">Créer un utilisateur</h3>
+    </div>
             <!-- END Form Elements Title -->
 
             <!-- Basic Form Elements Content -->

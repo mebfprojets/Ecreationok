@@ -142,22 +142,17 @@ FACEBOOK: https://www.facebook.com/themefisher
                           <p class="info-box-subtitle">info@me.bf</p>
                       </div>
                     </div>
-                  </li>
-                  <!-- <li class="last">
-                    <div class="info-box last">
-                      <div class="info-box-content">
-                          <p class="info-box-title">Global Certificate</p>
-                          <p class="info-box-subtitle">ISO 9001:2017</p>
-                      </div>
-                    </div>
-                  </li> --> 
+                  </li>                  
                   <li class="header-get-a-quote">
                     <a class="btn btn-primary" data-toggle="modal" href="#modal-verifier-nomCommercial">Vérifier un nom commerical</a>
                   </li>
                 </ul><!-- Ul end -->
             </div><!-- header right end -->
           </div><!-- logo area end -->
-  
+          <center><h3 style="color:#FFF; background:#FF0000;">EN RAISON DE LA MAUVAISE QUALITE DE LA CONNEXION INTERNET,
+              LA PLATEFORME EST TEMPORAIREMENT SUSPENDUE JUSQU'AU 31 MARS 2024            
+          </h3>
+          </center>
       </div><!-- Row end -->
     </div><!-- Container end -->
   </div>
@@ -172,73 +167,16 @@ FACEBOOK: https://www.facebook.com/themefisher
                 </button>
                 
                 <div id="navbar-collapse" class="collapse navbar-collapse contenant">
-                    <ul class="nav navbar-nav mr-auto">
-                     <!-- <li class="nav-item dropdown active">
-                          <a href="#" class="nav-link">Accueil <i class="fa fa-angle-down"></i></a>
-                           <ul class="dropdown-menu" role="menu">
-                            <li class="active"><a href="index.html">Home One</a></li>
-                            <li><a href="index-2.html">Home Two</a></li>
-                          </ul> 
-                      </li>-->
+                    <ul class="nav navbar-nav mr-auto">                     
                       <li class="nav-item"><a class="nav-link" href="{{ route('index') }}">Accueil</a></li>
                       @auth
-                        <li class="nav-item"><a class="nav-link" href="{{ route('create.usager') }}">Créer une demande</a></li>
+                        <!-- <li class="nav-item"><a class="nav-link" href="{{ route('create.usager') }}">Créer une demande</a></li> -->
                         @if(nbr_demande()>0)
                         <li class="nav-item"><a class="nav-link" href="{{route('demande.liste')}}">Mes demandes</a></li>
                         @endif
                       @endauth
                       <li class="nav-item"><a class="nav-link" target="_blank" href="http://me.bf/fr/annonces-legales">Annonces Légales</a></li>
-                      <!--<li class="nav-item dropdown">
-                          <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Annonces Légales <i class="fa fa-angle-down"></i></a>
-                           <ul class="dropdown-menu" role="menu">
-                            <li><a href="about.html">About Us</a></li>
-                            <li><a href="team.html">Our People</a></li>
-                            <li><a href="testimonials.html">Testimonials</a></li>
-                            <li><a href="faq.html">Faq</a></li>
-                            <li><a href="pricing.html">Pricing</a></li>
-                          </ul> 
-                      </li>-->
-<!--               
-                      <li class="nav-item dropdown">
-                          <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Projects <i class="fa fa-angle-down"></i></a>
-                          <ul class="dropdown-menu" role="menu">
-                            <li><a href="projects.html">Projects All</a></li>
-                            <li><a href="projects-single.html">Projects Single</a></li>
-                          </ul>
-                      </li>
-              
-                      <li class="nav-item dropdown">
-                          <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Services <i class="fa fa-angle-down"></i></a>
-                          <ul class="dropdown-menu" role="menu">
-                            <li><a href="services.html">Services All</a></li>
-                            <li><a href="service-single.html">Services Single</a></li>
-                          </ul>
-                      </li>
-              
-                      <li class="nav-item dropdown">
-                          <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Features <i class="fa fa-angle-down"></i></a>
-                          <ul class="dropdown-menu" role="menu">
-                            <li><a href="typography.html">Typography</a></li>
-                            <li><a href="404.html">404</a></li>
-                            <li class="dropdown-submenu">
-                                <a href="#!" class="dropdown-toggle" data-toggle="dropdown">Parent Menu</a>
-                                <ul class="dropdown-menu">
-                                  <li><a href="#!">Child Menu 1</a></li>
-                                  <li><a href="#!">Child Menu 2</a></li>
-                                  <li><a href="#!">Child Menu 3</a></li>
-                                </ul>
-                            </li>
-                          </ul>
-                      </li>
-              
-                      <li class="nav-item dropdown">
-                          <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">News <i class="fa fa-angle-down"></i></a>
-                          <ul class="dropdown-menu" role="menu">
-                            <li><a href="news-left-sidebar.html">News Left Sidebar</a></li>
-                            <li><a href="news-right-sidebar.html">News Right Sidebar</a></li>
-                            <li><a href="news-single.html">News Single</a></li>
-                          </ul>
-                      </li> -->
+                      
                       <li class="nav-item"><a class="nav-link" href="#">Contacts</a></li>
         @guest
           <li id="contenu" class="nav-item dropdown pull-right">
@@ -259,10 +197,10 @@ FACEBOOK: https://www.facebook.com/themefisher
                 </li> --}}
                 <li>
                   <!-- Opens the user settings modal that can be found at the bottom of each page (page_footer.html in PHP version) -->
-                  <a href="#modal-create-compte" data-toggle="modal">
+                  <!-- <a href="#modal-create-compte" data-toggle="modal">
                     <i class="fa fa-user"></i>
                      Créer un compte
-                  </a>
+                  </a> -->
               </li>
             </ul>
         </li>

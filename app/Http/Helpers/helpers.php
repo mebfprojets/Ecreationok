@@ -10,12 +10,12 @@ if (!function_exists('returnpieceinfos')) {
         {
             $usager= Usager::where('user_id',Auth::user()->id)->first();
             //$piecejointe= PieceJointe::where('usager_id',$usager->id)->where('categorie_piece', $categorie_piece )->first();
-            if($categorie_piece != 'piece_didentite'){
+            // if($categorie_piece != 'piece_didentite'){
                 $piecejointe= PieceJointe::where('usager_id',$usager->id)->where('demande_id',null)->where('categorie_piece', $categorie_piece )->first();
-            }
-            else{
-                $piecejointe= PieceJointe::where('usager_id',$usager->id)->where('categorie_piece', $categorie_piece )->first();
-            }
+            // }
+            // else{
+            //     $piecejointe= PieceJointe::where('usager_id',$usager->id)->where('categorie_piece', $categorie_piece )->first();
+            // }
             if($piecejointe){
                 return true;
             }
@@ -28,6 +28,11 @@ if (!function_exists('returnpieceinfos')) {
     if(!function_exists('format_date')){
         function format_date($date){
             return  date('d-m-Y', strtotime($date));
+        }
+    }
+    if(!function_exists('format_date2')){
+        function format_date2($date){
+            return  date('Y-m-d', strtotime($date));
         }
     }
     if(!function_exists('nbr_demande')){
@@ -54,6 +59,15 @@ if (!function_exists('returnpieceinfos')) {
                     return $libelle;
             }
         }
+
+        if (!function_exists('getfonction')) {
+            function getfonction($id)
+                {
+                    $record = Valeur::where('code', $id)->where('parametre_id', 8)->first();
+                    $libelle = isset($record['libelle']) ? $record['libelle'] : "";
+                        return $libelle;
+                }
+            }
     
         if (!function_exists('getpays')) {
             function getpays($code)

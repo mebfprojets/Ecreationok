@@ -14,9 +14,8 @@ $(document).ready(function () {
                 formData.append('piece_jointe_1', document.querySelector('#piece_jointe_1').files[0]);
                 //form_data.append('file', document.getElementById('piece_jointe_1').files[0]);
                 console.log(formData);
-                
                 $.ajax({
-                    url: 'http://127.0.0.1:8000/load/piecejointe',
+                    url: 'https://creerentreprise.me.bf/load/piecejointe',
                     type: "POST",
                    // enctype: 'multipart/form-data',
                     data: formData,
@@ -117,7 +116,7 @@ $(document).ready(function () {
                 console.log(formData);
                 var url = '{{ route("piecejointe.update") }}';
                 $.ajax({
-                    url: 'http://127.0.0.1:8000/update/piecejointe',
+                    url: 'https://creerentreprise.me.bf/update/piecejointe',
                     type: "POST",
                    // enctype: 'multipart/form-data',
                     data: formData,
@@ -216,7 +215,7 @@ $(document).ready(function () {
                 console.log(formData);
                 var url = '{{ route("usager.update") }}';
                 $.ajax({
-                    url: 'http://127.0.0.1:8000/usager-storing',
+                    url: 'https://creerentreprise.me.bf/usager-storing',
                     type: "POST",
                    // enctype: 'multipart/form-data',
                     data: formData,

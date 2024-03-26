@@ -78,6 +78,7 @@
         </div>
         <div style="margin-left:50px; font-size: 14px;">
         <strong><p>FACTURE N°: {{$demande->numero_demande}} du {{ date("d-m-Y à H:i", strtotime($demande->date_paiement)) }}</p></strong>
+        <strong><p>Promoteur : {{$demande->legal_rep_name}} </p></strong>
         <strong><p>Téléphone : {{$usager->Phone_No_}} - {{$usager->Tel_Bureau}}</p></strong>
         <strong><p>Raison Sociale : {{$demande->commercial_name}}</p></strong>
         <strong><p>Contact Entreprise : {{$demande->mobile_1}} - {{$demande->tel_bureau}}</p></strong>
@@ -119,17 +120,17 @@
                                 <tbody> 
                                             <tr>
                                                 <td>TOTAL FACTURE : </td>
-                                                <td><strong>{{$demande->montant}}</strong></td>                                                                          
+                                                <td><strong>{{$demande->montant_total}}</strong></td>                                                                          
                                             </tr>                                                              
                                     </tbody>
-                          </table><br><br><br><br>
+                          </table><br><br><br>
         <div class="enr mebf">
            <strong> <p style="margin-left:-40%">CEFORE/MEBF</p></strong>
         </div>
         <strong><p style="margin-left:70px;">NB: Le montant est exprimé en FCFA</p></strong>
         <br><br>
         <img style="margin-left:550px" src="data:image/png;base64,{{ $qrCode }}" alt="Code QR">
-        {{ $qrCode }}
+       
         <p style="margin-left:70px; border-bottom-style: solid;
             border-bottom-color: #0000ff;
   border-bottom-width: 6px;"></p>

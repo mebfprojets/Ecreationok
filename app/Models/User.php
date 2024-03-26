@@ -30,6 +30,8 @@ class User extends Authenticatable
         'password',
         'prenom',
         'telephone',
+        'isadmin',
+        'organisation',
     ];
 
     /**
@@ -63,5 +65,9 @@ class User extends Authenticatable
     ];
     public function getDateFormat(){
         return 'Y-d-m';
+        }
+        public function roles()
+        {
+            return $this->belongsToMany(Role::class);
         }
 }

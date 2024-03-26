@@ -1,12 +1,14 @@
-@extends('layouts.admin')
-@section('administration', 'active')
+@extends("backend.adminlte.main")
+@section('administration', 'menu-open')
 @section('administration-parametre', 'active')
 @section('content')
-<div class="block full">
-    <div class="block-title">
-        <h2><strong>Liste</strong> des parametres</h2>
-        <a href="{{ route('parametres.create') }}" class="btn btn-success pull-right"><span><i class="fa fa-plus"></i></span>Parametres</a>
+<div class="card card-success col-md-12 col-md-offset-2">
+    <div class="card-header">
+      <h3 class="card-title">Créer un paramètres</h3>
     </div>
+      <a href="{{ route('parametres.create') }}" class="btn btn-success col-md-2 pull-right"><span><i class="fa fa-plus"></i></span>Parametres</a>
+   
+
 
     <div class="table-responsive">
         <table id="" class="table table-vcenter table-condensed table-bordered listepdf">

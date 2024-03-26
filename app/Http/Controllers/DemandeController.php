@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Usager; 
+use App\Models\Usager;
+use App\Models\Paiement;
+use App\Models\User;
+use App\Models\Historique;
 use App\Models\Demande;
 use App\Models\DemandeDirigeant;
 use App\Models\Terrain;
@@ -16,6 +19,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Mail\NotifyRejet;
+use Illuminate\Support\Facades\Mail;
 use PDF;
 
 
@@ -30,7 +35,7 @@ class DemandeController extends Controller
      public function __construct()
     {
         //$this->middleware('auth', ['except' => ['verifier_nom_commercial']]);
-        $this->middleware('auth')->except(['verifier_nom_commercial','index','test']);
+        $this->middleware('auth')->except(['verifier_nom_commercial','index','test','reponse_paiement']);
     }
 
     public function test()
@@ -94,6 +99,7 @@ class DemandeController extends Controller
             $FJ_GIE= DB::table('forme_juridiques')->where('company_type','GIE')->get();
             $usage_terrains= DB::table('usage_terrains')->get();
             $all_usagers= Usager::all();
+            $civilites=DB::table('valeurs')->where('parametre_id',15)->get();
     
             $prestation_PPs= Prestation::where('type_demande','P1')->get();
             $prestation_PPs= $prestation_PPs->unique('type');
@@ -103,12 +109,12 @@ class DemandeController extends Controller
             $demandes=Demande::where('usager_id', $usager->id)->orderby('created_at','desc')->get();
             $c=count($demandes);
             return view('demande.test' ,compact('piecejointe_enrs','regions', 'pays','fonctions','activites','prestation_PPs','prestation_PMs',
-            'FJ_EI','FJ_ES','FJ_GIE','usager','activites_secondaires','pays','all_usagers','usage_terrains','c','nbr_demande_pp'));
+            'FJ_EI','FJ_ES','FJ_GIE','usager','activites_secondaires','pays','all_usagers','usage_terrains','c','nbr_demande_pp','civilites'));
         }
         else{
             $c=0;
             return view('demande.test' ,compact('piecejointe_enrs','regions', 'pays','fonctions','activites','prestation_PPs','prestation_PMs',
-            'FJ_EI','FJ_ES','FJ_GIE','usager','activites_secondaires','pays','all_usagers','usage_terrains','c','nbr_demande_pp'));
+            'FJ_EI','FJ_ES','FJ_GIE','civilites','usager','activites_secondaires','pays','all_usagers','usage_terrains','c','nbr_demande_pp'));
         }
         }
         //$usager= Usager::where('user_id',Auth::user()->id)->first();
@@ -217,7 +223,9 @@ class DemandeController extends Controller
         $date = new \DateTime();
         $annee=date("Y", strtotime(now()));
         $code=str_replace(" ", "-", $Cefore_code);
-        $numero=$request->type_request.'-'.$code.'-'.$annee.'-'.$nombre;
+        $code_command=str_replace(" ", "", $Cefore_code);
+        $numero=$request->type_request.'-'.$code.'-'.$annee.'-'.$nombre;       
+        $num_command=$request->type_request.$code_command.$annee.$nombre;
 
         $activites=DB::table('activites')->where('Code', $request['activite_principale'])->first();
         $category_code=$activites->category_code;
@@ -253,6 +261,25 @@ class DemandeController extends Controller
 
         ]);
            // dd($request->all());
+
+           if($request->denomination_sociale!=""){
+            $denomination=$request->denomination_sociale;
+           }
+           else{
+            $denomination=$request->commercial_name;
+           }
+        $nomcom=Demande::where('commercial_name', $request->nom_commercial)->first();
+        $denom=Demande::where('denomination_social', $denomination)->first();
+        if($nomcom || $denom)
+        {
+            //dd($denom->primary_activity);
+            $usager= Usager::where('user_id',Auth::user()->id)->first();
+            $demandes=Demande::where('usager_id', $usager->id)->orderby('created_at','desc')->get();
+            $c=count($demandes);
+            return view('demande.liste', compact('demandes','c'));
+        }
+        else{
+
         $demande= Demande::create([      
                  'type_entreprise' =>0,
                  'amount_timbre' =>0,
@@ -316,12 +343,13 @@ class DemandeController extends Controller
                 'montant' =>  $montant,
                 'etat'=>0,
                 'numero_demande'=>$numero,
+                'numero_command'=>$num_command,
                 'paye'=>0,
                 'montant_total'=>$montant_total
         ]);
         //dd($demande);
         // Mise à jour de la table pièce jointe
-        $pieces= PieceJointe::where('usager_id',$usager->id)->where('demande_id',null)->where('categorie_piece', '!=' ,'piece_didentite')->get();
+        $pieces= PieceJointe::where('usager_id',$usager->id)->where('demande_id',null)->get();
             foreach($pieces as $piece){
                 $piece->update([
                     'demande_id'=> $demande->id
@@ -418,7 +446,7 @@ class DemandeController extends Controller
 
             return view('demande.transition', compact('demande','activites','forme_juridique','dirigeants',
         'regions','provinces','communes','secteurs','c'));
-        
+        }
         //return back() ;
     }
     public function  modifier(Request $request){
@@ -434,6 +462,45 @@ class DemandeController extends Controller
      );
      return json_encode($data);
  }
+ public function correct_piece(Request $request){
+    $usager= Usager::where('user_id',Auth::user()->id)->first();
+    $piecejointe= PieceJointe::where('usager_id',$usager->id)->where('categorie_piece', $request->categoriepiece)->first();
+    $data = array(
+     'id'=>$piecejointe->id,
+     'type_piece'=>$piecejointe->type_piece,
+     'categorie_piece'=>$piecejointe->categorie_piece,
+     'reference'=>$piecejointe->numero,
+     'date_etablissement'=> format_date($piecejointe->date_etablissement),
+     'lieu_etablissement'=>$piecejointe->lieu_etablissement,
+ );
+ return json_encode($data);
+}
+public function updatepj_correct(Request $request){
+    $usager= Usager::where('user_id',Auth::user()->id)->first();
+    if ($request->hasFile('piece_jointe')) {
+        $piecejointe= PieceJointe::find($request->piece_id_correct);
+        $file = $request->file('piece_jointe');
+        $extension=$file->getClientOriginalExtension();
+        $fileName = $piecejointe->type_piece.'.'.$extension;
+        $emplacement='public/files/'.$usager->id;
+        $file_url= $request['piece_jointe']->storeAs($emplacement, $fileName);
+        $url_local=$usager->id.'/'.$fileName;
+        $pj= $piecejointe->update([
+            'url'=> $file_url,
+            'numero'=> $request->numero_ref,
+            'date_etablissement'=> $request->date_detablissment,
+            'lieu_etablissement' => $request->lieu_etablissment,
+            'url_local'=>$url_local
+           // 'categorie_piece'=> $request->categorie_piece
+        ]);
+    
+    }
+    if ($pj) {
+       // $data_json= array('data'=>'success','status'=>'201', 'type_doc'=>$type_doc);
+        return redirect()->back();
+    }
+    
+}
  public function verifier_nom_commercial(Request $request){
     if (isset($request['nom_commercial'])) {
         $nom_commercial = $request['nom_commercial'];
@@ -444,7 +511,7 @@ class DemandeController extends Controller
     //$token='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpcCI6IiIsInVpZCI6IjEwMDAiLCJ1c2VybmFtZSI6Im1lYmYuZWNyZWF0aW9uIiwiZW1haWwiOiJtZWJmLmVjcmVhdGlvbkBtZS5iZiIsImV4cCI6MTY4MDg3ODM5OH0.BUkk2_9bq1uFyASMdDGBQMdAdd79TjiN1_4Vi18phRE';
     //$token='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpcCI6IiIsInVpZCI6IjEwMDAiLCJ1c2VybmFtZSI6Im1lYmYuZWNyZWF0aW9uIiwiZW1haWwiOiJtZWJmLmVjcmVhdGlvbkBtZS5iZiIsImV4cCI6MTY4MjI2NTQ2OX0.imp8JNP8GwYTaU1ROB5a2L_XePyvudeMMMteQaNPaaM';
     //$token='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpcCI6IiIsInVpZCI6IjEwMDAiLCJ1c2VybmFtZSI6Im1lYmYuZWNyZWF0aW9uIiwiZW1haWwiOiJtZWJmLmVjcmVhdGlvbkBtZS5iZiIsImV4cCI6MTY4NjQyNzIzMH0.6WOx9JkPH6z0QNE7Q8nhzEDfcWFbU1Ke98XHzkDB9cI';
-    $token='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpcCI6IiIsInVpZCI6IjEwMDAiLCJ1c2VybmFtZSI6Im1lYmYuZWNyZWF0aW9uIiwiZW1haWwiOiJtZWJmLmVjcmVhdGlvbkBtZS5iZiIsImV4cCI6MTY5ODk0MTIwNH0.ZiWMSuKsRMOHjhfg9ngtQH-sGKjYgH-Rvny4QnTNWsw';
+    //$token='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpcCI6IiIsInVpZCI6IjEwMDAiLCJ1c2VybmFtZSI6Im1lYmYuZWNyZWF0aW9uIiwiZW1haWwiOiJtZWJmLmVjcmVhdGlvbkBtZS5iZiIsImV4cCI6MTcwMTMwNzQ3OX0.BPZZ7dJwiy7c7-xU8hMqqrsroxqPWVOSp6UtwZMRAEo';
     // $res = $client->request (
     //     'POST',
     //     'http://fichiernationalrccm.com/api/auth/token', [
@@ -454,6 +521,25 @@ class DemandeController extends Controller
     //         ],
     // ]);
     // dd($res);
+
+    $acces= base64_encode("mebf.ecreation:mebfERP@Ecrat1");
+       // dd($acces);
+    $res = $client->request (
+        'POST',
+        'http://fichiernationalrccm.com/api/auth/token', [           
+          
+            'headers' => [
+                'Authorization' => 'Basic '.$acces,
+                'Accept' => 'application/json',
+            ],
+    ]);
+    $Body=$res->getBody()->getContents();
+    $json_decoded=json_decode($Body, true);
+    if($json_decoded['status']=200){
+    $token=$json_decoded['response'];
+    //dd($token);
+    }
+
     $response = $client->request (
         'POST',
         'https://fichiernationalrccm.com/api/registres/verifync', [
@@ -544,7 +630,6 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             if($type_doc==null){
                 $type_doc=$piecejointe->type_piece;
             }
-            
             $file = $request->file('piece_jointe_u');
             $extension=$file->getClientOriginalExtension();
             $fileName = $type_doc.'.'.$extension;
@@ -591,6 +676,11 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
         // ]);
        return $path = Storage::download($piecejointe->url);
        
+    }
+    public function detaildocument_affiche($id){
+        $piecejointe= PieceJointe::find($id);
+        return $path = Storage::download($piecejointe->url);
+
     }
     public function getallpiecejointe(){
         $usager= Usager::where('user_id',Auth::user()->id)->first();
@@ -674,15 +764,25 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             $province_usager=DB::table('provinces')->where('id', $usager->Province_Code)->first();
             $region_usager=DB::table('regions')->where('id', $usager->Region_Code)->first();
            //$nationalite= Valeur::where('parametre_id', 5)->where('code', $usager->Nationality_No_)->first();
-        
+            $regions_all=DB::table('regions')->get();
+            $FJ_EI= DB::table('forme_juridiques')->where('company_type','EI')->get();
+            $FJ_ES= DB::table('forme_juridiques')->where('company_type','ES')->get();
+            $FJ_GIE= DB::table('forme_juridiques')->where('company_type','GIE')->get();
            //    DB::table('activites')->where('id', $demandes->primary_activity)->first();
+           $activites_all= DB::select('select secteur_activite from activites group by secteur_activite');
+           $usage_terrains= DB::table('usage_terrains')->get();
+           $civilites=DB::table('valeurs')->where('parametre_id',15)->get();
            $demande=Demande::where('usager_id', $usager->id)->orderby('created_at','desc')->get();
+           $professions= DB::table('valeurs')->where('parametre_id',8)->orderby('libelle','asc')->get();
+           $nationalites= DB::table('valeurs')->where('parametre_id',6)->orderby('libelle','asc')->get();
+           $pays= DB::table('valeurs')->where('parametre_id',5)->orderby('libelle','asc')->get();
            $c=count($demande);
            $cefore=DB::table('organisations')->where('CodeOrganisation',$demandes->organisation_code)->first();
             $cefore_code=$cefore->Ville;
             return view('demande.detailtest', compact('demandes','usager','activites','forme_juridiques',
             'professions','regions','provinces','communes','arrondissements','secteurs','terrains','piecejointes',
-        'secteur_usager','province_usager','region_usager','c','cefore_code'));       
+        'secteur_usager','province_usager','region_usager','c','cefore_code','regions_all','FJ_EI','FJ_ES','FJ_GIE',
+    'activites_all','usage_terrains','civilites','professions','nationalites','pays'));       
         
         }
 
@@ -691,21 +791,22 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             //dd($request->all());
             $date=new \DateTime();
             //$id=$request->id;
-            $date_paiement= $date->format("d-m-Y H:i:s");
+            $date_initiation= $date->format("d-m-Y H:i:s");
             $numero_demande=$request->num_command;
-            $numero=substr($numero_demande, 0, -6);
+            $numero=substr($numero_demande, 0, -5);
             //dd($numero);    
-           $demande=Demande::where('numero_demande',$numero)->first();
+           $demande=Demande::where('numero_command',$numero)->first();
            $usager=Usager::where('id',$demande->usager_id)->first();
+           if($demande->date_initiation==null){
+            $demande->update([               
+                'date_initiation'=>$date_initiation
+                ]);
+           }
+           if($demande->paye!="1"){
            $demande->update([
-            'paye'=>1,
-            'date_paiement'=>$date_paiement
-           ]);
-            //return redirect()->back();
-            //$pdf = PDF::loadView('pdf.facture', compact('demande','usager'));
-            //return view('pdf.facture', compact('demande','usager'));
-            //return $pdf->download('cefore_facture.pdf');
-            //return view('pdf.facture', compact('demande'));
+            'paye'=>2            
+            ]);
+            }           
             return redirect()->route('demande.liste');
         }
         public function facture($id)
@@ -732,10 +833,326 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             $demande->commercial_name=$request->nom_commercial;
             $demande->enseigne=$request->enseigne;
             $demande->sigle=$request->sigle;
-            //$demande->denomination_social=$request->denomination_sociale;
+            //dd($request->denomination_sociale);
+            if($request->denomination_sociale==null)
+            {
+                $demande->denomination_social=$request->nom_commercial;
+            }
+            else{
+                $demande->denomination_social=$request->denomination_sociale;
+            }
             $demande->chiffre_daffaire_previsionel=$request->chiffre_daffaire;
-            //$demande->sigle=$request->objet_social;
+            $demande->objet_social=$request->objet_social;
+            if($request->forme_juridique_pp!=null){
+                $forme_juridique=$request->forme_juridique_pp;
+            }
+            elseif($request->forme_juridique_es!=null){
+                $forme_juridique=$request->forme_juridique_es;
+            }
+            elseif($request->forme_juridique_gie!=null){
+                $forme_juridique=$request->forme_juridique_gie;
+            }
+            $demande->forme_juridique=$forme_juridique;
+            $demande->activity_sector=$request->secteur_activite;
+            $demande->primary_activity=$request->activite_principale;
+            //$demande->region_code=$request->region_entreprise;
+            //Mise à jour du terrain
+            //dd($request->id_terrain);
+            $terrain=Terrain::find($request->id_terrain);
+            $terrain->numero_lot=$request->lot;
+            $terrain->numero_section=$request->section;
+            $terrain->numero_parcelle=$request->parcelle;
+            $terrain->id_usage_terrain=$request->usage;
+            $terrain->update();
+
             $demande->update();
             return redirect()->back();
+           
         }
+
+        public function update_usager(Request $request, $id)
+        {//
+            //dd($request->province_usager);
+            $usager=Usager::find($id);                       
+            $usager->update([
+                'NomRaisonSociale'=>$request->nom,
+                'Prenom'=>$request->prenom,
+                'LieuNaissance'=>$request->lieu_naissance,
+                'Phone_No_'=>$request->tel_mobile,
+                'Tel_Bureau'=>$request->tel_bureau,
+                'E-Mail'=>$request->mail,
+                'Boite_postale'=>$request->boite_postale,
+                'titre' => $request->civilite,
+                'Civility' => $request->civilite,
+                'IdFonction'=>$request->profession,
+                'Nationality_No_'=>$request->nationalite_usager,
+                'Country_Code'=>$request->pays_usager,
+                'DateNaissance'=>$request->date_de_naissance,
+                'SituationMatrimoniale'=>$request->situation_matrimoniale,
+                // 'Region_Code'=>$request->region_usager,
+                // 'Province_Code'=>$request->province_usager
+               ]);
+            return redirect()->back();
+        }
+
+        public function index_admin(){
+            if(Auth::user()->organisation!="001000"){
+                $demandes=Demande::where('organisation_code',Auth::user()->organisation)->where('etat', '!=', null)->orderby('created_at','desc')->get();
+                $paye=Demande::where('paye', 1)->where('organisation_code',Auth::user()->organisation)->get();
+                $nbr_paye=count($paye);
+                $nonpaye=Demande::where('paye', 0)->where('organisation_code',Auth::user()->organisation)->get();
+                $rejet=Demande::where('etat', 2)->where('organisation_code',Auth::user()->organisation)->get();
+                $nbr_rejet=count($rejet);
+                $nbr_nonpaye=count($nonpaye);
+                $nbr=count($demandes);
+            }
+            else{
+                $demandes=Demande::where('etat', '!=', null)->orderby('created_at','desc')->get();
+                $paye=Demande::where('paye', 1)->get();
+                $nbr_paye=count($paye);
+                $nonpaye=Demande::where('paye', 0)->get();
+                $rejet=Demande::where('etat', 2)->get();
+                $nbr_rejet=count($rejet);
+                $nbr_nonpaye=count($nonpaye);
+                $nbr=count($demandes);
+            }
+            return view('backend.adminlte.dashboard', compact('demandes','nbr','nbr_paye','nbr_nonpaye','nbr_rejet'));
+        }
+
+        public function liste_demande(Request $request){
+            if(Auth::user()->organisation!="001000"){
+                $etat=$request->etat;
+            if($etat==0){
+                $dem="demande_a_valider";
+                $demandes=Demande::where('paye', 1)->where('etat', 0)->where('organisation_code',Auth::user()->organisation)->orderby('created_at','desc')->get();
+            return view('backend.adminlte.liste', compact('demandes','dem'));
+            }
+            else{
+                $dem="demande_valider";
+                $demandes=Demande::where('paye', 1)->where('etat', 1)->where('organisation_code',Auth::user()->organisation)->orderby('created_at','desc')->get();
+            return view('backend.adminlte.liste', compact('demandes','dem'));
+
+            }
+            }
+            else{
+                $etat=$request->etat;
+                if($etat==0){
+                    $dem="demande_a_valider";
+                    $demandes=Demande::where('paye', 1)->where('etat', 0)->orderby('created_at','desc')->get();
+                return view('backend.adminlte.liste', compact('demandes','dem'));
+                }
+                else{
+                    $dem="demande_valider";
+                    $demandes=Demande::where('paye', 1)->where('etat', 1)->orderby('created_at','desc')->get();
+                return view('backend.adminlte.liste', compact('demandes','dem'));
+
+                }
+            }
+        }
+        public function liste_demande_rejet(){
+            if(Auth::user()->organisation!="001000"){
+                $demandes=Demande::where('etat', 2)->where('organisation_code',Auth::user()->organisation)->orderby('created_at','desc')->get();
+                }
+            else{
+                $demandes=Demande::where('etat', 2)->orderby('created_at','desc')->get();
+                }
+            return view('backend.adminlte.liste_rejet', compact('demandes'));
+        }
+
+        public function detail_backend($id)
+        {
+            $demandes=Demande::where('id', $id)->first();
+            $usager=Usager::where('id', $demandes->usager_id)->first();
+           $activites= DB::table('activites')->where('Code', $demandes->primary_activity)->first();
+           $regions_all=DB::table('regions')->get();
+           $nationalites= DB::table('valeurs')->where('parametre_id',6)->orderby('libelle','asc')->get();
+           $civilites=DB::table('valeurs')->where('parametre_id',15)->get();
+           $pays= DB::table('valeurs')->where('parametre_id',5)->orderby('libelle','asc')->get();
+           $forme_juridiques= DB::table('forme_juridiques')->where('code', $demandes->forme_juridique)->first();
+           $professions= Valeur::where('code', $usager->IdFonction)->first();
+           $regions=DB::table('regions')->where('id', $demandes->region_code)->first();
+           $provinces=DB::table('provinces')->where('id', $demandes->province_code)->first();
+           $communes=DB::table('commune_departements')->where('id', $demandes->commune_departement_code)->first();
+           $arrondissements=DB::table('arrondissements')->where('id', $demandes->arrondissement_code)->first();
+           $secteurs=DB::table('secteur_villages')->where('code', $demandes->code_secteur_village)->first();
+           $terrains=DB::table('terrains')->where('id', $demandes->id_terrain)->first();
+           $piecejointes= PieceJointe::where('usager_id',$usager->id)->where('demande_id', $demandes->id)->get();
+            $secteur_usager=DB::table('secteur_villages')->where('code', $usager->Code_Secteur_Village)->first();
+            $province_usager=DB::table('provinces')->where('id', $usager->Province_Code)->first();
+            $region_usager=DB::table('regions')->where('id', $usager->Region_Code)->first();
+            $FJ_EI= DB::table('forme_juridiques')->where('company_type','EI')->get();
+            $FJ_ES= DB::table('forme_juridiques')->where('company_type','ES')->get();
+            $FJ_GIE= DB::table('forme_juridiques')->where('company_type','GIE')->get();
+           $activites_all= DB::select('select secteur_activite from activites group by secteur_activite');
+           $professions= DB::table('valeurs')->where('parametre_id',8)->orderby('libelle','asc')->get();
+           $usage_terrains= DB::table('usage_terrains')->get();
+           $demande=Demande::where('usager_id', $usager->id)->orderby('created_at','desc')->get();
+           $c=count($demande);
+           $cefore=DB::table('organisations')->where('CodeOrganisation',$demandes->organisation_code)->first();
+            $cefore_code=$cefore->Ville;
+            return view('backend.adminlte.detail', compact('demandes','usager','activites','forme_juridiques',
+            'professions','regions','provinces','communes','arrondissements','secteurs','terrains','piecejointes',
+        'secteur_usager','province_usager','region_usager','c','cefore_code','FJ_EI','FJ_ES','FJ_GIE','activites_all',
+    'usage_terrains','civilites','professions','pays','nationalites','regions_all'));       
+    }
+
+        public function valider_demande(Request $request , $id){
+            $demandes=Demande::find($id);
+            $etat=$request->etat;
+            $motif=$request->motif;
+            $date=new \DateTime();
+            $date_validation= $date->format("d-m-Y H:i:s");
+            if($etat=="oui"){                
+                $demandes->update([
+                    'etat'=>1,
+                    'Date_etat_validation'=>$date_validation,
+                    'User_ayant_valide'=>Auth::user()->id
+                   ]);
+                   return redirect()->route('list');
+            }
+            else{
+            $usager_id=$demandes->usager_id;
+            $usager=Usager::where('id', $usager_id)->first();
+            $user_id=$usager['user_id'];   
+            $user=User::where('id', $user_id)->first();
+            //dd($user);
+            $email=$user->email;
+            //dd($email);
+            $details['email'] = $email; 
+            $details['nom'] = $usager->NomRaisonSociale;
+            $details['prenom'] =$usager->Prenom;
+            $details['nom_commercial'] =$demandes->commercial_name;
+            $details['motif'] =$motif;
+            $demandes->update([
+                    'etat'=>2,
+                    'motif'=>$motif,
+                    'Date_etat_validation'=>$date_validation,
+                    'User_ayant_valide'=>Auth::user()->id
+                   ]);
+            $historique=Historique::create([
+                'id_demande'=>$demandes->id,
+                'id_user'=>Auth::user()->id,
+                'motif'=>$motif
+                ]);
+//dd($details);
+             Mail::to($email)->send(new NotifyRejet($details));
+                   return redirect()->route('list');
+            }
+        }
+        public function liste_filtre(Request $request){
+            if(Auth::user()->organisation!="001000"){
+                $statut=$request->paye;
+                $demandes=Demande::where('paye', $statut)->where('organisation_code', Auth::user()->organisation)->get();
+                }
+            else{
+                $statut=$request->paye;
+                $demandes=Demande::where('paye', $statut)->get();
+                }
+            return view('backend.adminlte.liste_demande', compact('demandes'));
+        }
+
+        public function update_rejet(Request $request, $id){
+            //dd($id);
+            $demande=Demande::find($id);
+            $demande->update([
+                'etat'=>0,             
+               ]);
+
+               $historique=Historique::create([
+                'id_demande'=>$demande->id,
+                'id_user'=>Auth::user()->id,
+                'motif'=>"Envoyer Pour Traitement"
+                ]);
+
+               return redirect()->back();            
+        }
+        public function showpj(Piecejointe $piecejointe){
+            //dd($piecejointe);
+            return view("demande.showPj", compact('piecejointe'));
+        }
+        public function editpj(Piecejointe $piecejointe){
+            return view("demande.editPj", compact('piecejointe'));
+        }
+        public function updatepj(Piecejointe $piecejointe, Request $request){
+            $type_doc=$piecejointe->type_piece;
+            $usager= $piecejointe->demande->usager;
+            $file = $request->file('piece_jointe_u');
+            $extension=$file->getClientOriginalExtension();
+            $fileName = $type_doc.'.'.$extension;
+            $emplacement='public/files/'.$usager->id;
+            $file_url= $request['piece_jointe_u']->storeAs($emplacement, $fileName);
+            $url_local=$usager->id.'/'.$fileName;           
+            $pj= $piecejointe->update([
+                'url'=> $file_url,
+                'numero'=> $request->numero_ref,
+                'date_etablissement'=> $request->date_detablissment,
+                'lieu_etablissement' => $request->lieu_etablissment,
+                'url_local'=>$url_local
+            ]);
+            return redirect()->route("detail.demande", ['id'=>$piecejointe->demande->id]);
+        }
+
+        public function statistique(Request $request)
+        {
+            
+            $cefores=DB::table('organisations')->get();
+            if($request->datedebut!="")
+            {
+                //dd($request->datedebut);
+                $date_debut=format_date($request->datedebut);
+               $demandes=Demande::where('id', 1)->first();
+               dd($demandes->created_at);
+               
+               for($i=0; $i<count($demandes); $i++){           
+                    $dates=format_date($demandes[$i]->created_at); 
+                    $date=date("Y-m-d", strtotime($dates));
+                    dd($date);                    
+                }
+            
+            //dd($date);
+               //dd($request->datedebut); 
+                           
+            }
+            if($request->cefore!=""){
+                               
+                $result=Demande::where('organisation_code',$request->cefore)->get();
+                $demandes=$result;
+                }
+            else{
+                if($request->reset=1){
+                    $demandes=Demande::all();
+                    }
+                }
+            return view('backend.adminlte.statistique', compact('demandes','cefores'));
+        }
+        
+        public function reponse_paiement(Request $request){
+            //dd($request->all());
+                $numero_demande=$request->command_number;
+                $numero=substr($numero_demande, 0, -5);
+                $demande=Demande::where('numero_command', $numero)->first();
+                $paiements=Paiement::create([
+                    'numero_demande'=>$request->command_number,
+                    'statut'=>$request->payment_status,
+                    'mode_paiement'=>$request->payment_mode,
+                    'paid_sum'=>$request->paid_sum,
+                    'paid_amount'=>$request->paid_amount
+                ]);
+            if($request->payment_status==200){
+                
+                $date=new \DateTime();
+                $date_paiement= $date->format("d-m-Y H:i:s");             
+                $demande->update([
+                    'paye'=>1,
+                    'date_paiement'=>$date_paiement
+                   ]);
+            }
+            else{
+                $demande->update([
+                    'paye'=>0                    
+                   ]);
+            }
+            return 0;
+        }
+
 }

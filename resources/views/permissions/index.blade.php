@@ -1,23 +1,11 @@
-@extends("layouts.admin")
-@section('administration', 'active')
-@section('administration-parametre', 'active')
+@extends("backend.adminlte.main")
+@section('administration', 'menu-open')
+@section('administration-permission', 'active')
 @section('content')
-@section('blank')
-    <li>Accueil</li>
-    <li>Permissions</li>
-    <li><a href="">liste</a></li>
-@endsection
-@section('content')
-
-<div class="block full">
-            <div class="block-title">
-                <div class="row">
-                    <div class="col-md-12">
-                    <h2>Liste des <strong>Permissions</strong></h2>
-                    <a href="{{ route('permissions.create') }}" class="btn btn-success pull-right"><span><i class="fa fa-plus"></i></span>Permission</a>
-                    </div>
-                </div>
-            </div>
+<div class="card card-success col-md-12 col-md-offset-2">
+    <div class="card-header">
+      <h3 class="card-title">Créer un utilisateur</h3>
+    </div>
 <div class="table-responsive">
     <table class="table table-vcenter table-condensed table-bordered listepdf">
         <thead>
@@ -32,7 +20,7 @@
                     <td>{{$permission->name}}</td>
                     <td class="text-center">
                             <div class="btn-group">
-                                <a href="{{ route('permissions.edit', $permission) }}" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
+                                <a href="{{ route('permissions.edit', $permission) }}" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-default"><i class="fa fa-edit"></i></a>
                                 <a href="#modal-confirm-delete" onclick="delConfirm({{ $permission->id }});" data-toggle="modal" title="Supprimer" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
                             </div>
                     </td>
