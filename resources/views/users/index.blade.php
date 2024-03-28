@@ -9,7 +9,7 @@
                           <h3 class="card-title">Liste des utilisateurs</h3>
                         </div>
                         @can('user.create', Auth::user()) 
-                        <button href="{{ route('user.create') }}" class="btn btn-block btn-success col-md-2 mt-2" type="button"><span><i class="fa fa-plus"></i></span>User</button>
+                        <a href="{{ route('user.create') }}" class="btn btn-md btn-success"><span><i class="fa fa-plus"></i></span>User</a>
                        @endcan
                         
                        

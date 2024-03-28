@@ -993,10 +993,15 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
         public function liste_en_attente_de_partenaire(){
             if (Auth::user()->can('lister.demande'))
             {
-
-            $dem="demande_en_attente_partenaire";
+            if(Auth::user()->organisation=="001000"){
             $demandes=Demande::where('RCCM','!=',null)->get();
+            }
+            else{
+            $demandes=Demande::where('RCCM','!=',null)->where('organisation_code',Auth::user()->organisation)->orderby('created_at','desc')->get();    
+            }
+            $dem="demande_en_attente_partenaire";
             return view('backend.adminlte.enattentedepartenaire', compact('demandes','dem'));
+            
         }
         else{
             flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();

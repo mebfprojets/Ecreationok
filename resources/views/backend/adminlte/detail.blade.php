@@ -13,10 +13,10 @@
                     @endif
                     - {{$cefore_code}}</h4></center>
                     <br>
-
 <form action="{{ route('demande.update',$demandes->id)}}" method="post">
                   {{ csrf_field() }}
                   {{ method_field('PUT') }}
+                  @can('valider.demande',Auth::user())
                   @if($demandes->organisation_code== Auth::user()->organisation || Auth::user()->organisation=="001000")
             @if($demandes->etat !=1 && $demandes->paye==1 )  
             <center><a  style="margin-left:10px;" href="#modal-confirm" data-toggle="modal" data-dismiss="modal" id="declaration_edit"  class="btn btn-md btn-success declaration" > <i class="fa fa-check-circle"></i> Valider </a>
@@ -30,6 +30,7 @@
             @endif
           
         @endif
+        @endcan
        @if($demandes->RCCM !="")
         <div class="card card-default">
           <div class="card-header">
@@ -558,9 +559,10 @@
                     <input id="typepiece" type="hidden" class="form-control" name="typepiece">
                     <input id="demande" type="hidden" class="form-control" name="demande" value="{{$demandes->id}}">
                     <label for="">Joindre une copie de la formalite:</label>
-                    <input class="" type="file" name="copie_de_la_formalite" accept=".pdf, .jpeg, .png"   placeholder="Joindre une copie de la formalite">
-                    <center><input type="submit" class="btn btn-md btn-success" value="Valider"></center>
-                </form>    
+                    <input class="" type="file" name="copie_de_la_formalite" accept=".pdf, .jpeg, .png" required placeholder="Joindre une copie de la formalite">
+                    <center><a class="btn btn-md btn-danger" data-dismiss="modal">Fermer</a>
+                      <input type="submit" class="btn btn-md btn-success" value="Valider"></center>
+                </form>
          
         </div>
              
@@ -573,7 +575,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-        <center><h3 class="modal-title text-center" id="modal-login-label"> Modifier la formalité <p class="p_typepiece_u"></p></h3></center>
+        <center><h3 class="modal-title text-center" id="modal-login-label"> Modifier la formalité <span class="p_typepiece_u"></span></h3></center>
         </div>
         <div class="modal-body">
           <div class="row">
@@ -582,10 +584,12 @@
                     <input id="typepiece_u" type="hidden" class="form-control" name="typepiece">
                     <input id="demande" type="hidden" class="form-control" name="demande" value="{{$demandes->id}}">
                     <label for="">Joindre une copie de la formalite:</label>
-                    <input class="" type="file" name="copie_de_la_formalite" accept=".pdf, .jpeg, .png"   placeholder="Joindre une copie de la formalite">
-                    <center><input type="submit" class="btn btn-md btn-success" value="Valider"></center>
+                    <input class="" type="file" name="copie_de_la_formalite" accept=".pdf, .jpeg, .png" required placeholder="Joindre une copie de la formalite">
+                    <center>
+                    <a class="btn btn-md btn-danger" data-dismiss="modal">Fermer</a>
+                      <input type="submit" class="btn btn-md btn-success" value="Valider"></center>
                 </form>    
-         
+                
         </div>
              
         </div>
