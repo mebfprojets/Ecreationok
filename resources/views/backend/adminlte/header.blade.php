@@ -128,15 +128,11 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-          <li class="nav-item">
+          <li class="nav-item"> 
             <a href="{{route('dashboard')}}" class="nav-link @yield("dashboard")">
               <i class="nav-icon fas fa-tachometer-alt"></i>
-              <p>
-                Tableau De Bord
-                
-              </p>
-            </a>
-            
+              <p>Tableau De Bord</p>
+            </a>            
           </li>
           <li class="nav-item">
             <a href="{{ route('list') }}?etat=0" class="nav-link @yield("demande_a_valider")">

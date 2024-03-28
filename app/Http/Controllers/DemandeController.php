@@ -12,6 +12,7 @@ use App\Models\Terrain;
 use App\Models\Prestation;
 use App\Models\PieceJointe;
 use App\Models\Valeur;
+use App\Models\Formalite;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Mail\NotifyRejet;
+use App\Mail\NotifyValider;
 use Illuminate\Support\Facades\Mail;
 use PDF;
 
@@ -677,6 +679,24 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
        return $path = Storage::download($piecejointe->url);
        
     }
+
+    public function documentformalite($id){
+        // $typedoc=$request->typedocument;
+        //$filename='test';
+       //dd($id);
+        
+        //$usager= Usager::where('user_id',Auth::user()->id)->first();
+        //$demande=Demande::where('usager_id',$usager->id)->first();
+        $piecejointe= Formalite::find($id);
+        //->first();
+         // return Response::make(file_get_contents($piecejointe->url), 200, [
+         //     'Content-Type' => 'application/pdf',
+         //     'Content-Disposition' => 'inline; filename="' . $filename . '"'
+         // ]);
+        return $path = Storage::download($piecejointe->url);
+        
+     }
+
     public function detaildocument_affiche($id){
         $piecejointe= PieceJointe::find($id);
         return $path = Storage::download($piecejointe->url);
@@ -779,10 +799,12 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
            $c=count($demande);
            $cefore=DB::table('organisations')->where('CodeOrganisation',$demandes->organisation_code)->first();
             $cefore_code=$cefore->Ville;
+            $types_formalites=Valeur::where('parametre_id',18)->orderby('libelle','desc')->get();
+            //dd($types_formalites);
             return view('demande.detailtest', compact('demandes','usager','activites','forme_juridiques',
             'professions','regions','provinces','communes','arrondissements','secteurs','terrains','piecejointes',
         'secteur_usager','province_usager','region_usager','c','cefore_code','regions_all','FJ_EI','FJ_ES','FJ_GIE',
-    'activites_all','usage_terrains','civilites','professions','nationalites','pays'));       
+    'activites_all','usage_terrains','civilites','professions','nationalites','pays','types_formalites'));       
         
         }
 
@@ -998,8 +1020,21 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
 
         public function valider_demande(Request $request , $id){
             $demandes=Demande::find($id);
+            $organisation=$demandes->organisation_code;
+            $cefore=DB::table('organisations')->where('CodeOrganisation', $organisation)->first();
             $etat=$request->etat;
             $motif=$request->motif;
+            $usager_id=$demandes->usager_id;
+            $usager=Usager::where('id', $usager_id)->first();
+            $user_id=$usager['user_id'];
+            $user=User::where('id', $user_id)->first();
+            $email=$user->email;
+            $details['email'] = $email;
+            $details['cefore'] = $cefore->Ville;
+            $details['nom'] = $usager->NomRaisonSociale;
+            $details['prenom'] =$usager->Prenom;
+            $details['nom_commercial'] =$demandes->commercial_name;
+            $details['motif'] =$motif;
             $date=new \DateTime();
             $date_validation= $date->format("d-m-Y H:i:s");
             if($etat=="oui"){                
@@ -1008,21 +1043,11 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
                     'Date_etat_validation'=>$date_validation,
                     'User_ayant_valide'=>Auth::user()->id
                    ]);
+                   Mail::to($email)->send(new NotifyValider($details));
                    return redirect()->route('list');
             }
             else{
-            $usager_id=$demandes->usager_id;
-            $usager=Usager::where('id', $usager_id)->first();
-            $user_id=$usager['user_id'];   
-            $user=User::where('id', $user_id)->first();
-            //dd($user);
-            $email=$user->email;
-            //dd($email);
-            $details['email'] = $email; 
-            $details['nom'] = $usager->NomRaisonSociale;
-            $details['prenom'] =$usager->Prenom;
-            $details['nom_commercial'] =$demandes->commercial_name;
-            $details['motif'] =$motif;
+            
             $demandes->update([
                     'etat'=>2,
                     'motif'=>$motif,

@@ -81,6 +81,8 @@ Route::get('/facture/demande/{id}', [DemandeController::class,'facture'])->name(
 Route::post('/load/piecejointe', [DemandeController::class, 'laodpiecejointe'])->name("piecejointe.laod");
 Route::get('piece/detail/', [DemandeController::class,'detaildocument'])->name('detaildocument');
 Route::get('piecejointe/afficher/{id}', [DemandeController::class,'detaildocument_affiche'])->name('detaildocument_affiche');
+Route::get('piecejointe/formalite/{id}', [DemandeController::class,'documentformalite'])->name('affiche_formalite');
+
 
 Route::post('/update/piecejointe', [DemandeController::class, 'updatepiecejointe'])->name("piecejointe.update");
 Route::post('/verifier/nom_commercial', [DemandeController::class, 'verifier_nom_commercial'])->name("verifier_nom_commercial");

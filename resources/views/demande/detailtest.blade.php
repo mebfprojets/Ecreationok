@@ -7,7 +7,7 @@
         <!-- SELECT2 EXAMPLE -->
         <center><h4>@if($demandes->company_type=="EI")
                       Entreprise Individuelle
-                    @else
+                         @else
                     Entreprise Sociétaire
                     @endif
                     - {{$cefore_code}}</h4></center>
@@ -28,6 +28,41 @@
   <form action="{{ route('demande.update',$demandes->id)}}" method="post">
                   {{ csrf_field() }}
                   {{ method_field('PUT') }}
+                  <div class="card card-default">
+            <div class="card-header">
+              @if($demandes->RCCM !="")
+            <span><h3 class="card-title">Mes Formalités Retour</h3></span>
+              <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                  <i class="fas fa-minus"></i>
+                </button>
+              </div>
+            </div>
+          <div class="card-body">
+          <div class="row">
+            @foreach ($types_formalites as $types_formalite)
+                            <div class="col-sm-3" style="border-style: outset;">
+                            <!-- text input -->
+                                <div class="form-group">
+                                    <label style="text-decoration: underline;">Numéro {{getlibelle($types_formalite->id)}}</label><br>
+                                    <label>{{getformalite($demandes->id, $types_formalite->id)['numero']}}</label>
+                                    <!-- <input type="text" class="form-control" disabled="disabled" value="{{$demandes->RCCM}}"> -->
+                                </div>
+                                <div class="form-group">
+                                <label style="text-decoration: underline;">Date {{getlibelle($types_formalite->id)}}</label><br>
+                                    <label>{{getformalite($demandes->id, $types_formalite->id)['date']}}</label><br>
+                                    <!-- <input type="text" style="" class="form-control" disabled="disabled"  value="{{format_date($demandes->DateRCCM)}}"> -->
+                                </div>                                
+                                <input type="hidden" name="formalite_id" value="{{$types_formalite->id}}">
+                              <center>  <a href="{{ route('affiche_formalite', getpieceformalite($demandes->id, $types_formalite->id))}}" style="margin-left:10px; margin-top:-20px;" id="declaration_view"   class="btn btn-md btn-success declaration_view"> Télécharger {{getlibelle($types_formalite->id)}} <i class="fas fa-eye"></i> </a></center>
+                      </div>
+                  @endforeach                            
+                           
+            </div>
+            <!-- /.row -->
+          </div>
+        </div>
+        @endif
         <div class="card card-default">
           <div class="card-header">
             <h2 class="card-title btn btn-tool" data-card-widget="collapse">Entreprise</h2>
