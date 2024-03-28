@@ -13,7 +13,6 @@ use App\Models\Prestation;
 use App\Models\PieceJointe;
 use App\Models\Valeur;
 use App\Models\Formalite;
-use App\Models\Formalite;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -808,8 +807,7 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             return view('demande.detailtest', compact('demandes','usager','activites','forme_juridiques',
             'professions','regions','provinces','communes','arrondissements','secteurs','terrains','piecejointes',
         'secteur_usager','province_usager','region_usager','c','cefore_code','regions_all','FJ_EI','FJ_ES','FJ_GIE',
-    'activites_all','usage_terrains','civilites','professions','nationalites','pays','types_formalites'));       
-    'activites_all','usage_terrains','civilites','professions','nationalites','pays'));   
+    'activites_all','usage_terrains','civilites','professions','nationalites','pays','types_formalites'));   
   
         
         }

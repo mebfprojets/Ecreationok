@@ -45,12 +45,12 @@
                             <!-- text input -->
                                 <div class="form-group">
                                     <label style="text-decoration: underline;">Numéro {{getlibelle($types_formalite->id)}}</label><br>
-                                    <label>{{getformalite($demandes->id, $types_formalite->id)['numero']}}</label>
+                                    <label>{{getelementformalite($demandes->id, $types_formalite->id)['numero']}}</label>
                                     <!-- <input type="text" class="form-control" disabled="disabled" value="{{$demandes->RCCM}}"> -->
                                 </div>
                                 <div class="form-group">
                                 <label style="text-decoration: underline;">Date {{getlibelle($types_formalite->id)}}</label><br>
-                                    <label>{{getformalite($demandes->id, $types_formalite->id)['date']}}</label><br>
+                                    <label>{{getelementformalite($demandes->id, $types_formalite->id)['date']}}</label><br>
                                     <!-- <input type="text" style="" class="form-control" disabled="disabled"  value="{{format_date($demandes->DateRCCM)}}"> -->
                                 </div>                                
                                 <input type="hidden" name="formalite_id" value="{{$types_formalite->id}}">

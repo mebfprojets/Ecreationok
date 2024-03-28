@@ -4,7 +4,6 @@ use App\Models\Demande;
 use App\Models\Usager;
 use App\Models\Valeur;
 use App\Models\Formalite;
-use App\Models\Formalite;
 use Illuminate\Support\Facades\Auth;
 
 if (!function_exists('returnpieceinfos')) {
@@ -79,6 +78,50 @@ if (!function_exists('returnpieceinfos')) {
                         return $libelle;
                 }
             }
+        
+            if (!function_exists('getelementformalite')) {
+                function getelementformalite($id_demande, $id_formalite)
+                    {   $array=array("numero" => '', "date" => '');
+                        $demandes=Demande::where('id', $id_demande)->first();
+                        $get_val=Valeur::where('id', $id_formalite)->first();
+                        $get_formalite=$get_val->libelle;
+                        if($get_formalite=="RCCM"){
+                            $formalites=$demandes->RCCM;
+                            $date=$demandes->DateRCCM;                  
+                             $array = array("numero" => $formalites, "date" => $date);
+                            //dd($array);
+                            //return $array;
+                        }
+                        if($get_formalite=="IFU"){
+                            $formalites=$demandes->IFU;
+                            $date=$demandes->DateIFU;                  
+                            $array = array("numero" => $formalites, "date" => $date);
+                            //dd($array);                            
+                        }
+                        if($get_formalite=="CNSS"){
+                            $formalites=$demandes->CNSS;
+                            $date=$demandes->DateCNSS;                  
+                            $array = array("numero" => $formalites, "date" => $date);
+                            //dd($array);                            
+                        }
+                        if($get_formalite=="CPC"){
+                            $formalites=$demandes->CPC;
+                            $date=$demandes->DateCPC;                 
+                            $array = array("numero" => $formalites, "date" => $date);
+                            //dd($array);                            
+                        }
+                        return $array;
+                    }
+                }
+
+                if (!function_exists('getpieceformalite')) {
+                    function getpieceformalite($id_demande, $id_formalite)
+                        {
+                            $valeur=Formalite::where('typepiece', $id_formalite)->where('demande_id', $id_demande)->first();
+                            $id=$valeur->id;
+                            return $id;
+                        }
+                    }
 
             if (!function_exists('getformalite')) {
                 function getformalite($typepiece,$demandeId)
