@@ -158,18 +158,24 @@ class DemandeController extends Controller
     $avecCPC=0;
     if($request->type_request=='M1' || $request->type_request=='G1'){
         $montant_demande= DB::table('montant_demandes')->where('type','M1')->where('avecCPC',0)->first();
-        // dd($montant_demande->montant);        
+        $montant=$montant_demande->montant;
+        $montant_total=$montant_demande->montant_total;
+        if(in_array($request['province_entreprise'],$list_code)){
+            $montant= $montant - env('montant_societaire_ss_ifu');
+            $montant_total= $montant_total - env('montant_societaire_ss_ifu');
+        }    
      }
      elseif($request->type_request=='P1'){
         $montant_demande= DB::table('montant_demandes')->where('type','P1')->first();
          $avecCPC=1;
+         $montant=$montant_demande->montant;
+            $montant_total=$montant_demande->montant_total;
+            if(in_array($request['province_entreprise'],$list_code)){
+                $montant= $montant - env('montant_societaire_ss_ifu');
+                $montant_total= $montant_total - env('montant_societaire_ss_ifu');
+            }
      }
-     $montant=$montant_demande->montant;
-     $montant_total=$montant_demande->montant_total;
-     if(in_array($request['province_entreprise'],$list_code) ){
-        $montant= $montant- env('montant_individuel_ss_ifu');
-        $montant_total= $montant_total- env('montant_individuel_ss_ifu');
-    }
+    
    }
         $usager=DB::table('usagers')->where('user_id',Auth::user()->id)->first();
 
