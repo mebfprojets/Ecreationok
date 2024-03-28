@@ -2,10 +2,10 @@
 
 namespace App\Policies;
 
-use Illuminate\Auth\Access\HandlesAuthorization;
 use App\Models\User;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
-class ParametrePoolicy
+class DemandePolicy
 {
     use HandlesAuthorization;
 
@@ -20,9 +20,12 @@ class ParametrePoolicy
     }
     public function view(User $user)
     {
-        return $this->getPermission($user,10);
+        return $this->getPermission($user,18);
     }
-
+    public function visualiser_demande(User $user)
+    {
+        return $this->getPermission($user,14);
+    }
     /**
      * Determine whether the user can create models.
      *
@@ -31,9 +34,20 @@ class ParametrePoolicy
      */
     public function create(User $user)
     {
-        return $this->getPermission($user,9);
+      
     }
-
+    public function valider(User $user)
+    {
+        return $this->getPermission($user,15);
+    }
+    public function save_formalite_retour(User $user)
+    {
+        return $this->getPermission($user,16);
+    }
+    public function visualiser_formalite_retour(User $user)
+    {
+        return $this->getPermission($user,17);
+    }
     /**
      * Determine whether the user can update the model.
      *
@@ -43,7 +57,7 @@ class ParametrePoolicy
      */
     public function update(User $user)
     {
-        return $this->getPermission($user,11);
+       
     }
     /**
      * Determine whether the user can delete the model.

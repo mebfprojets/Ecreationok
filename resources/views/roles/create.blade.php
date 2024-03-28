@@ -39,23 +39,16 @@
                         </div>
                     </div> --}}
                         <div class="row col-lg-offset-1">
-                                <div class="col-lg-4">
-                                    <label><u>Permissions système</u></label>
+                                <div class="col-lg-6">
+                                    <label><u>Permissions demande</u></label>
                                     @foreach ($permissions as $permission )
-                                        @if($permission->for== 'systeme')
+                                        @if($permission->for== 'demande')
                                                 <label><input type="checkbox" name=permission[] value="{{ $permission->id }}"> {{ $permission->name }}</label>
                                         @endif
                                     @endforeach
                                 </div>
-                                <div class="col-lg-4 ">
-                                        <label> <u>Permissions Dossier</u></label>
-                                        @foreach ($permissions as $permission )
-                                            @if($permission->for== 'dossier')
-                                                    <label><input type="checkbox" name=permission[] value="{{ $permission->id }}"> {{ $permission->name }}</label>
-                                            @endif
-                                        @endforeach
-                                </div>
-                                <div class="col-lg-4 ">
+                           
+                                <div class="col-lg-6 ">
                                     <label> <u>Permissions Administration</u></label>
                                     @foreach ($permissions as $permission )
                                         @if($permission->for== 'administration')

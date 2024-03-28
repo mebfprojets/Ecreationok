@@ -12,6 +12,7 @@ use App\Models\Terrain;
 use App\Models\Prestation;
 use App\Models\PieceJointe;
 use App\Models\Valeur;
+use App\Models\Formalite;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -131,7 +132,10 @@ class DemandeController extends Controller
     {
        // dd($request->type_request);
         // Vérification du montant CPC
-        //dd($request->all());
+        $provinces_ss_ifus= Valeur::where('parametre_id',19)->get();
+        foreach($provinces_ss_ifus as $province){
+            $list_code[]=$province->code;
+        }
         $ccp=$request->ccp_es;
         //dd($ccp);
        if(isset($ccp)){
@@ -143,6 +147,10 @@ class DemandeController extends Controller
             //dd($montant_demande->montant);
             $montant=$montant_demande->montant;
             $montant_total=$montant_demande->montant_total;
+            if(in_array($request['province_entreprise'],$list_code)){
+                $montant= $montant - env('montant_societaire_ss_ifu');
+                $montant_total= $montant_total - env('montant_societaire_ss_ifu');
+            }
         }
    }
    else{
@@ -153,14 +161,15 @@ class DemandeController extends Controller
      }
      elseif($request->type_request=='P1'){
         $montant_demande= DB::table('montant_demandes')->where('type','P1')->first();
-         //dd($montant_demande->montant);
          $avecCPC=1;
      }
      $montant=$montant_demande->montant;
      $montant_total=$montant_demande->montant_total;
+     if(in_array($request['province_entreprise'],$list_code) ){
+        $montant= $montant- env('montant_individuel_ss_ifu');
+        $montant_total= $montant_total- env('montant_individuel_ss_ifu');
+    }
    }
-
-   //dd($montant);
         $usager=DB::table('usagers')->where('user_id',Auth::user()->id)->first();
 
        // $num=$request->type_request.
@@ -181,12 +190,7 @@ class DemandeController extends Controller
         // $file =$path.$image_type;
         //$file ='public/files/'.$usager->id.'-'.$usager->NomRaisonSociale.'.'.$usager->Prenom; 
         file_put_contents($file,$image_base64);
-        //$url_signature=$file;
-             
-            //$url=$image_base64->store('public/files/');
-            //Storage::put('storage/app/public/files/'.$usager->id.'-'.$usager->NomRaisonSociale.$usager->Prenom, $image_base64);
-           // $file_url= $request['signed']->storeAs($emplacement, $fileName);
-            //$url_local="Signature/".$usager->id.'.'.$image_type;
+
             $url_local=$usager->id.'/signature'.'.'.$image_type;
             //$docName = $type_doc;
             $type_doc="Signature";
@@ -746,7 +750,7 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
 
         public function detail($id)
         {
-            // $usager= Usager::where('user_id',Auth::user()->id)->first();
+            
             
             $demandes=Demande::where('id', $id)->first();
             $usager=Usager::where('id', $demandes->usager_id)->first();
@@ -782,7 +786,8 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             return view('demande.detailtest', compact('demandes','usager','activites','forme_juridiques',
             'professions','regions','provinces','communes','arrondissements','secteurs','terrains','piecejointes',
         'secteur_usager','province_usager','region_usager','c','cefore_code','regions_all','FJ_EI','FJ_ES','FJ_GIE',
-    'activites_all','usage_terrains','civilites','professions','nationalites','pays'));       
+    'activites_all','usage_terrains','civilites','professions','nationalites','pays'));   
+  
         
         }
 
@@ -896,6 +901,8 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
         }
 
         public function index_admin(){
+            if (Auth::user()->can('lister.demande'))
+            {
             if(Auth::user()->organisation!="001000"){
                 $demandes=Demande::where('organisation_code',Auth::user()->organisation)->where('etat', '!=', null)->orderby('created_at','desc')->get();
                 $paye=Demande::where('paye', 1)->where('organisation_code',Auth::user()->organisation)->get();
@@ -918,8 +925,15 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             }
             return view('backend.adminlte.dashboard', compact('demandes','nbr','nbr_paye','nbr_nonpaye','nbr_rejet'));
         }
+        else{
+            flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
+            return redirect()->back();
+        }
+        }
 
         public function liste_demande(Request $request){
+            if (Auth::user()->can('lister.demande'))
+            {
             if(Auth::user()->organisation!="001000"){
                 $etat=$request->etat;
             if($etat==0){
@@ -949,7 +963,30 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
                 }
             }
         }
+        else{
+            flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
+            return redirect()->back();
+        }
+        }
+
+        public function liste_en_attente_de_partenaire(){
+            if (Auth::user()->can('lister.demande'))
+            {
+
+            $dem="demande_en_attente_partenaire";
+            $demandes=Demande::where('RCCM','!=',null)->get();
+            return view('backend.adminlte.enattentedepartenaire', compact('demandes','dem'));
+        }
+        else{
+            flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
+            return redirect()->back();
+        }
+
+        }
+
         public function liste_demande_rejet(){
+            if (Auth::user()->can('lister.demande'))
+            {
             if(Auth::user()->organisation!="001000"){
                 $demandes=Demande::where('etat', 2)->where('organisation_code',Auth::user()->organisation)->orderby('created_at','desc')->get();
                 }
@@ -957,10 +994,17 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
                 $demandes=Demande::where('etat', 2)->orderby('created_at','desc')->get();
                 }
             return view('backend.adminlte.liste_rejet', compact('demandes'));
+             }
+            else{
+                flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
+                return redirect()->back();
+            }
         }
 
         public function detail_backend($id)
         {
+            if (Auth::user()->can('lister.demande'))
+            {
             $demandes=Demande::where('id', $id)->first();
             $usager=Usager::where('id', $demandes->usager_id)->first();
            $activites= DB::table('activites')->where('Code', $demandes->primary_activity)->first();
@@ -990,13 +1034,81 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
            $c=count($demande);
            $cefore=DB::table('organisations')->where('CodeOrganisation',$demandes->organisation_code)->first();
             $cefore_code=$cefore->Ville;
+            $typepieceformaliteretours= Valeur::where('parametre_id',18)->get();
             return view('backend.adminlte.detail', compact('demandes','usager','activites','forme_juridiques',
             'professions','regions','provinces','communes','arrondissements','secteurs','terrains','piecejointes',
         'secteur_usager','province_usager','region_usager','c','cefore_code','FJ_EI','FJ_ES','FJ_GIE','activites_all',
-    'usage_terrains','civilites','professions','pays','nationalites','regions_all'));       
+    'usage_terrains','civilites','professions','pays','nationalites','regions_all','typepieceformaliteretours'));  
+}
+    else{
+        flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
+        return redirect()->back();
+    }
     }
 
-        public function valider_demande(Request $request , $id){
+
+    public function add_formalite_retour(Request $request){
+    if (Auth::user()->can('save_formalite_retour'))
+        {
+        if ($request->hasFile('copie_de_la_formalite')) {
+            $file = $request->file('copie_de_la_formalite');
+            $extension=$file->getClientOriginalExtension();
+            $fileName = getlibelle($request->typepiece).'.'.$extension;
+            $emplacement='public/files/formalite_retours/'.$request->demande;
+            $file_url= $request['copie_de_la_formalite']->storeAs($emplacement, $fileName);
+                Formalite::create([
+                    'typepiece'=>$request->typepiece,
+                    'demande_id'=>$request->demande,
+                    'url'=> $file_url,
+                   ]);
+                   flash("La formalité a été enregistré avec success!!!")->error();
+    }
+    return redirect()->back();
+}
+else{
+    flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
+    return redirect()->back();
+}
+}
+
+
+public function update_formalite_retour(Request $request){
+    if (Auth::user()->can('save_formalite_retour'))
+     {
+        if ($request->hasFile('copie_de_la_formalite'))
+            {
+                    $file = $request->file('copie_de_la_formalite');
+                    $extension=$file->getClientOriginalExtension();
+                    $fileName = getlibelle($request->typepiece).'.'.$extension;
+                    $emplacement='public/files/formalite_retours/'.$request->demande;
+                    $file_url= $request['copie_de_la_formalite']->storeAs($emplacement, $fileName);
+                    $formalite= Formalite::where('demande_id' ,$request->demande)->where('typepiece' ,$request->typepiece)->first();
+                    $formalite->update([
+                            'url'=> $file_url,
+                    ]);
+            }
+            return redirect()->back();
+        }
+            else{
+                flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
+                return redirect()->back();
+            }
+}
+
+public function show_formalite_retour(Formalite $formalite){
+    if (Auth::user()->can('lister.demande'))
+     {
+    return view("demande.detailformalite", compact('formalite'));
+}
+else{
+    flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
+    return redirect()->back();
+}
+}
+
+    public function valider_demande(Request $request , $id){
+        if (Auth::user()->can('valider.demande'))
+            {
             $demandes=Demande::find($id);
             $etat=$request->etat;
             $motif=$request->motif;
@@ -1039,7 +1151,14 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
                    return redirect()->route('list');
             }
         }
+        else{
+            flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
+            return redirect()->back();
+        }
+        }
         public function liste_filtre(Request $request){
+            if (Auth::user()->can('lister.demande'))
+            {
             if(Auth::user()->organisation!="001000"){
                 $statut=$request->paye;
                 $demandes=Demande::where('paye', $statut)->where('organisation_code', Auth::user()->organisation)->get();
@@ -1049,6 +1168,11 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
                 $demandes=Demande::where('paye', $statut)->get();
                 }
             return view('backend.adminlte.liste_demande', compact('demandes'));
+        }
+        else{
+            flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
+            return redirect()->back();
+        }
         }
 
         public function update_rejet(Request $request, $id){
@@ -1064,7 +1188,8 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
                 'motif'=>"Envoyer Pour Traitement"
                 ]);
 
-               return redirect()->back();            
+               return redirect()->back();    
+                  
         }
         public function showpj(Piecejointe $piecejointe){
             //dd($piecejointe);

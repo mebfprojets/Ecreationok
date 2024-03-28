@@ -2,10 +2,10 @@
 
 namespace App\Policies;
 
-use Illuminate\Auth\Access\HandlesAuthorization;
 use App\Models\User;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
-class ParametrePoolicy
+class ParametrePolicy
 {
     use HandlesAuthorization;
 
@@ -43,7 +43,7 @@ class ParametrePoolicy
      */
     public function update(User $user)
     {
-        return $this->getPermission($user,11);
+        return $this->getPermission($user,5);
     }
     /**
      * Determine whether the user can delete the model.

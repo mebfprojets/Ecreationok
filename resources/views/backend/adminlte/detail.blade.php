@@ -18,8 +18,10 @@
                   {{ csrf_field() }}
                   {{ method_field('PUT') }}
                   @if($demandes->organisation_code== Auth::user()->organisation || Auth::user()->organisation=="001000")
+            @if($demandes->etat !=1 && $demandes->paye==1 )  
             <center><a  style="margin-left:10px;" href="#modal-confirm" data-toggle="modal" data-dismiss="modal" id="declaration_edit"  class="btn btn-md btn-success declaration" > <i class="fa fa-check-circle"></i> Valider </a>
             <a  style="margin-left:10px;" id="declaration_edit" href="#modal-confirm-rejet" data-toggle="modal" data-dismiss="modal" style="display:none" class="btn btn-md btn-danger declaration" > <i class="fa fa-window-close"></i> Rejéter </a><br></center>
+            @endif
             @if($demandes->motif!="")
             <label class="form-label" style="color:red; font-size:16px;" for="progress-basicpill-vatno-input">                              
                               Motif du Rejet : {{$demandes->motif}}   <br>
@@ -28,6 +30,44 @@
             @endif
           
         @endif
+       @if($demandes->RCCM !="")
+        <div class="card card-default">
+          <div class="card-header">
+            <h3 class="card-title">Formalites retour</h3>
+            <div class="card-tools">
+              <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+              </button>
+            </div>
+          </div>
+          <!-- /.card-header -->
+          <div class="card-body">
+          <div class="row">
+            @foreach($typepieceformaliteretours as $typejointe)
+              <div class="col-md-3" style="padding:5px;">
+                <div class="input-group">
+                <!-- <label>Nom Pièce</label> -->
+               
+                <input class="form-control"  disabled="disabled" type="text" value="{{$typejointe->libelle}}">
+                @if(getformalite($typejointe->id,$demandes->id))
+                @can('save_formalite_retour',Auth::user())
+                  <a  href="#modal-update-piece" data-toggle="modal"  onclick="gettypepiece_update('{{$typejointe->id}}','{{$typejointe->libelle}}');" style="margin-left:10px;"  class="btn btn-md btn-success" > <i class="fas fa-pen"></i> </a>
+                @endcan
+                  <a href="{{ route('show_formalite_retour',getformalite($typejointe->id,$demandes->id)) }}" style="margin-left:10px;" target="_blank"   class="btn btn-md btn-success "> <i class="fas fa-eye"></i> </a>
+                @else
+                @can('save_formalite_retour',Auth::user())
+                    <a href="#modal-add-piece" data-toggle="modal" onclick="gettypepiece('{{$typejointe->id}}','{{$typejointe->libelle}}');"  style="margin-left:10px;"  class="btn btn-md btn-success" > <i class="fas fa-plus"></i> </a>
+                @endcan
+                @endif
+                </div>
+              </div>
+
+            @endforeach
+            </div>
+          </div>
+          </div>
+      </div>
+      @endif
         <div class="card card-default">
           <div class="card-header">
             <h2 class="card-title btn btn-tool" data-card-widget="collapse">Entreprise</h2>
@@ -503,6 +543,56 @@
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
+
+  <div class="modal fade modal-front" id="modal-add-piece" tabindex="-1" role="dialog" aria-labelledby="modal-login-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+        <center><h3 class="modal-title text-center" id="modal-login-label"> Ajouter la formalité <span class="p_typepiece"></span></h3></center>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+        <form method="POST" action="{{ route('add_formalite_retour') }}"  enctype="multipart/form-data">
+                @csrf
+                  
+                    <input id="typepiece" type="hidden" class="form-control" name="typepiece">
+                    <input id="demande" type="hidden" class="form-control" name="demande" value="{{$demandes->id}}">
+                    <label for="">Joindre une copie de la formalite:</label>
+                    <input class="" type="file" name="copie_de_la_formalite" accept=".pdf, .jpeg, .png"   placeholder="Joindre une copie de la formalite">
+                    <center><input type="submit" class="btn btn-md btn-success" value="Valider"></center>
+                </form>    
+         
+        </div>
+             
+        </div>
+        
+      </div>
+    </div>
+</div>
+<div class="modal fade modal-front" id="modal-update-piece" tabindex="-1" role="dialog" aria-labelledby="modal-login-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+        <center><h3 class="modal-title text-center" id="modal-login-label"> Modifier la formalité <p class="p_typepiece_u"></p></h3></center>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+        <form method="POST" action="{{ route('update_formalite_retour') }}"  enctype="multipart/form-data">
+                @csrf
+                    <input id="typepiece_u" type="hidden" class="form-control" name="typepiece">
+                    <input id="demande" type="hidden" class="form-control" name="demande" value="{{$demandes->id}}">
+                    <label for="">Joindre une copie de la formalite:</label>
+                    <input class="" type="file" name="copie_de_la_formalite" accept=".pdf, .jpeg, .png"   placeholder="Joindre une copie de la formalite">
+                    <center><input type="submit" class="btn btn-md btn-success" value="Valider"></center>
+                </form>    
+         
+        </div>
+             
+        </div>
+        
+      </div>
+    </div>
+</div>
   <div class="modal fade modal-front" id="modal-confirm" tabindex="-1" role="dialog" aria-labelledby="modal-login-label" aria-hidden="true">
     <div class="modal-dialog modal-md">
       <div class="modal-content">
@@ -562,6 +652,18 @@
 </div>
 
 <script>
+  function gettypepiece(id,libelle)
+      {
+    
+        $('#typepiece').val(id);
+        $('.p_typepiece').text(libelle);
+      }
+      function  gettypepiece_update(id,libelle)
+      {
+        $('#typepiece_u').val(id);
+        $('.p_typepiece_u').text(libelle);
+      }
+     
     function editdemande()
       {
         //alert('ok');

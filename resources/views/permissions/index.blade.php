@@ -4,8 +4,11 @@
 @section('content')
 <div class="card card-success col-md-12 col-md-offset-2">
     <div class="card-header">
-      <h3 class="card-title">Créer un utilisateur</h3>
+      <h3 class="card-title">Liste des permissions</h3>
     </div>
+                    @can('user.create', Auth::user()) 
+                        <a href="{{ route('permissions.create') }}" class="btn btn-block btn-success col-md-2 mt-2" type="button"><span><i class="fa fa-plus"></i></span>Permission</a>
+                    @endcan
 <div class="table-responsive">
     <table class="table table-vcenter table-condensed table-bordered listepdf">
         <thead>

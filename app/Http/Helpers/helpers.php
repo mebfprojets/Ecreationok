@@ -3,6 +3,7 @@ use App\Models\PieceJointe;
 use App\Models\Demande;
 use App\Models\Usager;
 use App\Models\Valeur;
+use App\Models\Formalite;
 use Illuminate\Support\Facades\Auth;
 
 if (!function_exists('returnpieceinfos')) {
@@ -77,5 +78,13 @@ if (!function_exists('returnpieceinfos')) {
                         return $libelle;
                 }
             }
+
+            if (!function_exists('getformalite')) {
+                function getformalite($typepiece,$demandeId)
+                    {
+                        $formalite = Formalite::where('demande_id', $demandeId)->where('typepiece', $typepiece)->first();
+                        return $formalite;
+                    }
+                }
     
 ?>

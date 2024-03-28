@@ -31,8 +31,9 @@
                             <div class="col-md-6">
                                 <select name="for" id="for" class="form-control">
                                     <option selected disabled>Selectionne permission Pour</option>
-                                    <option value="dossier">Souscription</option>
-                                    <option value="administration">Administration</option>
+                                    <option selected disabled>Selectionne permission pour</option>
+                                        <option value="demande">Gestion des demandes</option>
+                                        <option value="administration">Administration</option>
                                 </select>
                             </div>
                             </div>
