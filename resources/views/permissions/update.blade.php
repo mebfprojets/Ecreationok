@@ -35,10 +35,10 @@
                             <div class="form-group{{ $errors->has('nom') ? ' has-error' : '' }}">
                                     <label class="col-md-6 control-label">Module<span class="text-danger">*</span></label>
                             <div class="col-md-6">
-                                <select name="for" id="for" class="form-control"
+                                <select name="for" id="for" class="form-control" required
                                     >
                                         <option selected disabled>Selectionne permission pour</option>
-                                        <option value="dossier">Souscription</option>
+                                        <option value="demande">Gestion des demandes</option>
                                         <option value="administration">Administration</option>
                                     </select>
                             </div>

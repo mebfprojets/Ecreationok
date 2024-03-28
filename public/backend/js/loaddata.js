@@ -15,7 +15,7 @@ $(document).ready(function () {
                 //form_data.append('file', document.getElementById('piece_jointe_1').files[0]);
                 console.log(formData);
                 $.ajax({
-                    url: 'https://creerentreprise.me.bf/load/piecejointe',
+                    url: 'http://127.0.0.1:2000/load/piecejointe',
                     type: "POST",
                    // enctype: 'multipart/form-data',
                     data: formData,

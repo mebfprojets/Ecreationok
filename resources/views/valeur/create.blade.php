@@ -55,6 +55,19 @@
                     </div>
                 </div>
                 <div class="form-group{{ $errors->has('libele') ? ' has-error' : '' }}">
+                    <label class="col-md-4 control-label" for="libele">Code : <span class="text-danger">*</span></label>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input id="code" type="text" class="form-control" name="code" value="{{ old('code') }}" required>
+                        </div>
+                        @if ($errors->has('code'))
+                        <span class="help-block">
+                            <strong>{{ $errors->first('code') }}</strong>
+                        </span>
+                        @endif
+                    </div>
+                </div>
+                <div class="form-group{{ $errors->has('libele') ? ' has-error' : '' }}">
                     <label class="col-md-4 control-label" for="libele">Libellé : <span class="text-danger">*</span></label>
                     <div class="col-md-6">
                         <div class="input-group">

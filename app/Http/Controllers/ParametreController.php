@@ -14,7 +14,7 @@ class ParametreController extends Controller
     }
     public function index()
     {
-    if (Auth::user()->can('parametre.create')) {
+    if (Auth::user()->can('parametre.view')) {
         $parametres = Parametre::all();
         return view('parametres.index', compact('parametres'));
     }

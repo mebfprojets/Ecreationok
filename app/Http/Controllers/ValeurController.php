@@ -63,6 +63,7 @@ class ValeurController extends Controller
         Valeur::create([
             'parametre_id'=>$request->parametre,
             'valeur_id'=>$request->parent,
+            'code'=>$request->code,
             'libelle'=>$request->libelle,
             'description'=>$request->description,
 
@@ -121,6 +122,7 @@ class ValeurController extends Controller
         $valeur->valeur_id= $request->parent;
         $valeur->libelle=$request->libelle;
         $valeur->description= $request->description;
+        $valeur->code= $request->code;
         $valeur->save();
         flash("Valeur modifiée avec succes")->success();
         return redirect(route('valeurs.index'));

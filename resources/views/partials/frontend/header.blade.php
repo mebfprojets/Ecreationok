@@ -170,7 +170,7 @@ FACEBOOK: https://www.facebook.com/themefisher
                     <ul class="nav navbar-nav mr-auto">                     
                       <li class="nav-item"><a class="nav-link" href="{{ route('index') }}">Accueil</a></li>
                       @auth
-                        <!-- <li class="nav-item"><a class="nav-link" href="{{ route('create.usager') }}">Créer une demande</a></li> -->
+                       <li class="nav-item"><a class="nav-link" href="{{ route('create.usager') }}">Créer une demande</a></li>
                         @if(nbr_demande()>0)
                         <li class="nav-item"><a class="nav-link" href="{{route('demande.liste')}}">Mes demandes</a></li>
                         @endif
@@ -197,10 +197,10 @@ FACEBOOK: https://www.facebook.com/themefisher
                 </li> --}}
                 <li>
                   <!-- Opens the user settings modal that can be found at the bottom of each page (page_footer.html in PHP version) -->
-                  <!-- <a href="#modal-create-compte" data-toggle="modal">
+                 <a href="#modal-create-compte" data-toggle="modal">
                     <i class="fa fa-user"></i>
                      Créer un compte
-                  </a> -->
+                  </a> 
               </li>
             </ul>
         </li>

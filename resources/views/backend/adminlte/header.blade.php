@@ -162,6 +162,15 @@
             </a>            
           </li>
           <li class="nav-item">
+            <a href="{{route('list.en_attente_de_partenaire')}}" class="nav-link @yield('liste-enattente')">
+              <i class="nav-icon fas fa-copy"></i>
+              <p>
+                En attente de partenaires
+               
+              </p>
+            </a>            
+          </li>
+          <li class="nav-item">
             <a href="{{route('statistique')}}" class="nav-link @yield("statistique")">
               <i class="nav-icon fas fa-copy"></i>
               <p>

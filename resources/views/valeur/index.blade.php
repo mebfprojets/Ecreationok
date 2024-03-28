@@ -6,7 +6,7 @@
     <div class="card-header">
       <h3 class="card-title">Liste des valeurs</h3>
     </div>
-    <a href="{{ route('valeurs.create') }}" class="btn btn-success col-md-2 pull-right"><span><i class="fa fa-plus"></i></span>Parametres</a>
+    <a href="{{ route('valeurs.create') }}" class="btn btn-success col-md-2 pull-right"><span><i class="fa fa-plus"></i></span>Valeur</a>
 
         <div class="form-group mt-2 row" >
             <label  class="col-md-4 control-label" for="parametre">Parametre concerné <span class="text-danger">*</span> :</label>
