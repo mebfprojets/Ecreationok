@@ -1,4 +1,5 @@
 @extends('backend.adminlte.main')
+@section('demandes', 'menu-open')
 @section($dem, 'active')
 @section('content')
 <div class="card">

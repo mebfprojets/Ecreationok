@@ -18036,8 +18036,8 @@ body.text-sm .control-sidebar {
 }
 
 .navbar-white {
-  background-color: #fff;
-  color: #1f2d3d;
+  background-color: #0b9e44;
+  color: #FFF;
 }
 
 .navbar-white.navbar-light .form-control-navbar::-webkit-input-placeholder {
@@ -18062,7 +18062,7 @@ body.text-sm .control-sidebar {
 
 .navbar-white.navbar-light .form-control-navbar,
 .navbar-white.navbar-light .form-control-navbar + .input-group-append > .btn-navbar {
-  background-color: whitesmoke;
+  background-color: #0b9e44;
   border-color: #e8e8e8;
   color: rgba(52, 58, 64, 0.8);
 }

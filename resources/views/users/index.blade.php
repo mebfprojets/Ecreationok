@@ -3,66 +3,68 @@
 @section('administration-user', 'active') 
 
 @section('content')
-        <div class="row">
-                    <div class="card card-success col-md-12 col-md-offset-2">
-                        <div class="card-header">
-                          <h3 class="card-title">Liste des utilisateurs</h3>
-                        </div>
-                        @can('user.create', Auth::user()) 
-                        <a href="{{ route('user.create') }}" class="btn btn-md btn-success"><span><i class="fa fa-plus"></i></span>User</a>
-                       @endcan
-                        
-                       
-            
-    
-<div class="table-responsive">
-<table class="table table-vcenter table-condensed table-bordered listepdf">
-        <thead>
-                <tr>
+<div class="block-title">
+    <center><h2><strong>Liste des Utilisateurs</strong></h2></center>                    
+</div>
+<div class="card">                           
+              <!-- /.card-header -->
+              <div class="card-body">
+              @can('user.create', Auth::user())
+            <a href="{{ route('user.create') }}" class="btn btn-success col-md-2 pull-right mt-2"><span><i class="fa fa-plus"></i></span>User</a>
+            @endcan<br><br>
+                <table id="example1" class="table table-bordered table-striped">
+                  <thead>
+                  <tr style="background-color:#0b9e44; color:white">
+                  
                     <th>N°</th>
                     <th>Nom</th>
                     <th>Prenom</th>
                     <th>Email</th>
                     <th>Tel</th>
                     <th >Action</th>
-                </tr>
-        </thead>
-        <tbody>
-                @php
-                $i=0;
-                    @endphp
-                 @foreach($users as $user)
-                @php
-                $i++;
-                @endphp
-                <tr>
+                
+                  </tr>
+                  </thead>
+                  <tbody>
+                        @php
+                        $i=0;
+                            @endphp
+                        @foreach($users as $user)
+                        @php
+                        $i++;
+                        @endphp
+                  <tr>
                     <td>{{$i}}</td>
                     <td>{{$user->name}}</td>
                     <td>{{$user->prenom}}</td>
                     <td>{{$user->email}}</td>
-                    <td>{{ $user->telephone}}</td>
-                    {{-- <td class="col-md-1">
-                        <label class="switch switch-danger "><input type="checkbox" onclick="idstatus({{ $user->id }})"
-                             @if($user->status == 1)
-                                checked
-                            @endif
-                            value="1"><span></span></label>
-                    </td> --}}
+                    <td>{{ $user->telephone}}</td>                    
                     <td class="text-center">
-                         @can('user.update',Auth::user()) 
-                            <div class="btn-group">
-                                <a href="{{ route('user.edit',$user) }}" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-primary"><i class="fa fa-edit"></i></a>
-                            </div>
-                         @endcan 
-                    </td>
+                         @can('user.update',Auth::user())
 
-                </tr>
+                            <a href="#" class="btn btn-sm btn-success" style="background:#3393FF" title="Afficher les détais"> <i class="fa fa-eye"></i></a>
+                            <a href="{{ route('user.edit',$user) }}" data-toggle="tooltip" title="Edit" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></a>
+
+                         @endcan 
+                    </td>                
+                    
+                  </tr>
             @endforeach
-        </tbody>
-    </table>
-</div>
-</div>
-</div>
+                  </tbody>
+                  <tfoot>                  
+                  <tr>
+                    <th>N°</th>
+                    <th>Nom</th>
+                    <th>Prenom</th>
+                    <th>Email</th>
+                    <th>Tel</th>
+                    <th >Action</th>                
+                  </tr>
+                  </tfoot>
+                </table>
+              </div>
+              <!-- /.card-body -->
+    </div>
 
 @endsection
 @section('modalSection')

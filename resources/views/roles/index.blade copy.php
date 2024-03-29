@@ -3,40 +3,29 @@
 @section('administration-role', 'active')
 
 @section('content')
-<div class="block-title">
-    <center><h2><strong>Liste des Rôles</strong></h2></center>                    
-</div>
-<div class="card"> 
- <!-- /.card-header -->
-<div class="card-body">
+<div class="card card-success col-md-12 col-md-offset-2">
+    <div class="card-header">
+      <h3 class="card-title">Lister les rôles</h3>
+    </div>
     @can('user.create', Auth::user()) 
      <a href="{{ route('role.create') }}" class="btn btn-success col-md-2 pull-right mt-2"><span><i class="fa fa-plus"></i></span> Rôle</a>
    @endcan
-   <br><br>
-<table id="example1" class="table table-bordered table-striped">
+<div class="table-responsive">
+<table class="table table-vcenter table-condensed table-bordered listepdf">
         <thead>
                 <tr>
-                    <th>N°</th>
                     <th>Libelle</th>
                     <th>Action</th>
                 </tr>
         </thead>
         <tbody>
-        @php
-                        $i=0;
-                            @endphp
-                            @foreach($roles as $role)
-                        @php
-                        $i++;
-                        @endphp
-            
+            @foreach($roles as $role)
                 <tr>
-                    <td>{{$i}}</td>
                     <td>{{$role->nom}}</td>
                     <td class="text-center">
+                            <div class="btn-group">
                              {{-- @can('role.update', Auth::user()) --}}
-                            <a href="#" class="btn btn-sm btn-success" style="background:#3393FF" title="Afficher les détais"> <i class="fa fa-eye"></i></a>
-                                <a href="{{ route('role.edit',$role) }}" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-warning"><i class="fa fa-edit"></i></a>
+                                <a href="{{ route('role.edit',$role) }}" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-default"><i class="fa fa-edit"></i></a>
                             {{-- @endcan --}}
                             @can('role.delete',Auth::user())
                                 <a href="#modal-confirm-delete" onclick="delConfirm({{ $role->id }});" data-toggle="modal" title="Supprimer" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
@@ -46,16 +35,9 @@
                 </tr>
             @endforeach
         </tbody>
-        <tfoot>                  
-                  <tr>
-                    <th>N°</th>
-                    <th>Libelle</th>
-                    <th >Action</th>                
-                  </tr>
-                  </tfoot>
     </table>
 </div>
-</div>
+        </div>
 @endsection
 @section('modalSection')
     <div id="modal-confirm-delete" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">

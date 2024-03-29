@@ -2,34 +2,53 @@
 @section('administration', 'menu-open')
 @section('administration-permission', 'active')
 @section('content')
-<div class="card card-success col-md-12 col-md-offset-2">
-    <div class="card-header">
-      <h3 class="card-title">Liste des permissions</h3>
-    </div>
+<div class="block-title">
+    <center><h2><strong>Liste des Permissions</strong></h2></center>                    
+</div>
+<div class="card">                           
+              <!-- /.card-header -->
+              <div class="card-body">
                     @can('user.create', Auth::user()) 
                         <a href="{{ route('permissions.create') }}" class="btn btn-block btn-success col-md-2 mt-2" type="button"><span><i class="fa fa-plus"></i></span>Permission</a>
                     @endcan
-<div class="table-responsive">
-    <table class="table table-vcenter table-condensed table-bordered listepdf">
+                    <br>
+
+    <table id="example1" class="table table-bordered table-striped">
         <thead>
-                <tr>
+                <tr style="background-color:#0b9e44; color:white">
+                    <th>N°</th>
                     <th>Libelle</th>
                     <th>Action</th>
                 </tr>
         </thead>
-        <tbody>
-            @foreach($permissions as $permission)
+        <tbody>            
+            @php
+                        $i=0;
+                            @endphp
+                        @foreach($permissions as $permission)
+                        @php
+                        $i++;
+                        @endphp
                 <tr>
+                    <td>{{$i}}</td>
                     <td>{{$permission->name}}</td>
                     <td class="text-center">
-                            <div class="btn-group">
-                                <a href="{{ route('permissions.edit', $permission) }}" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-default"><i class="fa fa-edit"></i></a>
-                                <a href="#modal-confirm-delete" onclick="delConfirm({{ $permission->id }});" data-toggle="modal" title="Supprimer" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
-                            </div>
+                       
+                    <a href="#" class="btn btn-sm btn-success" style="background:#3393FF" title="Afficher les détais"> <i class="fa fa-eye"></i></a>
+                            <a href="{{ route('permissions.edit', $permission) }}" data-toggle="tooltip" title="Edit" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></a>                        
+                                <a href="#modal-confirm-delete" onclick="delConfirm({{ $permission->id }});" style="background:#3393FF" data-toggle="modal" title="Supprimer" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
+                        
                     </td>
                 </tr>
             @endforeach
         </tbody>
+        <tfoot>                  
+                  <tr>
+                    <th>N°</th>
+                    <th>Libelle</th>
+                    <th>Action</th>                
+                  </tr>
+                  </tfoot>
     </table>
 </div>
 </div>

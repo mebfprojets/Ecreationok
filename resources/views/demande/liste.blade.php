@@ -44,6 +44,10 @@
                                                                  Attente de Validation du Paiement
                                                                  @elseif($demande->paye==1 && $demande->etat==2)
                                                                  Demande Rejétée, Consulter le motif pour corriger et renvoyer pour traitement
+                                                                 @elseif($demande->etat==1 && $demande->statut==2)
+                                                                 RCCM signé, En Attente des autres formalités
+                                                                 @elseif($demande->etat==1 && $demande->statut==3)
+                                                                 Attente de Retrait, Veuillez vous rendre au CEFORE pour le retrait de vos documents signés 
                                                                  @endif
                                                                 </label>
                                                                 </div>

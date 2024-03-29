@@ -2,13 +2,10 @@
 @section('administration', 'menu-open')
 @section('administration-valeur', 'active')
 @section('content')
-<div class="card card-success col-md-12 col-md-offset-2">
-    <div class="card-header">
-      <h3 class="card-title">Liste des valeurs</h3>
-    </div>
-    <a href="{{ route('valeurs.create') }}" class="btn btn-success col-md-2 pull-right"><span><i class="fa fa-plus"></i></span>Valeur</a>
-
-        <div class="form-group mt-2 row" >
+<div class="block-title">
+    <center><h2><strong>Liste des Valeurs</strong></h2></center>                    
+</div>
+    <div class="form-group mt-2 row" >
             <label  class="col-md-4 control-label" for="parametre">Parametre concerné <span class="text-danger">*</span> :</label>
             <div class="col-md-8">
                 <select   id="parametre" name="parametre"  class="form-control select-select2" onchange="changelistevale();">
@@ -21,42 +18,59 @@
             </div>
         
     </div>
-
-
-    <div class="table-responsive">
-        <table id="listepdf" class="table table-vcenter table-condensed table-bordered listepdf">
-            <thead>
-                <tr>
-                    <th class="text-center">Numéro</th>
-                    <th class="text-center">libelle</th>
-                    <th class="text-center" >Description</th>
-                    <th class="text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="tbadys">
-                @php
+<div class="card">                           
+              <!-- /.card-header -->
+              <div class="card-body">
+              @can('user.create', Auth::user())
+            <a href="{{ route('valeurs.create') }}" class="btn btn-success col-md-2 pull-right mt-2"><span><i class="fa fa-plus"></i></span>Valeur</a>
+            @endcan<br><br>
+                <table id="example1" class="table table-bordered table-striped">
+                  <thead>
+                  <tr style="background-color:#0b9e44; color:white">
+                  
+                    <th>N°</th>
+                    <th>Libéllé</th>
+                    <th>Description</th>
+                    <th >Action</th>
+                
+                  </tr>
+                  </thead>
+                  <tbody>
+                  @php
                   $i=0;
                 @endphp
                 @foreach ($valeurs as $valeur)
                         @php
                            $i++;
                         @endphp
-                    <tr>
-                        <td class="text-center" style="width: 10%">{{ $i }}</td>
-                        <td class="text-center">{{ $valeur->libelle }} </td>
-                        <td class="text-center">{{ $valeur->description }}</td>
-                        <td class="text-center">
-                            <div class="btn-group">
-                                <a href="{{ route('valeurs.edit',$valeur) }}" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
-                                <a  href="#modal-confirm-delete" onclick="delConfirm({{ $valeur->id }});" data-toggle="modal" title="Supprimer" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
-                            </div>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+                  <tr>
+                    <td>{{$i}}</td>
+                    <td>{{ $valeur->libelle }} </td>
+                    <td>{{$valeur->description}}</td>                                     
+                    <td class="text-center">
+                         @can('user.update',Auth::user())
+
+                            <a href="#" class="btn btn-sm btn-success" style="background:#3393FF" title="Afficher les détais"> <i class="fa fa-eye"></i></a>
+                            <a href="{{ route('valeurs.edit',$valeur) }}" data-toggle="tooltip" title="Edit" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></a>
+
+                         @endcan 
+                    </td>                
+                    
+                  </tr>
+            @endforeach
+                  </tbody>
+                  <tfoot>                  
+                  <tr>
+                    <th>N°</th>
+                    <th>Libéllé</th>
+                    <th>Description</th>
+                    <th >Action</th>              
+                  </tr>
+                  </tfoot>
+                </table>
+              </div>
+              <!-- /.card-body -->
     </div>
-</div>
 
 @endsection
 <script>

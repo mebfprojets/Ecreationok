@@ -1,5 +1,6 @@
 @extends('backend.adminlte.main')
-@section('demande_a_valider', 'active')
+@section('demandes', 'menu-open')
+@section('dashboard', 'active')
 @section('content')
 <div class="card">
               <div class="card-header">

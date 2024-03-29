@@ -2,20 +2,22 @@
 @section('administration', 'menu-open')
 @section('administration-parametre', 'active')
 @section('content')
-<div class="block-title">
-    <center><h2><strong>Liste des Paramètres</strong></h2></center>                    
-</div>
-<div class="card"> 
-<div class="card-body">
+<div class="card card-success col-md-12 col-md-offset-2">
+    <div class="card-header">
+      <h3 class="card-title">Créer un paramètres</h3>
+    </div>
       <a href="{{ route('parametres.create') }}" class="btn btn-success col-md-2 pull-right"><span><i class="fa fa-plus"></i></span>Parametres</a>
    
-        <table id="example1" class="table table-bordered table-striped">
+
+
+    <div class="table-responsive">
+        <table id="" class="table table-vcenter table-condensed table-bordered listepdf">
             <thead>
                 <tr>
-                    <th>N°</th>
-                    <th>libelle</th>
-                    <th>Description</th>
-                    <th>Actions</th>
+                    <th class="text-center">Numéro</th>
+                    <th class="text-center">libelle</th>
+                    <th class="text-center" >Description</th>
+                    <th class="text-center">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -27,26 +29,18 @@
                            $i++;
                         @endphp
                     <tr>
-                        <td>{{ $i }}</td>
-                        <td>{{ $parametre->libelle }} </td>
-                        <td>{{ $parametre->description }}</td>
-                        <td class="text-center">   
-                                <a href="#" class="btn btn-sm btn-success" style="background:#3393FF" title="Afficher les détais"> <i class="fa fa-eye"></i></a>
-                                <a href="{{ route('parametres.edit',$parametre) }}" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-warning"><i class="fa fa-edit"></i></a>
+                        <td class="text-center" style="width: 10%">{{ $i }}</td>
+                        <td class="text-center">{{ $parametre->libelle }} </td>
+                        <td class="text-center">{{ $parametre->description }}</td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <a href="{{ route('parametres.edit',$parametre) }}" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
                                 <a  href="#modal-confirm-delete" onclick="delConfirm({{ $parametre->id }});" data-toggle="modal" title="Supprimer" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
-
+                            </div>
                         </td>
                     </tr>
                 @endforeach
             </tbody>
-            <tfoot>
-            <tr>
-                    <th>N°</th>
-                    <th>libelle</th>
-                    <th>Description</th>
-                    <th>Actions</th>
-                </tr>
-            </tfoot>
         </table>
     </div>
 </div>

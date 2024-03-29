@@ -50,7 +50,7 @@
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="index3.html" class="nav-link">Home</a>
+        <a href="{{route('dashboard')}}" class="nav-link">Home</a>
       </li>
       
       <li class="nav-item d-none d-sm-inline-block">
@@ -109,7 +109,7 @@
           <img src="{{asset('frontend/images/CEFORE.jpg')}}" class="brand-image" alt="User Image">
         </div><br>
         <div class="info">
-          <a href="#" class="d-block">{{Auth::user()->name}} {{Auth::user()->prenom}}</a>
+          <a href="#" class="d-block">{{Auth::user()->prenom}} {{Auth::user()->name}}</a>
         </div>
       </div>
       <!-- SidebarSearch Form -->
@@ -128,48 +128,46 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-          <li class="nav-item"> 
+               <li class="nav-item"> 
             <a href="{{route('dashboard')}}" class="nav-link @yield("dashboard")">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>Tableau De Bord</p>
             </a>            
           </li>
-          <li class="nav-item">
-            <a href="{{ route('list') }}?etat=0" class="nav-link @yield("demande_a_valider")">
-              <i class="nav-icon fas fa-th"></i>
-              <p>
-                Demandes à Valider
-                <!-- <span class="right badge badge-danger">New</span> -->
+          <li class="nav-item @yield("demandes")">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-chart-pie"></i>
+              <p>Demandes
+                <i class="right fas fa-angle-left"></i>
               </p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="{{route('list')}}?etat=1" class="nav-link @yield("demande_valider")">
-              <i class="nav-icon fas fa-copy"></i>
-              <p>
-                Demandes Validées
-                
-              </p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="{{route('list.rejet')}}" class="nav-link @yield("liste-rejetee")">
-              <i class="nav-icon fas fa-copy"></i>
-              <p>
-                Demandes Rejétées
-               
-              </p>
-            </a>            
-          </li>
-          <li class="nav-item">
-            <a href="{{route('list.en_attente_de_partenaire')}}" class="nav-link @yield('liste-enattente')">
-              <i class="nav-icon fas fa-copy"></i>
-              <p>
-                En attente de partenaires
-               
-              </p>
-            </a>            
-          </li>
+            </a> 
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+              <a href="{{ route('list') }}?etat=0" class="nav-link @yield("demande_a_valider")">
+                      <i class="nav-icon fa fa-list-alt" aria-hidden="true"></i>
+                      <p>Demandes à Valider</p>
+                    </a>
+              </li>
+              <li class="nav-item @yield('administration-role')">
+              <a href="{{route('list')}}?etat=1" class="nav-link @yield("demande_valider")">
+                      <i class="nav-icon fa fa-check-square"></i>
+                      <p>Demandes Validées</p>
+                    </a>
+              </li>
+              <li class="nav-item">
+              <a href="{{route('list.rejet')}}" class="nav-link @yield("liste-rejetee")">
+                      <i class="nav-icon fa fa-ban"></i>
+                      <p>Demandes Rejétées</p>
+                    </a>
+              </li>
+              <li class="nav-item">
+              <a href="{{route('list.en_attente_de_partenaire')}}" class="nav-link @yield("liste_partenaire")">
+              <i class="nav-icon fa fa-check-square"></i>
+                      <p>Attente Partenaire</p>
+                    </a>
+              </li>                           
+            </ul>            
+          </li>          
           <li class="nav-item">
             <a href="{{route('statistique')}}" class="nav-link @yield("statistique")">
               <i class="nav-icon fas fa-copy"></i>
@@ -179,7 +177,7 @@
             </a>            
           </li>
         @can('user.create', Auth::user())
-          <li class="nav-item @yield("administration")" >
+        <li class="nav-item @yield("administration")" >
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-chart-pie"></i>
               <p>
@@ -190,35 +188,35 @@
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="{{ route("user.index") }}" class="nav-link @yield("administration-user")">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="fa fa-users nav-icon"></i>
                   <p>Liste des Utilisateurs</p>
                 </a>
               </li>
               <li class="nav-item @yield('administration-role')">
                 <a href="{{ route("role.index") }}" class="nav-link @yield("administration-role")">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="fa fa-cogs nav-icon"></i>
                   <p>Gestion des Rôles</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{ route("permissions.index") }}" class="nav-link @yield("administration-permission")">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="fa fa-cogs nav-icon"></i>
                   <p>Gestion des Permissions</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{ route("parametres.index") }}" class="nav-link @yield("administration-parametre")">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="fa fa-cogs nav-icon"></i>
                   <p>Paramètres</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{ route("valeurs.index") }}" class="nav-link @yield("administration-valeur")">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="fa fa-cogs nav-icon"></i>
                   <p>Valeurs</p>
                 </a>
-              </li>              
-            </ul>
+              </li>                           
+            </ul>            
           </li>          
         @endcan
           <!-- <li class="nav-item">

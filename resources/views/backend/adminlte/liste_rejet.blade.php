@@ -1,4 +1,5 @@
 @extends('backend.adminlte.main')
+@section('demandes', 'menu-open')
 @section('liste-rejetee', 'active')
 @section('content')
 <div class="card">

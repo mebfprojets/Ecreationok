@@ -150,7 +150,9 @@ class DemandeController extends Controller
             $montant_total=$montant_demande->montant_total;
             if(in_array($request['province_entreprise'],$list_code)){
                 $montant= $montant - env('montant_societaire_ss_ifu');
-                $montant_total= $montant_total - env('montant_societaire_ss_ifu');
+                $frais=$montant*2/100;
+                $montant_total= $montant + $frais;
+                //$montant_total= $montant_total - env('montant_societaire_ss_ifu');
             }
         }
    }
@@ -162,7 +164,9 @@ class DemandeController extends Controller
         $montant_total=$montant_demande->montant_total;
         if(in_array($request['province_entreprise'],$list_code)){
             $montant= $montant - env('montant_societaire_ss_ifu');
-            $montant_total= $montant_total - env('montant_societaire_ss_ifu');
+            $frais=$montant*2/100;
+            $montant_total= $montant + $frais;
+            //$montant_total= $montant_total - env('montant_societaire_ss_ifu');
         }    
      }
      elseif($request->type_request=='P1'){
@@ -171,16 +175,19 @@ class DemandeController extends Controller
          $montant=$montant_demande->montant;
             $montant_total=$montant_demande->montant_total;
             if(in_array($request['province_entreprise'],$list_code)){
-                $montant= $montant - env('montant_societaire_ss_ifu');
-                $montant_total= $montant_total - env('montant_societaire_ss_ifu');
+                $montant= $montant - env('montant_individuel_ss_ifu');
+                $frais=$montant*2/100;
+                $montant_total= $montant + $frais;
+                //$montant_total= $montant_total - env('montant_societaire_ss_ifu');
             }
      }
     
    }
+   //dd($montant_total);
         $usager=DB::table('usagers')->where('user_id',Auth::user()->id)->first();
 
        // $num=$request->type_request.
-        //Pour la signature        
+        //Pour la signature
             //$path = 'C:\wamp64/www/Zip Ecreation/Ecreation_sanou/storage/app/public/files/Signature/';
             $path='C:\wamp64/www/Ecreation/storage/app/public/files/'.$usager->id.'/';
          //$request->signed->store('public','upload');
@@ -1001,12 +1008,20 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             {
             if(Auth::user()->organisation=="001000"){
             $demandes=Demande::where('RCCM','!=',null)->get();
+            $rccm =count(Demande::where('RCCM','=',null)->where('etat', 1)->get());
+            $ifu=count(Demande::where('IFU','=',null)->where('etat', 1)->get());
+            $cnss=count(Demande::where('CNSS','=',null)->where('etat', 1)->get());
+            $cpc=count(Demande::where('CPC','=',null)->where('etat', 1)->get());
             }
             else{
-            $demandes=Demande::where('RCCM','!=',null)->where('organisation_code',Auth::user()->organisation)->orderby('created_at','desc')->get();    
+            $demandes=Demande::where('RCCM','!=',null)->where('organisation_code',Auth::user()->organisation)->orderby('created_at','desc')->get();
+            $rccm =count(Demande::where('RCCM','=',null)->where('etat', 1)->get());
+            $ifu=count(Demande::where('IFU','=',null)->where('etat', 1)->get());
+            $cnss=count(Demande::where('CNSS','=',null)->where('etat', 1)->get());
+            $cpc=count(Demande::where('CPC','=',null)->where('etat', 1)->get());    
             }
             $dem="demande_en_attente_partenaire";
-            return view('backend.adminlte.enattentedepartenaire', compact('demandes','dem'));
+            return view('backend.adminlte.enattentedepartenaire', compact('demandes','dem','rccm','ifu','cnss','cpc'));
             
         }
         else{
