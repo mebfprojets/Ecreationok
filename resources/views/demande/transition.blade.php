@@ -26,7 +26,7 @@
                                             </tr>
                                             <tr>
                                                 <td><strong>Montant</strong></td>
-                                                <td>{{$demande->montant}} FCFA<td>                                                                      
+                                                <td>{{$demande->montant_total}} FCFA<td>                                                                      
                                             </tr>
                                             <tr>
                                                 <td><strong>Nom Commercial</strong></td>
@@ -62,11 +62,21 @@
                     <!-- <br><input type="text" class="form-control" name="code_inscrit" placeholder="" required> <br><br> -->
                     <!-- <button type="reset" class="btn btn-danger">Annuler</button> -->
                    <center> 
-                   <button onclick="calltouchpay('{{$demande->numero_command}}','{{$demande->montant}}')" class="btn btn-success">Payer</button>
+                   <!-- <button onclick="calltouchpay('{{$demande->numero_command}}','{{$demande->montant}}')" class="btn btn-success">Payer</button>
                    <input type="hidden" name="" id="demande_montant" value="{{$demande->montant}}">
                    <input type="hidden" name="" id="demande_id" value="{{$demande->id}}">
-                   <input type="hidden" name="" id="numero_demande" value="{{$demande->numero_command}}">                                                                                           
+                   <input type="hidden" name="" id="numero_demande" value="{{$demande->numero_command}}">                                                                                            -->
                     <!-- <button type="submit" class="btn btn-success">Payer</button> -->
+                   
+                    <form action="{{ route('orange.index')}}" method="POST"> 
+                                                                    @csrf  
+                                                                <!-- <button  onclick="calltouchpay('{{$demande->numero_command}}','{{$demande->montant}}')" class="btn btn-success">Payer</button> -->
+                                                                <input type="hidden" name="montant" id="demande_montant" value="{{$demande->montant_total}}"> 
+                                                                <input type="hidden" name="id" id="id" value="{{$demande->id}}">
+                                                                <input type="hidden" name="numero_command" id="numero_demande" value="{{$demande->numero_command}}">
+                                                                <input type="submit" class="btn btn-danger" value="Payer"> 
+                    </form>
+                   
                 </center>
            
             

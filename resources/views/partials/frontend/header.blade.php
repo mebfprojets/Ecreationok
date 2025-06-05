@@ -107,7 +107,29 @@ FACEBOOK: https://www.facebook.com/themefisher
 
 <!-- Pour la signature -->
 <link rel="stylesheet" href="{{asset('backend/css/signature.css')}}"> 
-
+<style>
+  .custom-alert {
+        background-color: green;
+        color: white;
+        width: 40%;
+        text-align: center;
+        padding: 5px;
+        border-radius: 10px;
+        margin: 5px 0;
+    }
+    .custom-rouge {
+        background-color: red;
+        color: white;
+        width: 40%;
+        text-align: center;
+        padding: 5px;
+        border-radius: 10px;
+        margin: 5px 0;
+    }
+    .uppercase {
+    text-transform: uppercase;
+}
+</style>
     <!-- <link rel="stylesheet" type="text/css" href="http://keith-wood.name/css/jquery.signature.css"> -->
 </head>
 <body>
@@ -149,10 +171,10 @@ FACEBOOK: https://www.facebook.com/themefisher
                 </ul><!-- Ul end -->
             </div><!-- header right end -->
           </div><!-- logo area end -->
-          <center><h3 style="color:#FFF; background:#FF0000;">EN RAISON DE LA MAUVAISE QUALITE DE LA CONNEXION INTERNET,
-              LA PLATEFORME EST TEMPORAIREMENT SUSPENDUE JUSQU'AU 31 MARS 2024            
+          <!-- <center><h3 style="color:#FFF; background:#FF0000;">EN RAISON DE LA MAUVAISE QUALITE DE LA CONNEXION INTERNET,
+              LA PLATEFORME EST TEMPORAIREMENT SUSPENDUE JUSQU'A NOUVEL ORDRE.          
           </h3>
-          </center>
+          </center> -->
       </div><!-- Row end -->
     </div><!-- Container end -->
   </div>
@@ -170,7 +192,7 @@ FACEBOOK: https://www.facebook.com/themefisher
                     <ul class="nav navbar-nav mr-auto">                     
                       <li class="nav-item"><a class="nav-link" href="{{ route('index') }}">Accueil</a></li>
                       @auth
-                       <li class="nav-item"><a class="nav-link" href="{{ route('create.usager') }}">Créer une demande</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ route('create.usager') }}">Créer une demande</a></li>
                         @if(nbr_demande()>0)
                         <li class="nav-item"><a class="nav-link" href="{{route('demande.liste')}}">Mes demandes</a></li>
                         @endif
@@ -201,7 +223,7 @@ FACEBOOK: https://www.facebook.com/themefisher
                     <i class="fa fa-user"></i>
                      Créer un compte
                   </a> 
-              </li>
+              </li> 
             </ul>
         </li>
        @else 

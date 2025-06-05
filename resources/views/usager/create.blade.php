@@ -35,7 +35,7 @@
                                                             <div class="col-lg-6">
                                                                 <div class="mb-3">                                                                    
                                                                     <label class="form-label" for="nom_usager">Nom (<font color="red">*</font>)</label>
-                                                                        <input type="text" id="nom" name="nom_usager" class="form-control" style="width: 100%;" value="{{old('nom')}}" onchange="this.value = this.value.toUpperCase()" placeholder="Entrez votre nom" title="Ce champ est obligatoire" required >
+                                                                        <input type="text" id="nom" name="nom_usager" class="form-control uppercase" style="width: 100%;" value="{{old('nom')}}" onchange="this.value = this.value.toUpperCase()" placeholder="Entrez votre nom" title="Ce champ est obligatoire" required >
                                                                             @if ($errors->has('nom'))
                                                                                     <span class="help-block">
                                                                                         <strong>{{ $errors->first('nom_usager') }}</strong>
@@ -44,7 +44,7 @@
                                                                 </div>
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="val_username">Prénom (s) (<font color="red">*</font>)</label>
-                                                                        <input type="text" id="prenom" name="prenom_usager" class="form-control" value="{{old('prenom')}}"placeholder="Entrez votre prenom.." required="Ce champ est obligatoire" onchange="this.value = this.value.charAt(0).toUpperCase()+ this.value.substr(1);">
+                                                                        <input type="text" id="prenom" name="prenom_usager" class="form-control uppercase" value="{{old('prenom')}}"placeholder="Entrez votre prenom.." required="Ce champ est obligatoire" onchange="this.value = this.value.charAt(0).toUpperCase()+ this.value.substr(1);">
                                                                     <!-- <input type="text" name="prenom_usager" class="form-control" id="progress-basicpill-vatno-input" > -->
                                                                 </div>
                                                                 <div class="mb-3" id="">
@@ -54,7 +54,7 @@
                                                                 </div>
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="val_username">Lieu de naissance (<font color="red">*</font>)</label>
-                                                                        <input type="text" id="" name="lieu_de_naissance" class="form-control"  placeholder="votre lieu de naissance .." value="{{old('lieu_de_naissance')}}" required>
+                                                                        <input type="text" id="" name="lieu_de_naissance" class="form-control uppercase"  placeholder="votre lieu de naissance .." value="{{old('lieu_de_naissance')}}" required>
                                                                             @if ($errors->has('lieu_de_naissance'))
                                                                                 <span class="help-block text-center">
                                                                                     <strong> {{ $errors->first('lieu_de_naissance') }}</strong>
@@ -83,7 +83,7 @@
                                                                 </div>
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="val_username">N° Pièce d'identitié (<font color="red">*</font>)</label>
-                                                                    <input type="text" id="" name="numero_piece" class="form-control"  placeholder="Numéro NIP de la CNIB ou N°Passport .." value="{{old('numero_piece')}}" required>
+                                                                    <input type="text" id="" name="numero_piece" class="form-control uppercase"  placeholder="Numéro NIP de la CNIB ou N°Passport .." value="{{old('numero_piece')}}" required>
                                                                 </div>
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="val_username">Situation matrimoniale (<font color="red">*</font>)</label>
@@ -143,7 +143,7 @@
                                                                 </div>
                                                                 <div class="col-md-5">
                                                                     <label class=" control-label" for="example-chosen">Lieu de Mariage (<font color="red">*</font>)</label>
-                                                                    <input type="text" name="lieu_mariage" class="form-control" placeholder="Lieu de Mariage" id="">
+                                                                    <input type="text" name="lieu_mariage" class="form-control uppercase" placeholder="Lieu de Mariage" id="">
                                                                 </div>
                                                                 <div class="col-md-5 mariage" style="display:none">
                                                                 <label class=" control-label" for="example-chosen">Joindre l'acte de mariage (<font color="red">*</font>)</label>
@@ -228,7 +228,7 @@
                                                             <div class="col-lg-6">
                                                                 <div class="mb-3">
                                                                     <label class=" control-label" for="">Boite Postale (<font color="red">*</font>)</label>                        
-                                                                        <input type="text" id="boite_postale" name="boite_postale" value="{{old('boite_postale')}}" class="form-control" placeholder="Boite Postale" required>    
+                                                                        <input type="text" id="boite_postale" name="boite_postale" value="{{old('boite_postale')}}" class="form-control uppercase" placeholder="Boite Postale" required>    
                                                                         @if ($errors->has('boite_postale'))
                                                                             <span class="help-block text-danger">
                                                                                 <strong>Une personne a déja été enregistrée avec ce numéro d'identité</strong>
@@ -266,7 +266,7 @@
                                                              <div class="col-lg-6">
                                                                 <div class="mb-3" >
                                                                     <label class=" control-label" for="">Adresse (<font color="red">*</font>)</label>
-                                                                        <input type="text" id="adresse" name="adresse" value="{{old('adresse')}}" class="form-control" placeholder="adresse.." required>
+                                                                        <input type="text" id="adresse" name="adresse" value="{{old('adresse')}}" class="form-control uppercase" placeholder="adresse.." required>
                                                                         @if ($errors->has('adresse'))
                                                                             <span class="help-block text-danger">
                                                                                 <strong>Une personne a déja été enregistrée avec ce numéro d'identité</strong>

@@ -975,6 +975,21 @@ $(function(){
           $('.save_usager').show();
       }
   </script>
+   <script>
+    $(document).ready(function(){
+        // Le message disparaît après 5 secondes (5000 ms)
+        setTimeout(function() {
+            $(".custom-alert").fadeOut("slow", function() {
+                $(this).remove();
+            });
+        }, 5000); // 5000 ms = 5 secondes
+        setTimeout(function() {
+            $(".custom-rouge").fadeOut("slow", function() {
+                $(this).remove();
+            });
+        }, 5000); // 5000 ms = 5 secondes
+    });
+</script>
   </div><!-- Body inner end -->
   </body>
 

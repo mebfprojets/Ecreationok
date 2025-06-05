@@ -4,6 +4,7 @@
     <section class="content">
       <div class="container-fluid">
         <!-- SELECT2 EXAMPLE -->
+        <button type="button" class="btn btn-outline-danger me-2 cancel" onclick="history.back()"><i class="fas fa fa-ban"></i> Retour</button>
         <center><h4>
         {{$demandes->commercial_name}}    
         - @if($demandes->company_type=="EI")
@@ -504,7 +505,8 @@
                 <!-- <label>Nom Pièce</label> -->
                 <input class="form-control"  disabled="disabled" type="text" value="{{$piecejointe->type_piece}}">
                 <a href="{{ route('edit.pj',$piecejointe) }}" style="margin-left:10px;"  class="btn btn-md btn-success declaration" > <i class="fas fa-pen"></i> </a>
-                <a href="{{ route('show.pj',$piecejointe) }}" style="margin-left:10px;" target="_blank"   class="btn btn-md btn-success "> <i class="fas fa-eye"></i> </a>
+                <!-- <a href="{{ route('show.pj',$piecejointe) }}" style="margin-left:10px;" target="_blank"   class="btn btn-md btn-success "> <i class="fas fa-eye"></i> </a> -->
+                <a  style="margin-left:10px;" href="#piece{{$piecejointe->id}}" data-toggle="modal" data-dismiss="modal" id="declaration_edit"  class="btn btn-md btn-success declaration" > <i class="fas fa-eye"></i> </a>
                 
                 <!-- <a href="{{ route('detaildocument',$piecejointe->id)}}"title="Visualiser le document" class="btn btn-xs btn-default" ><i class="fa fa-eye"></i> </a> -->
                   <!-- <label>Nom et Prénom</label>
@@ -516,6 +518,29 @@
                   <input class="form-control" disabled="disabled" type="text" value="Test">                  
                 </div> -->
                 <!-- /.form-group -->
+              </div>
+              <div class="modal fade modal-front" id="piece{{$piecejointe->id}}" tabindex="-1" role="dialog" aria-labelledby="modal-login-label" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                      <div class="modal-content">
+                        
+                        <div class="modal-header">
+                
+                        <center><h3 class="modal-title text-center" id="modal-login-label"> Visualisation du document</h3></center>
+
+                          <button type="button" class="close" data-dismiss="modal">
+                            <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                          </button>
+                        </div>
+                        
+                        <div class="modal-body">    
+                          <!-- <p>{{$piecejointe->url}}</p>   -->
+                            <!-- <embed src= "{{ asset('storage/files/1202/casier_judiciaire.pdf') }}" height=600 type='application/pdf' style="width: 100%;" /> -->
+                            <iframe id="#" src="{{ Storage::url($piecejointe->url) }}" width="100%" height="550px" style="border: none;"></iframe>  
+                                            
+                        </div>
+                        
+                      </div>
+                    </div>
               </div>
             @endforeach
               <!-- /.col -->

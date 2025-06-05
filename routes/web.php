@@ -59,12 +59,14 @@ Route::get('/show/demande', [DemandeController::class,'liste'])->name('demande.l
 Route::get('/detail/demande/{id}', [DemandeController::class,'detail'])->name('demande.detail');
 
 //Pour la page d'accueil
-Route::get('/', [DemandeController::class,'test'])->name('test');
+//Route::get('/', [DemandeController::class,'test'])->name('test');
 Route::get('/', [DemandeController::class,'index'])->name('index');
 
 // Test wizard
 Route::get('/testdemande', [TestsController::class, 'index'])->name("createtest");
 Route::post('/storetest', [TestsController::class, 'store'])->name("testdemande");
+Route::post('/paiement/orange/index', [DemandeController::class, 'orange'])->name('orange.index');
+Route::post('/paiement/orange/store', [DemandeController::class, 'orange_paiement'])->name('orange.store');
 
 //Verifier email
 Route::get('/email/existe', [UserController::class,'email_existe'])->name('email_existe');
@@ -112,12 +114,13 @@ Route::resource('permissions', PermissionController::class);
 Route::resource("role",RoleController::class);
 
 //Ajout BARRO
+//Commente
 Route::get('/backend/liste', [DemandeController::class, 'liste_demande'])->name("list");
 Route::get('/backend/liste/attentedepqrtenaire', [DemandeController::class, 'liste_en_attente_de_partenaire'])->name("list.en_attente_de_partenaire");
 Route::post('/backend/ajouter/formalite', [DemandeController::class, 'add_formalite_retour'])->name("add_formalite_retour");
 Route::post('/backend/update/formalite', [DemandeController::class, 'update_formalite_retour'])->name("update_formalite_retour");
 Route::get('/backend/show/formalite/{formalite}', [DemandeController::class, 'show_formalite_retour'])->name("show_formalite_retour");
-
+//Commente
 Route::get('/backend/statistique', [DemandeController::class, 'statistique'])->name("statistique");
 Route::get('/backend/liste/rejet', [DemandeController::class, 'liste_demande_rejet'])->name("list.rejet");
 Route::get('/backend/detail/{id}', [DemandeController::class,'detail_backend'])->name('detail.demande');
@@ -138,6 +141,11 @@ Route::post('/piecejointecorrect/update', [DemandeController::class, 'updatepj_c
 //         return view('dashboard');
 //     })->name('dashboard');
 // });
+// Route::get('/register', function () {
+//     return redirect()->route('index');
+// });
+Route::get('/register', [DemandeController::class,'index'])->name('register');
+
 Route::get('/listeval', [ValeurController::class,"listevakeur"])->name("valeur.listeval");
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard',[AccueilController::class, 'page_accueil'])->name('page_accueil');
 Route::post('logout', [UserController::class, 'logout'])->name('logout');

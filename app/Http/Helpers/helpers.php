@@ -118,7 +118,12 @@ if (!function_exists('returnpieceinfos')) {
                     function getpieceformalite($id_demande, $id_formalite)
                         {
                             $valeur=Formalite::where('typepiece', $id_formalite)->where('demande_id', $id_demande)->first();
+                            if($valeur){
                             $id=$valeur->id;
+                            }                            
+                            else{
+                                $id=0;
+                            }
                             return $id;
                         }
                     }

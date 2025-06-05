@@ -1,5 +1,17 @@
 @extends('layouts.frontend')
 @section('content')
+@if(session('message'))
+                    <center><div class="custom-alert" style="color: white;">
+                        {{ session('message') }}
+                    </div>
+                    </center>
+@endif
+@if(session('error'))
+                    <center><div class="custom-rouge" style="color: white;">
+                        {{ session('error') }}
+                    </div>
+                    </center>
+@endif
 <div class="block-content" style="margin-top: 50px;">
 <div class="block-title">
                     <center><h3><strong>Mes demandes</strong></h3></center>
@@ -38,9 +50,9 @@
                                                                  Attente de paiement
                                                                  @elseif($demande->paye==1 && $demande->etat==0 )
                                                                  Payée, En Traitement
-                                                                 @elseif($demande->paye==1 && $demande->etat==1 )
+                                                                 @elseif($demande->paye==1 && $demande->etat==1)
                                                                  Demande Validée, Veuillez apporter le dossier physique au CEFORE
-                                                                 @elseif($demande->paye==2 && $demande->etat==0 )
+                                                                 @elseif($demande->paye==2)
                                                                  Attente de Validation du Paiement
                                                                  @elseif($demande->paye==1 && $demande->etat==2)
                                                                  Demande Rejétée, Consulter le motif pour corriger et renvoyer pour traitement
@@ -60,9 +72,19 @@
                                                             <div class="col-lg-1">
                                                                 <div class="mb-2"> 
                                                                 @if($demande->paye==0)                                                           
-                                                                <button  onclick="calltouchpay('{{$demande->numero_command}}','{{$demande->montant}}')" class="btn btn-success">Payer</button>
+                                                                <!-- <button  onclick="calltouchpay('{{$demande->numero_command}}','{{$demande->montant}}')" class="btn btn-success">Payer</button>
                                                                 <input type="hidden" name="" id="demande_montant" value="{{$demande->montant}}"> 
-                                                                <input type="hidden" name="" id="numero_demande" value="{{$demande->numero_command}}"> 
+                                                                <input type="hidden" name="" id="numero_demande" value="{{$demande->numero_command}}">  -->
+                                                                
+                                                                
+                                                                <form action="{{ route('orange.index')}}" method="POST"> 
+                                                                    @csrf  
+                                                                <!-- <button  onclick="calltouchpay('{{$demande->numero_command}}','{{$demande->montant}}')" class="btn btn-success">Payer</button> -->
+                                                                <input type="hidden" name="montant" id="demande_montant" value="{{$demande->montant_total}}"> 
+                                                                <input type="hidden" name="id" id="id" value="{{$demande->id}}">
+                                                                <input type="hidden" name="numero_command" id="numero_demande" value="{{$demande->numero_command}}">
+                                                                <input type="submit" class="btn btn-danger" value="Payer"> 
+                                                                </form>
                                                                 
                                                                 @elseif($demande->paye==1)                                             
                                                                 <a href="{{ route('demande.facture',$demande->id)}}" class="btn btn-success">Facture</a>

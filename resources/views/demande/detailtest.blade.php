@@ -54,7 +54,7 @@
                                     <!-- <input type="text" style="" class="form-control" disabled="disabled"  value="{{format_date($demandes->DateRCCM)}}"> -->
                                 </div>                                
                                 <input type="hidden" name="formalite_id" value="{{$types_formalite->id}}">
-                              <center>  <a href="{{ route('affiche_formalite', getpieceformalite($demandes->id, $types_formalite->id))}}" style="margin-left:10px; margin-top:-20px;" id="declaration_view"   class="btn btn-md btn-success declaration_view"> Télécharger {{getlibelle($types_formalite->id)}} <i class="fas fa-eye"></i> </a></center>
+                              <center> @if(getpieceformalite($demandes->id, $types_formalite->id)!=0) <a href="{{ route('affiche_formalite', getpieceformalite($demandes->id, $types_formalite->id))}}" style="margin-left:10px; margin-top:-20px;" id="declaration_view"   class="btn btn-md btn-success declaration_view"> Télécharger {{getlibelle($types_formalite->id)}} <i class="fas fa-eye"></i> </a> @endif</center>
                       </div>
                   @endforeach                            
                            

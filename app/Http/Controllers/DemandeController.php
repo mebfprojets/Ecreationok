@@ -37,7 +37,7 @@ class DemandeController extends Controller
      public function __construct()
     {
         //$this->middleware('auth', ['except' => ['verifier_nom_commercial']]);
-        $this->middleware('auth')->except(['verifier_nom_commercial','index','test','reponse_paiement']);
+        $this->middleware('auth')->except(['verifier_nom_commercial','index','test','reponse_paiement','fnrccm']);
     }
 
     public function test()
@@ -52,6 +52,13 @@ class DemandeController extends Controller
         $nbr_pp= count($PP);
         $nbr_pm= count($PM);
         $total= $nbr_pp+$nbr_pm;
+        //Nombre de demande du mois
+        $nbr_mois = Demande::whereYear('created_at', now()->year)
+                ->whereMonth('created_at', now()->month)
+                ->where('paye', 1)
+                ->count();
+
+       //dd($nbr_mois);
 
         
         if(Auth::user()){
@@ -60,16 +67,16 @@ class DemandeController extends Controller
         if($usager!=null){
         $demandes=Demande::where('usager_id', $usager->id)->orderby('created_at','desc')->get();
         $c=count($demandes);
-        return view('index', compact('nbr_pp','nbr_pm','total','c'));
+        return view('index', compact('nbr_pp','nbr_pm','total','c','nbr_mois'));
         }
         else
         {
             $c=0;
-            return view('index', compact('nbr_pp','nbr_pm','total','c'));
+            return view('index', compact('nbr_pp','nbr_pm','total','c','nbr_mois'));
         }
     }
     else{
-        return view('index', compact('nbr_pp','nbr_pm','total'));
+        return view('index', compact('nbr_pp','nbr_pm','total','nbr_mois'));
         
     }
         //$demandes=Demande::where('usager_id', $usager->id)->orderby('created_at','desc')->get();
@@ -938,24 +945,32 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             if (Auth::user()->can('lister.demande'))
             {
             if(Auth::user()->organisation!="001000"){
-                $demandes=Demande::where('organisation_code',Auth::user()->organisation)->where('etat', '!=', null)->orderby('created_at','desc')->get();
+                $demandes=Demande::where('organisation_code',Auth::user()->organisation)->where('etat', '!=', null)->orderby('created_at','desc')
+                //->take(1000)
+                ->get();
+                $demande_count=Demande::where('etat', '!=', null)->orderby('created_at','desc')
+                ->get();
                 $paye=Demande::where('paye', 1)->where('organisation_code',Auth::user()->organisation)->get();
                 $nbr_paye=count($paye);
                 $nonpaye=Demande::where('paye', 0)->where('organisation_code',Auth::user()->organisation)->get();
                 $rejet=Demande::where('etat', 2)->where('organisation_code',Auth::user()->organisation)->get();
                 $nbr_rejet=count($rejet);
                 $nbr_nonpaye=count($nonpaye);
-                $nbr=count($demandes);
+                $nbr=count($demande_count);
             }
             else{
-                $demandes=Demande::where('etat', '!=', null)->orderby('created_at','desc')->get();
+                $demandes=Demande::where('etat', '!=', null)->orderby('created_at','desc')
+                //->take(1000)
+                ->get();
+                $demande_count=Demande::where('etat', '!=', null)->orderby('created_at','desc')
+                ->get();
                 $paye=Demande::where('paye', 1)->get();
                 $nbr_paye=count($paye);
                 $nonpaye=Demande::where('paye', 0)->get();
                 $rejet=Demande::where('etat', 2)->get();
                 $nbr_rejet=count($rejet);
                 $nbr_nonpaye=count($nonpaye);
-                $nbr=count($demandes);
+                $nbr=count($demande_count);
             }
             return view('backend.adminlte.dashboard', compact('demandes','nbr','nbr_paye','nbr_nonpaye','nbr_rejet'));
         }
@@ -972,12 +987,12 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
                 $etat=$request->etat;
             if($etat==0){
                 $dem="demande_a_valider";
-                $demandes=Demande::where('paye', 1)->where('etat', 0)->where('organisation_code',Auth::user()->organisation)->orderby('created_at','desc')->get();
+                $demandes=Demande::where('paye', 1)->where('etat', 0)->where('organisation_code',Auth::user()->organisation)->orderby('date_paiement','desc')->get();
             return view('backend.adminlte.liste', compact('demandes','dem'));
             }
             else{
                 $dem="demande_valider";
-                $demandes=Demande::where('paye', 1)->where('etat', 1)->where('organisation_code',Auth::user()->organisation)->orderby('created_at','desc')->get();
+                $demandes=Demande::where('paye', 1)->where('etat', 1)->where('organisation_code',Auth::user()->organisation)->orderby('date_paiement','desc')->get();
             return view('backend.adminlte.liste', compact('demandes','dem'));
 
             }
@@ -986,12 +1001,12 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
                 $etat=$request->etat;
                 if($etat==0){
                     $dem="demande_a_valider";
-                    $demandes=Demande::where('paye', 1)->where('etat', 0)->orderby('created_at','desc')->get();
+                    $demandes=Demande::where('paye', 1)->where('etat', 0)->orderby('date_paiement','desc')->get();
                 return view('backend.adminlte.liste', compact('demandes','dem'));
                 }
                 else{
                     $dem="demande_valider";
-                    $demandes=Demande::where('paye', 1)->where('etat', 1)->orderby('created_at','desc')->get();
+                    $demandes=Demande::where('paye', 1)->where('etat', 1)->orderby('date_paiement','desc')->get();
                 return view('backend.adminlte.liste', compact('demandes','dem'));
 
                 }
@@ -1180,7 +1195,7 @@ else{
                     'Date_etat_validation'=>$date_validation,
                     'User_ayant_valide'=>Auth::user()->id
                    ]);
-                   Mail::to($email)->send(new NotifyValider($details));
+                  //Mail::to($email)->send(new NotifyValider($details));
                    return redirect()->route('list');
             }
             else{
@@ -1197,7 +1212,7 @@ else{
                 'motif'=>$motif
                 ]);
 //dd($details);
-             Mail::to($email)->send(new NotifyRejet($details));
+            //Mail::to($email)->send(new NotifyRejet($details));
                    return redirect()->route('list');
             }
         }
@@ -1329,5 +1344,232 @@ else{
             }
             return 0;
         }
+
+        public function fnrccm(Request $request)
+        {
+            $num=$request->numero;
+            $requete=Paiement::where('numero_demande',$num)->first();
+            
+            if($requete){
+                $numero=$requete->numero_demande;
+                $statut=$requete->statut;
+                $mode=$requete->mode_paiement;
+
+                return response()->json([
+                    'status'=>$statut,
+                    'mode_paiement'=>$mode,
+                    'numero'=>$numero
+                ]);
+            }
+            else {
+                return response()->json([
+                    //'status'=>420,
+                    'message'=>'Aucun numero ne correspond a la recherche'                 
+                ]);
+            }
+        }
+
+        public function orange_paiement(Request $request){
+            //
+           // dd($request->all());
+            $customer_msisdn = $request->numero;
+            $otp = $request->otp;
+            $command=$request->command;
+            $montant=$request->montant;
+            $token=$request->_token;
+            $demande=Demande::find($request->id);
+
+            //dd($token);
+
+            // $client = new \GuzzleHttp\Client([
+            //     'verify' => false
+            // ]);
+            //65909882;
+            //Entrep@2;
+            //MAISONdelentrerpise;
+            // Construction du XML
+        $xmlRequest = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+        <COMMAND>
+            <TYPE>OMPREQ</TYPE>
+            <customer_msisdn>{$customer_msisdn}</customer_msisdn>
+            <merchant_msisdn>65909882</merchant_msisdn>
+            <api_username>MAISONdelentrerpise</api_username>
+            <api_password>Entrep@2</api_password>
+            <amount>{$montant}</amount>
+            <PROVIDER>101</PROVIDER>
+            <PROVIDER2>101</PROVIDER2>
+            <PAYID>12</PAYID>
+            <PAYID2>12</PAYID2>
+            <otp>{$otp}</otp>
+            <reference_number>{$token}</reference_number>
+            <ext_txn_id>{$command}</ext_txn_id>
+        </COMMAND>";
+
+        // Envoi de la requête
+        // $url = 'https://apiom.orange.bf:9007/payment'; // Remplacez par l'URL correcte
+        // $response = Http::withHeaders([
+        //     'Content-Type' => 'application/xml',
+        // ])->send('POST', $url, [
+        //     'body' => $xmlRequest,
+        // ]);
+
+         // Initialisation de cURL
+         set_time_limit(120);
+         $ch = curl_init();
+
+         // Configuration des options cURL
+         curl_setopt($ch, CURLOPT_URL, "https://apiom.orange.bf/"); // Remplacez par l'URL correcte
+         curl_setopt($ch, CURLOPT_POST, true);
+         curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
+         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+         curl_setopt($ch, CURLOPT_FAILONERROR, TRUE);
+         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+         curl_setopt($ch, CURLOPT_HTTPHEADER, [
+             'Content-Type: application/xml',
+             'Content-Length: ' . strlen($xmlRequest),
+         ]);
+         curl_setopt($ch, CURLOPT_POSTFIELDS, $xmlRequest);
+ 
+         // Exécution de la requête
+         $response = curl_exec($ch);
+         curl_close($ch);
+
+         // Chargement de la réponse XML
+         $status = $this->find_between($response, "<status>", "</status>");
+         $message = $this->find_between($response, "<message>", "</message>");
+         $transID = $this->find_between($response, "<transID>", "</transID>");
+
+         
+         $date=new \DateTime();
+         $date_paiement= $date->format("d-m-Y H:i:s"); 
+         $demande->update([
+            'date_initiation'=>$date_paiement
+         ]);
+         //dd($response);
+           // Gestion des erreurs cURL
+        if (curl_errno($ch)) {
+            $error = curl_error($ch);
+            curl_close($ch);
+            $paiements=Paiement::create([
+                'numero_demande'=>$demande->numero_command,
+                'statut'=>120,
+                'mode_paiement'=>'OrangeMoney',
+                'paid_sum'=>$demande->montant_total,
+                'message'=>'Erreur dans l\'envoie XML Ou Serveur Orange non disponible !',
+                'echec_orange'=>'Oui'              
+            ]);
+            session()->flash('error', "Paiement Echoué, Veuillez Réessayer !1");
+            return redirect()->route('demande.liste');
+            //return response()->json(['error' => 'Erreur cURL : ' . $error], 500);
+        }
+         // Nettoyage de la réponse
+        //$response = trim($response); // Supprime les espaces en début et fin
+        //$response = preg_replace('/\s+/', ' ', $response); // Réduit les espaces multiples à un seul espace
+        // Validation et parsing
+         //dd($response);
+        //  if($response){
+        //     $responseXml = simplexml_load_string($response);
+        //     $status = (string)$responseXml->status;
+        //     dd($status);
+        //  }        
+
+        // Traitement de la réponse XML
+        //dd($status);
+            try {
+                
+                if ($status=="200"){
+                    if($demande){                        
+                        $date=new \DateTime();
+                        $date_paiement= $date->format("d-m-Y H:i:s");
+                        $demande->update([
+                            'paye'=>1,
+                            'date_paiement'=>$date_paiement
+                        ]);
+                        $paiements=Paiement::create([
+                            'numero_demande'=>$demande->numero_command,
+                            'statut'=>$status,
+                            'mode_paiement'=>'OrangeMoney',
+                            'paid_sum'=>$demande->montant_total,
+                            'message'=>$message,
+                            'transId'=>$transID
+                        ]);
+
+                    }
+                    session()->flash('message', "Paiement Effectué avec succès !");
+                    return redirect()->route('demande.liste');
+                }
+                else{
+                    $paiements=Paiement::create([
+                        'numero_demande'=>$demande->numero_command,
+                        'statut'=>$status,
+                        'mode_paiement'=>'OrangeMoney',
+                        'paid_sum'=>$demande->montant_total,
+                        'message'=>$message,
+                        'transId'=>$transID,
+                        'echec_orange'=>'Oui'
+                    ]);
+                    if($status=="990418"){
+                    session()->flash('error', "OTP déjà Utilisé, Veuillez Réessayer !!");
+                    return redirect()->route('demande.liste');
+                    }
+                    if($status=="990417"){
+                    session()->flash('error', "OTP Incorrect, Veuillez Réessayer !!");
+                    return redirect()->route('demande.liste');
+                    }
+                    if($status=="8"){
+                        session()->flash('error', "Le montant à payer doit être " . $montant . " FCFA. Veuillez Réessayer !!");
+                        return redirect()->route('demande.liste');
+                        }
+                    
+                    session()->flash('error', "Paiement Echoué, Veuillez Réessayer !!");
+                    return redirect()->route('demande.liste');
+                }
+                
+                // $responseXml = simplexml_load_string($response);
+                // dd($responseXml);
+                // // Vérification du code de statut
+                // $status = (string)$responseXml->status;
+                // $message = (string)$responseXml->message;
+                //dd($status);
+            }
+            catch (Exception $e) {
+                session()->flash('error', "Paiement Echoué, Veuillez Réessayer !!!");
+                    return redirect()->route('demande.liste');
+                // Gestion des erreurs lors du traitement de la réponse XML
+               // return response()->json(['error' => 'Erreur lors du traitement de la réponse XML : ' . $e->getMessage()], 500);
+            }
+
+        // Fermeture de la session cURL
+        //curl_close($ch);
+        session()->flash('error', "Paiement Echoué, Veuillez Réessayer !!!!");
+        return redirect()->route('demande.liste');
+        
+        //return $response;
+        }
+
+        public function orange(Request $request){
+            //
+            //dd($request->all());
+            //$command=Demande::where('numero_command', $request->numero_command)->first();
+            $id=Demande::where('id', $request->id)->first();
+            $command=$id->numero_command;
+            $montant=$id->montant_total;
+            $montant_telm=$id->montant;
+            $demande_id=$id->id;
+            return view('orange.index', compact('demande_id', 'command', 'montant','montant_telm'));
+        }
+
+    private function find_between($xmlBody, $openTag, $closeTag)
+    {
+        $openTagpos = strpos($xmlBody, $openTag) + strlen($openTag);
+        if (strpos($xmlBody, $openTag) !== false) {
+            $closeTagpos = strpos($xmlBody, $closeTag, $openTagpos);
+            if (strpos($xmlBody, $closeTag, $openTagpos) !== false) {
+                return substr($xmlBody, $openTagpos, $closeTagpos - $openTagpos);
+            }
+        }
+    }
 
 }

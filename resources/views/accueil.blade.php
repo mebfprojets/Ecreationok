@@ -6,12 +6,12 @@
     <div class="slider-content">
         <div class="container h-100">
           <div class="row align-items-center h-100">
-              <div style="background:#FF0000;" class="col-md-12 text-center">
-              <h3 style="color:#FFF; margin-top: 30px;">             
-              LES DEMANDES DE CREATION D'ENTREPRISE REPRENDRONT LE 02 AVRIL 2024</h3>                
+              <div class="col-md-12 text-center">
+              <!-- <h3 style="color:#FFF; margin-top: 30px;">             
+              LES DEMANDES DE CREATION D'ENTREPRISE REPRENDRONT LE 02 AVRIL 2024</h3>                 -->
                 @auth
                 <p data-animation-in="slideInLeft" data-duration-in="1.2">
-                    <!-- <a href="{{ route('create.usager') }}" class="slider btn btn-primary">Créer mon entreprise</a> -->
+                    <a href="{{ route('create.usager') }}" class="slider btn btn-primary">Créer mon entreprise</a>
                     <!-- <a href="contact.html" class="slider btn btn-primary border">Contact Now</a> -->
                 </p>
                 @endauth
@@ -306,7 +306,7 @@ du Conseiller CEFORE si vous êtes dans une localité disposant d'un bureau CEFO
                 <img loading="lazy" src="frontend/images/icon-image/fact3.png" alt="facts-img">
               </div>
               <div class="ts-facts-content">
-                <h2 class="ts-facts-num"><span class="counterUp" data-count="{{$total}}">0</span></h2>
+                <h2 class="ts-facts-num"><span class="counterUp" data-count="{{$nbr_mois}}">0</span></h2>
                 <h3 class="ts-facts-title">Créations du mois</h3>
               </div>
           </div><!-- Col end -->

@@ -37,6 +37,7 @@
                 </div>
                 <hr>
                 <div class="form-group">
+        <!-- <button type="button" class="btn btn-outline-danger me-2 cancel" onclick="history.back()"><i class="fas fa fa-ban"></i> Fermer</button> -->
                 <a href="{{ route('detail.demande',$piecejointe->demande->id) }}" class="btn btn-sm btn-success"><i class="fa fa-repeat"></i> Fermer</a>
                 </div>
         </div>
