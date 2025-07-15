@@ -138,7 +138,7 @@ class DemandeController extends Controller
      */
     public function store(Request $request)
     {
-       // dd($request->type_request);
+       //dd($request->all());
         // Vérification du montant CPC
         $provinces_ss_ifus= Valeur::where('parametre_id',19)->get();
         foreach($provinces_ss_ifus as $province){
@@ -291,7 +291,7 @@ class DemandeController extends Controller
             $denomination=$request->denomination_sociale;
            }
            else{
-            $denomination=$request->commercial_name;
+            $denomination=$request->nom_commercial;
            }
         $nomcom=Demande::where('commercial_name', $request->nom_commercial)->first();
         $denom=Demande::where('denomination_social', $denomination)->first();
@@ -315,7 +315,7 @@ class DemandeController extends Controller
                  'confirm_request' => 0,
                  'usager_id' =>$usager->id,
                  'legal_representative' =>$usager->id,
-                 'legal_rep_name' =>$usager->NomRaisonSociale.' '.$usager->Prenom,
+                 'legal_rep_name' =>strtoupper($usager->NomRaisonSociale).' '.strtoupper($usager->Prenom),
                  'activity_category_code'=>$category_code,// à voir pour mettre
                  // 'origin_request_code' => $request[
                  //'serial_no' => $request[          
@@ -337,11 +337,11 @@ class DemandeController extends Controller
                  'employee_temporary' => $request['employee_temporaire'],
                  'employee_etranger' => $request['employee_etranger'],
                  'enseigne' => $request['enseigne'],
-                 'commercial_name' => $request['nom_commercial'],
-                 'sigle' => $request['sigle'],
+                 'commercial_name' => strtoupper($request['nom_commercial']),
+                 'sigle' => strtoupper($request['sigle']),
                  'primary_activity' => $request['activite_principale'],
                  'begin_activity_date' => $date,
-                 'denomination_social' => $request['nom_commercial'],
+                 'denomination_social' => strtoupper($request['nom_commercial']),
                  'region_code' => $request['region_entreprise'],
                  'province_code' => $request['province_entreprise'],
                  'commune_departement_code' => $request['commune_entreprise'],
@@ -363,7 +363,8 @@ class DemandeController extends Controller
                  'code_direction_impot' => 'test',
                  'forme_juridique' => $forme_juridique,
                  'signature_demandeur' => $path,        
-                 'objet_social' => $request['objet_social'],
+                 //'objet_social' => strtoupper($request['objet_social']),
+                 'objet_social' => mb_strtoupper($request['objet_social'], 'UTF-8'),
                  'avecCPC' =>  $avecCPC,
                 'montant' =>  $montant,
                 'etat'=>0,

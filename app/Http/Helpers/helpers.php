@@ -3,6 +3,7 @@ use App\Models\PieceJointe;
 use App\Models\Demande;
 use App\Models\Usager;
 use App\Models\Valeur;
+use App\Models\User;
 use App\Models\Formalite;
 use Illuminate\Support\Facades\Auth;
 
@@ -31,6 +32,23 @@ if (!function_exists('returnpieceinfos')) {
             return  date('d-m-Y', strtotime($date));
         }
     }
+
+    if (!function_exists('getuser')) {
+        function getuser($id)
+            {
+                $value=User::where('id', $id)->first();
+                if($value){
+                $array = array('nom'=>$value->name,
+                'email'=>$value->email                
+                );
+            }
+            else{
+                $array=[];
+            }
+                return $array;
+            }
+        }
+
     if(!function_exists('format_date2')){
         function format_date2($date){
             return  date('Y-m-d', strtotime($date));

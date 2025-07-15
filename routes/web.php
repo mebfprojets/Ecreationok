@@ -109,6 +109,7 @@ Route::post('reset-password', [AccountController::class, 'resetPassword'])->name
 Route::get('forget-password/{token}', [AccountController::class, 'showForgetPasswordForm'])->name('reset.password.get');
 Route::get('/test', [TestController::class,'syncrodata']);
 Route::get('/loginss',[AccountController::class, 'getlogin']);
+Route::get('/user/compte', [UserController::class,'compte'])->name('user.compte');
 Route::resource('user', UserController::class);
 Route::resource('permissions', PermissionController::class);
 Route::resource("role",RoleController::class);

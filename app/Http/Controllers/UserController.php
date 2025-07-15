@@ -32,6 +32,17 @@ class UserController extends Controller
     //      return redirect()->back();
     //  }
     }
+    public function compte()
+    {
+    //  if (Auth::user()->can('user.create')) {
+        $users= User::where('isadmin', '=', null)->orderBy('updated_at', 'desc')->get();
+        return view('users.compte', compact("users"));
+    //  }
+    //  else{
+    //      flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
+    //      return redirect()->back();
+    //  }
+    }
     public function store_user(){
         dd('oko');
     }

@@ -126,9 +126,9 @@ FACEBOOK: https://www.facebook.com/themefisher
         border-radius: 10px;
         margin: 5px 0;
     }
-    .uppercase {
+    /* .uppercase {
     text-transform: uppercase;
-}
+} */
 </style>
     <!-- <link rel="stylesheet" type="text/css" href="http://keith-wood.name/css/jquery.signature.css"> -->
 </head>

@@ -167,7 +167,15 @@
                     </a>
               </li>                           
             </ul>            
-          </li>          
+          </li>      
+          <li class="nav-item">
+            <a href="{{route('user.compte')}}" class="nav-link @yield("compte")">
+              <i class="fa fa-users nav-icon"></i>
+              <p>
+                Comptes               
+              </p>
+            </a>            
+          </li>    
           <li class="nav-item">
             <a href="{{route('statistique')}}" class="nav-link @yield("statistique")">
               <i class="nav-icon fas fa-copy"></i>

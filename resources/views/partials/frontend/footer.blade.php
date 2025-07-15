@@ -990,6 +990,29 @@ $(function(){
         }, 5000); // 5000 ms = 5 secondes
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Sélectionner tous les inputs et textareas
+      const inputs = document.querySelectorAll('input[type="text"], input:not([type]), textarea');
+      
+      inputs.forEach(input => {
+          // Transformer en majuscules lors de la saisie
+          input.addEventListener('input', function() {
+              this.value = this.value.toUpperCase();
+          });
+          
+          // Transformer en majuscules lors de la perte de focus (au cas où)
+          input.addEventListener('blur', function() {
+              this.value = this.value.toUpperCase();
+          });
+          
+          // Transformer la valeur initiale si elle existe
+          if (input.value) {
+              input.value = input.value.toUpperCase();
+          }
+      });
+    });
+</script>
   </div><!-- Body inner end -->
   </body>
 

@@ -33,6 +33,7 @@ class UsagerController extends Controller
        
     }
     public function store(Request $request){
+        //dd($request->all());
         // $this->validate($request, [
     	// 	'nom_usager'=> "required",
     	// 	'prenom_usager'=> "required",
@@ -242,7 +243,9 @@ class UsagerController extends Controller
                 foreach ($usagers as $usager) {
                     $data[] = array("id" => $usager->id, "nom" => $usager->NomRaisonSociale,'prenom'=>$usager->Prenom,'phone'=>$usager->Phone_No_,);
                 }           
-                return json_encode($data);
+                //return json_encode($data);
+                return redirect()->route('create.demande');      
+
        }
      
     }

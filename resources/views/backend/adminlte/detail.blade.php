@@ -70,6 +70,40 @@
           </div>
       </div>
       @endif
+      <div class="card card-default">
+          <div class="card-header">
+            <h3 class="card-title">Compte Utilisateur</h3>
+            <div class="card-tools">
+              <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+              </button>
+            </div>
+          </div>
+          <!-- /.card-header -->
+          <div class="card-body">
+          <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label>Nom</label>
+                  <input class="form-control" disabled="disabled" type="text" value="{{getuser($usager->user_id)['nom']}}">
+                </div>                
+                <!-- /.form-group -->
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label>Email</label>
+                  <input class="form-control" disabled="disabled" type="text" value="{{getuser($usager->user_id)['email']}}">
+                </div>                
+                <!-- /.form-group -->
+              </div>      
+              <!-- /.col -->
+            </div>
+            <!-- /.row -->
+          </div>
+          
+          <!-- /.card-body -->
+          
+        </div>
         <div class="card card-default">
           <div class="card-header">
             <h2 class="card-title btn btn-tool" data-card-widget="collapse">Entreprise</h2>

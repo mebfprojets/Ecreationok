@@ -261,7 +261,7 @@
                                                                     <!-- <label class="form-label" for="progress-basicpill-pancard-input">Type Etablissement</label> -->
                                                                     <label class="form-label" for="progress-basicpill-vatno-input">Nom Commercial (<font color="red">*</font>)</label>
                                     
-                                                                    <input type="text" id="nom_commercial_pp" name="nom_commercial" class="form-control uppercase" id="progress-basicpill-vatno-input"  onchange="valider_nom_commercial('nom_commercial_pp');" required>
+                                                                    <input type="text" id="nom_commercial_pp" name="nom_commercial" class="form-control" id="progress-basicpill-vatno-input"  onchange="valider_nom_commercial('nom_commercial_pp');" required>
                                                                     <!--  -->
                                                                     <input type="hidden" name="type_request" value="P1" class="form-control" id="progress-basicpill-pancard-input">
                                                                 </div>
@@ -270,7 +270,7 @@
                                                             <div class="col-lg-6">
                                                                 <div class="mb-3">
                                                                 <label class="form-label" for="progress-basicpill-vatno-input">Enseigne</label>
-                                                                    <input type="text" name="enseigne" class="form-control uppercase" id="progress-basicpill-vatno-input" >                                                                  
+                                                                    <input type="text" name="enseigne" class="form-control" id="progress-basicpill-vatno-input" >                                                                  
                                                                 </div>
                                                             </div>
                                                             <div class="col-lg-6">
@@ -347,7 +347,7 @@
                                                             <div class="col-lg-6">
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="progress-basicpill-vatno-input">Objet Social (<font color="red">*</font>)</label>
-                                                                    <textarea type="text" name="objet_social" class="form-control uppercase" data-placeholder="Saisir les activités que vous exercez" id="objet_social" required></textarea>                                                                   
+                                                                    <textarea type="text" name="objet_social" class="form-control" data-placeholder="Saisir les activités que vous exercez" id="objet_social" required></textarea>                                                                   
                                                                 </div>
                                                             </div>
                                                             <div class="col-lg-6">
@@ -479,7 +479,7 @@
                                                                 </div>
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="progress-basicpill-vatno-input">Boite Postale (<font color="red">*</font>)</label>
-                                                                    <input type="text" name="boite_postale" class="form-control uppercase" id="progress-basicpill-cstno-input" required>
+                                                                    <input type="text" name="boite_postale" class="form-control" id="progress-basicpill-cstno-input" required>
                                                                 </div>
                                                                 <!-- <div class="mb-3">
                                                                     <label class="form-label" for="progress-basicpill-vatno-input">Adresse</label>
