@@ -34,12 +34,23 @@
                         </div>
                         <div class="col-md-4" style="margin-top: -7%;">       
                             <div class="mb-3">
-                                <button  onclick="calltouchpay('{{$command}}','{{$montant_telm}}')" class="btn btn-outline-info me-2">
+                                <!-- <button  onclick="calltouchpay('{{$command}}','{{$montant_telm}}')" class="btn btn-outline-info me-2">
                                     <img src="{{asset('frontend/images/Moov.png')}}" width="100" height="100" alt="">
-                                </button><br><br>
-                                <!-- <label for="exampleInputEmail1" class="form-label">
-                                    Poursuivre
-                                </label> -->
+                                </button><br><br> -->
+                                <form action="{{ route('moov.index')}}" method="POST"> 
+                                                                    @csrf  
+                                    <input type="hidden" name="montant" id="demande_montant" value="{{$montant}}"> 
+                                    <input type="hidden" name="id" id="id" value="{{$demande_id}}">
+                                    <input type="hidden" name="numero_command" id="numero_demande" value="{{$command}}">
+                                    <button type="submit" class="btn btn-outline-info me-2">
+                                        <img src="{{asset('frontend/images/Moov.png')}}" width="100" height="100" alt="">
+                                    </button>
+                                    
+                                </form>
+                                <label for="exampleInputEmail1" class="form-label">                                    
+                                        <li>1. Renseigner le numéro de paiement pour générer le code OTP</li>
+                                        <li>3. Renseigner le code OTP puis cliquer sur Valider</li>
+                                </label>
                             </div>
                         </div>
                     </div>

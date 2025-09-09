@@ -1573,4 +1573,236 @@ else{
         }
     }
 
+    public function moov(Request $request){
+        //
+        //dd($request->all());
+        //$command=Demande::where('numero_command', $request->numero_command)->first();
+        $id=Demande::where('id', $request->id)->first();
+        $command=$id->numero_command;
+        $montant=$id->montant_total;
+        $otp=0;
+        $demande_id=$id->id;
+        return view('moov.index', compact('demande_id', 'command', 'montant','otp'));
+    }
+
+    public function moov_store(Request $request){
+        //
+        // Préparation des données
+        //dd($request->all());
+        $id=Demande::where('id', $request->id)->first();
+        $command=$id->numero_command;
+        $demande_id=$id->id;
+        $montant=$id->montant_total;
+        $numero=$request->numero;
+        $data = [
+            "request-id"    => $command,
+            "destination"   => $numero,
+            "amount"        => $montant,
+            "remarks"       => "OTP TEST",
+            "message"       => "GENERATION OTP MOOV",
+            "extended-data" =>
+            
+             new \stdClass()
+            ];
+
+            $curl = curl_init();
+            //$acces= base64_encode("MAISON:OjX8eJ9rlCC4"); //Acces de test
+            $acces= base64_encode("MAISON:G7pM3xL9vQ2nT1Fb"); //Acces de Prod
+            $url_prod="https://196.28.245.227/tlcfzc_gw_prod/mbs-gateway/gateway/3pp/transaction/process";
+            $url_test="https://196.28.245.227/tlcfzc_gw/api/gateway/3pp/transaction/process";
+
+            //https://196.28.245.227/tlcfzc_gw_prod/mbs-gateway/gateway/3pp/transaction/process
+            //https://196.28.245.227/tlcfzc_gw/api/gateway/3pp/transaction/process
+            curl_setopt_array($curl, [
+                CURLOPT_URL            => "https://196.28.245.227/tlcfzc_gw_prod/mbs-gateway/gateway/3pp/transaction/process",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING       => "UTF-8",
+                CURLOPT_MAXREDIRS      => 10,
+                CURLOPT_TIMEOUT        => 30,
+                CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+                CURLOPT_SSL_VERIFYHOST => false,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_CUSTOMREQUEST  => "POST",
+                CURLOPT_POSTFIELDS     => json_encode($data),
+                CURLOPT_HTTPHEADER     => [
+                    "Authorization: Basic ".$acces, // À remplacer par vos credentials
+                    "Content-Type: application/json",
+                   //"command-id: mror-transaction-ussd" //pour le mode validation par le promoteur
+                   //"command-id: process-check-subscriber" //pour checker les infos du promoteur
+                   "command-id: process-create-mror-otp" //pour la génération d'OTP par moov
+                ],
+            ]);
+            $response = curl_exec($curl);
+            $err = curl_error($curl);
+            $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            
+            curl_close($curl);
+            // Gestion des erreurs
+            //dd($response);
+            if ($err) {
+                                                        
+                session()->flash('error', "Erreur lors de la connexion au service de paiement !");
+                return redirect()->route('demande.liste');
+            }
+
+            if ($response){
+                //ENregistrement dans la table paiement en cas de response
+                $responseData = json_decode($response, true);
+                // Récupérer les valeurs nécessaires
+                $requestId = $responseData['request-id'];
+                $status = $responseData['status'];
+                $transId = $responseData['trans-id'];
+                $message = $responseData['message'];
+                $paiement=Paiement::create([
+                    'numero_demande'=>$command,
+                    'statut'=>$status,
+                    'mode_paiement'=>'MoovMoney',
+                    'paid_sum'=>$montant,
+                    'transId'=>$transId,
+                    'message'=>$message,
+                    'numero_tel'=>$numero,
+                    'type'=>0,// Pour initiation du paiement moovMoney
+                    'requestId'=>$requestId //peut être égal à numero_demande
+                ]);
+
+                $date=new \DateTime();
+                    $date_format= $date->format("d-m-Y H:i:s");
+                    $id->update([
+                        'paye'=>2,
+                        'date_initiation'=>$date_format
+                    ]);
+               
+                //dd($status); checked if status is ok
+                if($status==0){
+                    //dd('ok');
+                    $otp=1; //signifie que otp a été envoyé au client, donc on peut le redirigéer ver page OTP
+                    //session()->flash('message', "OTP généré avec succès ! Renseigner le code OTP");
+                    return view('moov.index', compact('demande_id', 'command', 'montant','otp','transId','requestId','numero'));
+                }
+                elseif($status==10){
+                    $paiement->update([
+                        'echec_moov'=>'Oui'
+                    ]);
+                    $date=new \DateTime();
+                    $date_format= $date->format("d-m-Y H:i:s");
+                    $id->update([
+                        'paye'=>0,
+                        'date_initiation'=>$date_format
+                    ]);
+                    session()->flash('error', "Solde Insuffisant, Veuillez Recharger puis Réessayer !");
+                    return redirect()->route('demande.liste');
+                }
+                else{
+                    $paiement->update([
+                        'echec_moov'=>'Oui'
+                    ]);
+                    $date=new \DateTime();
+                    $date_format= $date->format("d-m-Y H:i:s");
+                    $id->update([
+                        'paye'=>0,
+                        'date_initiation'=>$date_format
+                    ]);
+                    session()->flash('error', "une erreur s'est produite, Veuillez Réessayer !");
+                    return redirect()->route('demande.liste');
+                }
+            }
+
+        }
+
+        public function moov_verif_otp(Request $request){
+            //dd($request->all());
+            $id=Demande::where('id', $request->id)->first();
+            $montant=$id->montant_total;
+            $date = date('dmy'); // Donnera "170725" pour le 17 juillet 2025 (aujourd'hui)
+            $time = date('His');
+            //dd($request->otp);
+            if($id){
+            $data = [
+                "request-id"    => $date.'-'.$time.'-'.$id->numero_command,
+                "destination"   => $request->numero,
+                "amount"        => $montant,
+                "remarks"       => "OTP VERIFICATION",
+               // "message"       => "PAIEMENT MOOV VEUILLEZ CONFIRMER AVEC LE PIN",
+                "extended-data" =>
+                    [
+                         "module"=> "MERCHOTPPAY",
+                         "otp"=> $request->otp,
+                         "ext1"=> $date.$time,
+                         "ext2"=> $date.$time."ext2",
+                         "trans-id"=> $request->transId,
+                    ]
+                ];
+
+                $curl = curl_init();
+                $acces= base64_encode("MAISON:G7pM3xL9vQ2nT1Fb");
+                curl_setopt_array($curl, [
+                    CURLOPT_URL            => "https://196.28.245.227/tlcfzc_gw_prod/mbs-gateway/gateway/3pp/transaction/process",
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING       => "UTF-8",
+                    CURLOPT_MAXREDIRS      => 10,
+                    CURLOPT_TIMEOUT        => 30,
+                    CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_SSL_VERIFYHOST => false,
+                    CURLOPT_SSL_VERIFYPEER => false,
+                    CURLOPT_CUSTOMREQUEST  => "POST",
+                    CURLOPT_POSTFIELDS     => json_encode($data),
+                    CURLOPT_HTTPHEADER     => [
+                        "Authorization: Basic ".$acces, // À remplacer par vos credentials
+                        "Content-Type: application/json",
+                       //"command-id: mror-transaction-ussd" //pour le mode validation par le promoteur
+                       //"command-id: process-check-subscriber" //pour checker les infos du promoteur
+                       "command-id: process-commit-otppay" //pour checker l'OTP
+                    ],
+                ]);
+                $response = curl_exec($curl);
+                $err = curl_error($curl);
+                $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                
+                curl_close($curl);
+
+                if($response){
+                    //dd($response);
+                    $responseData = json_decode($response, true);
+                    // Récupérer les valeurs nécessaires
+                    $requestId = $responseData['request-id'];
+                    $status = $responseData['status'];
+                    $transId = $responseData['trans-id'];
+                    $message = $responseData['message'];
+                    $paiement=Paiement::create([
+                        'numero_demande'=>$id->numero_command,
+                        'statut'=>$status,
+                        'mode_paiement'=>'MoovMoney',
+                        'paid_sum'=>$montant,
+                        'transId'=>$transId,
+                        'message'=>$message,
+                        'type'=>1,// Pour confirmation du paiement moovMoney
+                        'requestId'=>$requestId //peut être égal à numero_demande
+                    ]);     
+                                            
+                    //dd($status);
+                    if($status==0){
+                        //dd('ok');
+                        $date=new \DateTime();
+                        $date_format= $date->format("d-m-Y H:i:s");
+                        $id->update([
+                            'paye'=>1,
+                            'date_paiement'=>$date_format
+                        ]);
+                        session()->flash('message', "Paiement Effectué avec succès !");
+                        return redirect()->route('demande.liste');
+                        //return view('moov.index', compact('demande_id', 'command', 'montant','otp','transId','requestId','numero'));
+                    }
+                    if($status==900228){
+                        $date=new \DateTime();
+                        $date_format= $date->format("d-m-Y H:i:s");
+                        $id->update([
+                            'paye'=>0                                    
+                        ]);
+                        session()->flash('error', "OTP n'existe pas, Veuillez ressayer !");
+                        return redirect()->route('demande.liste');
+                    }
+                }
+            }           
+        }  
+
 }

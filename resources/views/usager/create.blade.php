@@ -108,7 +108,7 @@
                                                                     <select id="conjoints"  name="conjoints[]" data-placeholder="Selectionner votre conjoint ..." class="form-control select2 conjoints" style="width: 100%;" required >
                                                                         <option></option>
                                                                             @foreach ($all_usagers as $all_usager )
-                                                                                <option value="{{ $all_usager->id }}">{{ $all_usager->CIN }} - {{ $all_usager->NomRaisonSociale }} {{ $all_usager->Prenom }} - {{ $all_usager->Phone_No_ }}</option>
+                                                                                <option value="{{ $all_usager->id }}">{{ $all_usager->CIN }} - {{ $all_usager->NomRaisonSociale }} {{ $all_usager->Prenom }}</option>
                                                                             @endforeach                                                                  
                                                                     </select>
                                                                 </div>

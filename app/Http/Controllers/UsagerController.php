@@ -243,8 +243,8 @@ class UsagerController extends Controller
                 foreach ($usagers as $usager) {
                     $data[] = array("id" => $usager->id, "nom" => $usager->NomRaisonSociale,'prenom'=>$usager->Prenom,'phone'=>$usager->Phone_No_,);
                 }           
-                //return json_encode($data);
-                return redirect()->route('create.demande');      
+                return json_encode($data);
+                //return redirect()->route('create.demande');      
 
        }
      

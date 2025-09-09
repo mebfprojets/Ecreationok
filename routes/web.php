@@ -67,6 +67,9 @@ Route::get('/testdemande', [TestsController::class, 'index'])->name("createtest"
 Route::post('/storetest', [TestsController::class, 'store'])->name("testdemande");
 Route::post('/paiement/orange/index', [DemandeController::class, 'orange'])->name('orange.index');
 Route::post('/paiement/orange/store', [DemandeController::class, 'orange_paiement'])->name('orange.store');
+Route::post('/paiement/moov/index', [DemandeController::class, 'moov'])->name('moov.index');
+Route::post('/paiement/moov/store', [DemandeController::class, 'moov_store'])->name('moov.store');
+Route::post('/paiement/moov/verifotp', [DemandeController::class, 'moov_verif_otp'])->name('moov.otp');
 
 //Verifier email
 Route::get('/email/existe', [UserController::class,'email_existe'])->name('email_existe');
