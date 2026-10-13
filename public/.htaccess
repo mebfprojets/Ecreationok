@@ -5,6 +5,16 @@
 
     #RewriteEngine On
     RewriteEngine On
+	
+	# Rediriger www vers non-www (https://site.com)
+	RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+	RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+	#RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+	
+	# Rediriger www vers non-www (https://site.com)
+	RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+	RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+	
 	# forcer la navigation en HTTPS
     RewriteCond %{HTTPS} !=on
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
@@ -12,6 +22,8 @@
 	# Autoriser HTTP 
     #RewriteCond %{HTTP:Authorization} .
     #RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+		
+	
 
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d

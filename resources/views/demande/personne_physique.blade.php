@@ -1,5 +1,5 @@
 
-                        <div class="row" id="progrss-wizar" >
+<div class="row" id="progrss-wizar" >
                             <div class="col-lg-12">
                                 <div class="card">
                                     <div class="card-body taille">
@@ -53,7 +53,6 @@
                                                     <!-- <form> -->
                                                         
                                                         <div class="row">
-                                                            <h5 class="font-size-14 mb-4 text-center">Enregistrer les pièces requises</h5>
                                                             <div class="row text-center" style="border: 1px solid rgb(116, 116, 105); margin-bottom:5px;"  class="mb-2">
                                                                 <h5 class="font-size-14 mb-4">Formalités</h5>                                                                
                                                                 <div class="row" style="margin-left:10px;">
@@ -66,8 +65,98 @@
                                                                             </div>
                                                                     @endforeach                                                         
                                                                 </div>
-                                                    </div>
-                                                            <!-- <center><p class='alerte_piece' style="color:red; display:none; background:"> Veuillez renseigner les pièces obligatoires</p></center> -->
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <center><h5 class="font-size-14 mb-3">Informations du Promoteur Lié au Compte Utilisateur</h5></center>
+                                                                <div class="card">
+                                                                    <div class="card-body">
+                                                                        <div class="row">
+                                                                            <div class="col-md-6">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Nom</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->NomRaisonSociale ?? 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Prénom</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->Prenom ?? 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        
+                                                                        <div class="row">
+                                                                            <div class="col-md-4">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Date de Naissance</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->DateNaissance ?? 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-4">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Lieu de Naissance</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->LieuNaissance ?? 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-4">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>N° Pièce Identité</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->CIN ?? 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        
+                                                                        <div class="row">
+                                                                            <div class="col-md-4">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Mobile 1</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->Phone_No_ ?? 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-4">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Mobile 2</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->Tel_Bureau ?? 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-4">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Email</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->{'E-Mail'} ?? 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        
+                                                                        <div class="row">
+                                                                            <div class="col-md-6">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Adresse</strong></label>
+                                                                                    <p class="form-control-static">
+                                                                                        {{ getvaleur('regions',$usager->Region_Code) ?? 'Non renseigné' }} - 
+                                                                                        {{ getvaleur('provinces',$usager->Province_Code) ?? 'Non renseigné' }} - 
+                                                                                        {{ getvaleur('commune_departements',$usager->Commun_Departement_Code) ?? 'Non renseigné' }} -
+                                                                                        {{ getvaleur('secteur_villages',$usager->Code_Secteur_Village) ?? 'Non renseigné' }}
+                                                                                    </p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-3">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Créé le</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->created_at ? $usager->created_at->format('d/m/Y H:i') : 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-3">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Modifié le</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->updated_at ? $usager->updated_at->format('d/m/Y H:i') : 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!-- Caché la partie, sinon si on n'éfface, le bouton next ne marchera pas -->
+                                                            <div style="display: none" class="row text-center">
                                                             <center><div class="alert-warning alerte_piece" style="color:red; display:none; background:">
                                                                 <p>Veuillez renseigner les pièces obligatoires</p>
                                                             </div>
@@ -211,7 +300,7 @@
                                                                 </div>
                                                                 @endif
                                                             </div>
-                                                        </div>
+                                                            </div>
                                                             <div class="col-lg-6">
                                                                 <div class="form-group">
                                                                     <label class="form-label" for="progress-basicpill-firstname-input">Titre de Propriété/Jouissance (<font color="red">*</font>)</label>
@@ -240,6 +329,7 @@
                                                                     @endif
                                                                 </div>
                                                             </div>
+                                                            </div>
                                                         </div>
                                                         
                                                     <!-- </form> -->
@@ -261,7 +351,7 @@
                                                                     <!-- <label class="form-label" for="progress-basicpill-pancard-input">Type Etablissement</label> -->
                                                                     <label class="form-label" for="progress-basicpill-vatno-input">Nom Commercial (<font color="red">*</font>)</label>
                                     
-                                                                    <input type="text" id="nom_commercial_pp" name="nom_commercial" class="form-control" id="progress-basicpill-vatno-input"  onchange="valider_nom_commercial('nom_commercial_pp');" required>
+                                                                    <input type="text" id="nom_commercial_pp" name="nom_commercial" class="form-control uppercase-input" id="progress-basicpill-vatno-input"  onchange="valider_nom_commercial('nom_commercial_pp');" required>
                                                                     <!--  -->
                                                                     <input type="hidden" name="type_request" value="P1" class="form-control" id="progress-basicpill-pancard-input">
                                                                 </div>
@@ -270,13 +360,13 @@
                                                             <div class="col-lg-6">
                                                                 <div class="mb-3">
                                                                 <label class="form-label" for="progress-basicpill-vatno-input">Enseigne</label>
-                                                                    <input type="text" name="enseigne" class="form-control" id="progress-basicpill-vatno-input" >                                                                  
+                                                                    <input type="text" name="enseigne" class="form-control uppercase-input" id="progress-basicpill-vatno-input" >                                                                  
                                                                 </div>
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="progress-basicpill-vatno-input">Sigle</label>
-                                                                    <input type="text" name="sigle" class="form-control" id="sigle_pp" >
+                                                                    <input type="text" name="sigle" class="form-control uppercase-input" id="sigle_pp" >
                                                                 </div>
                                                             </div>                                     
                                                         </div>
@@ -347,7 +437,7 @@
                                                             <div class="col-lg-6">
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="progress-basicpill-vatno-input">Objet Social (<font color="red">*</font>)</label>
-                                                                    <textarea type="text" name="objet_social" class="form-control" data-placeholder="Saisir les activités que vous exercez" id="objet_social" required></textarea>                                                                   
+                                                                    <textarea type="text" name="objet_social" class="form-control uppercase-input" data-placeholder="Saisir les activités que vous exercez" id="objet_social" required></textarea>                                                                   
                                                                 </div>
                                                             </div>
                                                             <div class="col-lg-6">
@@ -479,7 +569,7 @@
                                                                 </div>
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="progress-basicpill-vatno-input">Boite Postale (<font color="red">*</font>)</label>
-                                                                    <input type="text" name="boite_postale" class="form-control" id="progress-basicpill-cstno-input" required>
+                                                                    <input type="text" name="boite_postale" class="form-control uppercase-input" id="progress-basicpill-cstno-input" required>
                                                                 </div>
                                                                 <!-- <div class="mb-3">
                                                                     <label class="form-label" for="progress-basicpill-vatno-input">Adresse</label>
@@ -650,3 +740,26 @@
                             
                         </div>
                         <!-- end row -->               
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Sélectionner tous les inputs et textareas
+      const inputs = document.querySelectorAll('input[type="text"], input:not([type]), textarea');
+      
+      inputs.forEach(input => {
+          // Transformer en majuscules lors de la saisie
+          input.addEventListener('input', function() {
+              this.value = this.value.toUpperCase();
+          });
+          
+          // Transformer en majuscules lors de la perte de focus (au cas où)
+          input.addEventListener('blur', function() {
+              this.value = this.value.toUpperCase();
+          });
+          
+          // Transformer la valeur initiale si elle existe
+          if (input.value) {
+              input.value = input.value.toUpperCase();
+          }
+      });
+    });
+</script>

@@ -11,7 +11,7 @@
       <div class="container-fluid">
         
         <div class="row">
-          <div class="col-lg-3 col-6">
+          <div class="col-lg-2 col-6">
             <!-- small box -->
             <div class="small-box bg-info">
               <div class="inner">
@@ -25,7 +25,7 @@
             </div>
           </div>
           <!-- ./col -->
-          <div class="col-lg-3 col-6">
+          <div class="col-lg-2 col-6">
             <!-- small box -->
             <div class="small-box bg-success">
               <div class="inner">
@@ -40,7 +40,7 @@
           </div>
           <!-- ./col -->
           <!-- ./col -->
-          <div class="col-lg-3 col-6">
+          <div class="col-lg-2 col-6">
             <!-- small box -->
             <div class="small-box bg-warning">
               <div class="inner">
@@ -54,7 +54,7 @@
               <a href="{{route('liste.filtre')}}?paye=0" class="small-box-footer">Consulter <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
-          <div class="col-lg-3 col-6">
+          <div class="col-lg-2 col-6">
             <!-- small box -->
             <div class="small-box bg-danger">
               <div class="inner">

@@ -13,6 +13,7 @@ use App\Http\Controllers\TestsController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ParametreController;
+use App\Http\Controllers\PieceJointeController;
 
 
 
@@ -60,6 +61,7 @@ Route::get('/detail/demande/{id}', [DemandeController::class,'detail'])->name('d
 
 //Pour la page d'accueil
 //Route::get('/', [DemandeController::class,'test'])->name('test');
+// Route::get('/', [DemandeController::class,'test'])->name('test');
 Route::get('/', [DemandeController::class,'index'])->name('index');
 
 // Test wizard
@@ -87,7 +89,10 @@ Route::post('/load/piecejointe', [DemandeController::class, 'laodpiecejointe'])-
 Route::get('piece/detail/', [DemandeController::class,'detaildocument'])->name('detaildocument');
 Route::get('piecejointe/afficher/{id}', [DemandeController::class,'detaildocument_affiche'])->name('detaildocument_affiche');
 Route::get('piecejointe/formalite/{id}', [DemandeController::class,'documentformalite'])->name('affiche_formalite');
-
+// Nouvelle Route ajout BARRO le 01/11/2025
+Route::get('/view-document/{category}', [PieceJointeController::class, 'view'])->name('view.document');
+Route::get('type/entreprise', [DemandeController::class,'typeEntreprise'])->name('type.entreprise');
+Route::get('/process-type-entreprise/{type}', [DemandeController::class, 'processTypeEntreprise'])->name('process.type.entreprise');
 
 Route::post('/update/piecejointe', [DemandeController::class, 'updatepiecejointe'])->name("piecejointe.update");
 Route::post('/verifier/nom_commercial', [DemandeController::class, 'verifier_nom_commercial'])->name("verifier_nom_commercial");
@@ -113,6 +118,7 @@ Route::get('forget-password/{token}', [AccountController::class, 'showForgetPass
 Route::get('/test', [TestController::class,'syncrodata']);
 Route::get('/loginss',[AccountController::class, 'getlogin']);
 Route::get('/user/compte', [UserController::class,'compte'])->name('user.compte');
+Route::get('promoteur/liste', [UsagerController::class, 'promoteur'])->name('promoteur.liste');
 Route::resource('user', UserController::class);
 Route::resource('permissions', PermissionController::class);
 Route::resource("role",RoleController::class);
@@ -120,6 +126,7 @@ Route::resource("role",RoleController::class);
 //Ajout BARRO
 //Commente
 Route::get('/backend/liste', [DemandeController::class, 'liste_demande'])->name("list");
+Route::get('/backend/liste/all', [DemandeController::class, 'all'])->name("all.list");
 Route::get('/backend/liste/attentedepqrtenaire', [DemandeController::class, 'liste_en_attente_de_partenaire'])->name("list.en_attente_de_partenaire");
 Route::post('/backend/ajouter/formalite', [DemandeController::class, 'add_formalite_retour'])->name("add_formalite_retour");
 Route::post('/backend/update/formalite', [DemandeController::class, 'update_formalite_retour'])->name("update_formalite_retour");
@@ -155,6 +162,7 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard',[AccueilContro
 Route::post('logout', [UserController::class, 'logout'])->name('logout');
 Route::resource("parametres",ParametreController::class);
 Route::resource("valeurs", ValeurController::class);
+Route::resource("piece", PieceJointeController::class);
 //Route::get('login', [UserController::class, 'login'])->name('login');
 
 

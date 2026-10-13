@@ -16,19 +16,89 @@ class UsagerController extends Controller
         $this->middleware('auth');
     }
 
+    // public function create(){
+    //     $usager= Usager::where('user_id', Auth::user()->id)->first();
+    //     if(!$usager){
+    //         $regions= DB::table('regions')->get();
+    //         $pays= DB::table('valeurs')->where('parametre_id',5)->orderby('libelle','asc')->get();
+    //         $civilites=DB::table('valeurs')->where('parametre_id',15)->get();
+    //         $nationalites= DB::table('valeurs')->where('parametre_id',6)->orderby('libelle','asc')->get();
+    //         $professions= DB::table('valeurs')->where('parametre_id',8)->orderby('libelle','asc')->get();
+    //         $all_usagers= Usager::all();
+    //         return view('usager.create', compact('civilites','nationalites','regions', 'pays', 'professions','all_usagers'));
+    //     }
+    //     else{
+    //         $piecejointe_enrs= PieceJointe::where('usager_id',$usager->id)->where('demande_id', null)->get();
+    //         if(count($piecejointe_enrs)>0){
+    //             $type_entreprise = $piecejointe_enrs->first()->type_entreprise ?? null;
+    //             return redirect()->route('process.type.entreprise', ['type' => $type_entreprise]);
+    //         }
+    //         else{
+    //             return redirect()->route('type.entreprise');
+    //         }
+    //         //return redirect()->route('create.demande');
+    //     }
+       
+    // }
     public function create(){
+        //dd($request->all());
         $usager= Usager::where('user_id', Auth::user()->id)->first();
         if(!$usager){
-            $regions= DB::table('regions')->get();
-            $pays= DB::table('valeurs')->where('parametre_id',5)->orderby('libelle','asc')->get();
-            $civilites=DB::table('valeurs')->where('parametre_id',15)->get();
-            $nationalites= DB::table('valeurs')->where('parametre_id',6)->orderby('libelle','asc')->get();
-            $professions= DB::table('valeurs')->where('parametre_id',8)->orderby('libelle','asc')->get();
-            $all_usagers= Usager::all();
+            $regions = DB::table('regions')->get();
+            $pays = DB::table('valeurs')->where('parametre_id',5)->orderby('libelle','asc')->get();
+            $civilites = DB::table('valeurs')->where('parametre_id',15)->get();
+            $nationalites = DB::table('valeurs')->where('parametre_id',6)->orderby('libelle','asc')->get();
+            $professions = DB::table('valeurs')->where('parametre_id',8)->orderby('libelle','asc')->get();
+            $all_usagers = Usager::all();
             return view('usager.create', compact('civilites','nationalites','regions', 'pays', 'professions','all_usagers'));
         }
-        else{            
-            return redirect()->route('create.demande');
+        else{
+            $piecejointe_enrs = PieceJointe::where('usager_id',$usager->id)->where('demande_id', null)->get();
+            
+            if(count($piecejointe_enrs) > 0){
+                $type_entreprise = $piecejointe_enrs->first()->type_entreprise ?? null;
+                
+                if($type_entreprise) {
+                    return redirect()->route('process.type.entreprise', ['type' => $type_entreprise]);
+                }
+                else {
+                    $piece_pp = ['certificat_de_residence','photo_didentite','formulaire_dem_cpc'];
+                    $piece_pm = ['statut','formulaire_rccm','acte_de_depot'];
+                    
+                    // Récupérer tous les types de pièces joints existants
+                    $types_pieces_existants = $piecejointe_enrs->pluck('categorie_piece')->toArray();
+                    
+                    // Vérifier si les types correspondent à piece_pp
+                    $is_pp = count(array_intersect($piece_pp, $types_pieces_existants)) > 0;
+                    
+                    // Vérifier si les types correspondent à piece_pm
+                    $is_pm = count(array_intersect($piece_pm, $types_pieces_existants)) > 0;
+                    
+                    // Déterminer le type d'entreprise et faire la mise à jour
+                    if($is_pp && !$is_pm) {
+                        // Mise à jour pour EI (Entreprise Individuelle)
+                        foreach($piecejointe_enrs as $piece) {
+                            $piece->update(['type_entreprise' => 'ei']);
+                        }
+                        return redirect()->route('process.type.entreprise', ['type' => 'ei']);
+                        
+                    } elseif($is_pm && !$is_pp) {
+                        // Mise à jour pour ES (Entreprise Société)
+                        foreach($piecejointe_enrs as $piece) {
+                            $piece->update(['type_entreprise' => 'es']);
+                        }
+                        return redirect()->route('process.type.entreprise', ['type' => 'es']);
+                        
+                    } else {
+                        // Cas ambigu ou les deux types sont présents
+                        // Rediriger vers la sélection manuelle du type
+                        return redirect()->route('type.entreprise');
+                    }
+                }
+            }
+            else {
+                return redirect()->route('type.entreprise');
+            }
         }
        
     }
@@ -235,14 +305,21 @@ class UsagerController extends Controller
         //Ce controle permet de savoir si c'est un usager qui est créer pour une demande ou un usager creer pour completer mles information d'un autre usager 
         //tel que le conjoint ou autre
     if( $request ['province_usager'] != null){             
-        return redirect()->route('create.demande');      
+        //return redirect()->route('create.demande');    
+        return redirect()->route('type.entreprise')
+        ->with('success', 'Usager créé avec succès. Vous pouvez maintenant créer une demande.');  
     }
    
     else{
-            $usagers= Usager::all();
-                foreach ($usagers as $usager) {
-                    $data[] = array("id" => $usager->id, "nom" => $usager->NomRaisonSociale,'prenom'=>$usager->Prenom,'phone'=>$usager->Phone_No_,);
-                }           
+            // $usagers= Usager::all();
+            //     foreach ($usagers as $usager) {
+            //         $data[] = array("id" => $usager->id, "nom" => $usager->NomRaisonSociale,'prenom'=>$usager->Prenom,'phone'=>$usager->Phone_No_,);
+            //     }  
+
+            $data=[
+                'success'=>200,
+                'message'=>'Créé avec succès'
+            ];       
                 return json_encode($data);
                 //return redirect()->route('create.demande');      
 
@@ -251,4 +328,11 @@ class UsagerController extends Controller
     }
     }
     
+    public function promoteur()
+    {
+        $usagers= Usager::where('id', '!=', null)->orderBy('updated_at', 'desc')
+        //->take(100)
+        ->get();
+        return view('usager.adminliste', compact('usagers'));
+    }
 }

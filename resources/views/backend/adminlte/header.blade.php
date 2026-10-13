@@ -159,7 +159,7 @@
                       <i class="nav-icon fa fa-ban"></i>
                       <p>Demandes Rejétées</p>
                     </a>
-              </li>
+              </li>              
               <li class="nav-item">
               <a href="{{route('list.en_attente_de_partenaire')}}" class="nav-link @yield("liste_partenaire")">
               <i class="nav-icon fa fa-check-square"></i>
@@ -167,7 +167,21 @@
                     </a>
               </li>                           
             </ul>            
-          </li>      
+          </li>
+          <li class="nav-item">
+          <a href="{{route('all.list')}}" class="nav-link @yield("all")">
+                    <i class="nav-icon fa fa-list-alt"></i>
+                        <p>Toutes les demandes</p>
+                </a>            
+          </li>
+          <li class="nav-item">
+            <a href="{{route('promoteur.liste')}}" class="nav-link @yield("promoteur")">
+              <i class="fa fa-users nav-icon"></i>
+              <p>
+                Promoteurs
+              </p>
+            </a>
+          </li>
           <li class="nav-item">
             <a href="{{route('user.compte')}}" class="nav-link @yield("compte")">
               <i class="fa fa-users nav-icon"></i>
@@ -175,7 +189,7 @@
                 Comptes               
               </p>
             </a>            
-          </li>    
+          </li>
           <li class="nav-item">
             <a href="{{route('statistique')}}" class="nav-link @yield("statistique")">
               <i class="nav-icon fas fa-copy"></i>

@@ -42,7 +42,7 @@ class DemandeController extends Controller
 
     public function test()
     {        
-        return view('test');
+        return view('maintenance');
     }
 
     public function index()
@@ -98,6 +98,7 @@ class DemandeController extends Controller
         $nbr_demande_pp=count($demande_pp);
         if($usager!=null){
             $piecejointe_enrs= PieceJointe::where('usager_id',$usager->id)->get();
+            $type_dem = $piecejointe_enrs->first()->type_entreprise;
             $regions= DB::table('regions')->get();
             $pays= DB::table('valeurs')->where('parametre_id',5)->get();
             $fonctions= DB::table('valeurs')->where('parametre_id',8)->get();
@@ -115,15 +116,16 @@ class DemandeController extends Controller
             $prestation_PMs= Prestation::where('type_demande','M1')->get();
             $prestation_PMs= $prestation_PMs->unique('type');      
     
+            //dd($type_dem);
             $demandes=Demande::where('usager_id', $usager->id)->orderby('created_at','desc')->get();
             $c=count($demandes);
             return view('demande.test' ,compact('piecejointe_enrs','regions', 'pays','fonctions','activites','prestation_PPs','prestation_PMs',
-            'FJ_EI','FJ_ES','FJ_GIE','usager','activites_secondaires','pays','all_usagers','usage_terrains','c','nbr_demande_pp','civilites'));
+            'FJ_EI','FJ_ES','FJ_GIE','usager','activites_secondaires','pays','all_usagers','usage_terrains','c','nbr_demande_pp','civilites','type_dem'));
         }
         else{
             $c=0;
             return view('demande.test' ,compact('piecejointe_enrs','regions', 'pays','fonctions','activites','prestation_PPs','prestation_PMs',
-            'FJ_EI','FJ_ES','FJ_GIE','civilites','usager','activites_secondaires','pays','all_usagers','usage_terrains','c','nbr_demande_pp'));
+            'FJ_EI','FJ_ES','FJ_GIE','civilites','usager','activites_secondaires','pays','all_usagers','usage_terrains','c','nbr_demande_pp','type_dem'));
         }
         }
         //$usager= Usager::where('user_id',Auth::user()->id)->first();
@@ -235,7 +237,16 @@ class DemandeController extends Controller
         }
         
         $Cefore=DB::table('organisations')->where('CodeRegion', $request['region_entreprise'])->first();
-        $Cefore_code=$Cefore->CodeOrganisation;
+        if($request->province_entreprise==6 || $request->province_entreprise==19){
+            $Cefore_code='CEFORE TNK';
+        }
+        elseif($request->province_entreprise==4 || $request->province_entreprise==9){
+            $Cefore_code='CEFORE OUA';
+        }
+        else{
+            $Cefore_code=$Cefore->CodeOrganisation;
+        }
+        //$Cefore_code=$Cefore->CodeOrganisation;
         
         $last_id=DB::table('demandes')->latest('id')->first();
         if($last_id){
@@ -577,8 +588,14 @@ public function updatepj_correct(Request $request){
             'keywords' => $nom_commercial,
         ]
     ]);
-         $responses = json_decode ($response->getBody ());
-            return  $responses;
+        //  $responses = json_decode ($response->getBody ());
+        //     return  $responses;
+        $Body=$response->getBody()->getContents();
+         $json_decoded=json_decode($Body, true);
+         $data= array('data'=>$json_decoded['response'], 'status'=>$json_decoded['status']);
+
+         //   return  $responses;
+         return json_encode($data);
  }
 
 public function laodpiecejointe(Request $request){
@@ -947,6 +964,49 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             {
             if(Auth::user()->organisation!="001000"){
                 $demandes=Demande::where('organisation_code',Auth::user()->organisation)->where('etat', '!=', null)->orderby('created_at','desc')
+                ->take(300)
+                ->get();
+                $demande_count=Demande::where('etat', '!=', null)->orderby('created_at','desc')
+                ->get();
+                $paye=Demande::where('paye', 1)->where('organisation_code',Auth::user()->organisation)->get();
+                $nbr_paye=count($paye);
+                $nonpaye=Demande::where('paye', 0)->where('organisation_code',Auth::user()->organisation)->get();
+                $rejet=Demande::where('etat', 2)->where('organisation_code',Auth::user()->organisation)->get();
+                $valider=Demande::where('etat', 1)->where('paye', 1)->where('organisation_code',Auth::user()->organisation)->get();
+                $non_valider=Demande::where('etat', 0)->where('paye', 1)->where('organisation_code',Auth::user()->organisation)->get();
+                $nbr_rejet=count($rejet);
+                $nbr_nonpaye=count($nonpaye);
+                $nbr=count($demande_count);
+            }
+            else{
+                $demandes=Demande::where('etat', '!=', null)->orderby('created_at','desc')
+                ->take(300)
+                ->get();
+                $demande_count=Demande::where('etat', '!=', null)->orderby('created_at','desc')
+                ->get();
+                $paye=Demande::where('paye', 1)->get();
+                $nbr_paye=count($paye);
+                $nonpaye=Demande::where('paye', 0)->get();
+                $rejet=Demande::where('etat', 2)->get();
+                $valider=Demande::where('etat', 1)->where('paye',1)->get();
+                $non_valider=Demande::where('etat', 0)->where('paye',1)->get();
+                $nbr_rejet=count($rejet);
+                $nbr_nonpaye=count($nonpaye);
+                $nbr=count($demande_count);
+            }
+            return view('backend.adminlte.dashboard', compact('demandes','nbr','nbr_paye','nbr_nonpaye','nbr_rejet','valider','non_valider'));
+        }
+        else{
+            flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
+            return redirect()->back();
+        }
+        }
+
+        public function all(){
+            if (Auth::user()->can('lister.demande'))
+            {
+            if(Auth::user()->organisation!="001000"){
+                $demandes=Demande::where('organisation_code',Auth::user()->organisation)->where('etat', '!=', null)->orderby('created_at','desc')
                 //->take(1000)
                 ->get();
                 $demande_count=Demande::where('etat', '!=', null)->orderby('created_at','desc')
@@ -973,7 +1033,7 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
                 $nbr_nonpaye=count($nonpaye);
                 $nbr=count($demande_count);
             }
-            return view('backend.adminlte.dashboard', compact('demandes','nbr','nbr_paye','nbr_nonpaye','nbr_rejet'));
+            return view('backend.adminlte.all', compact('demandes','nbr','nbr_paye','nbr_nonpaye','nbr_rejet'));
         }
         else{
             flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
@@ -1590,31 +1650,44 @@ else{
         // Préparation des données
         //dd($request->all());
         $id=Demande::where('id', $request->id)->first();
+        $chaine = Str::random(10);
         $command=$id->numero_command;
+        $num_command=$command."-".$chaine;
         $demande_id=$id->id;
-        $montant=$id->montant_total;
+        $montant= (int) $id->montant_total;
         $numero=$request->numero;
+        //dd($montant);
         $data = [
-            "request-id"    => $command,
+            "request-id"    => $num_command,
             "destination"   => $numero,
             "amount"        => $montant,
             "remarks"       => "OTP TEST",
-            "message"       => "GENERATION OTP MOOV",
-            "extended-data" =>
-            
-             new \stdClass()
+            "message"       => "GENERATION OTP MOOV",                    
+            "extended-data"=>[
+                    "module"=> "MERCHOTPPAY"
+                ]
+               
+                //  new \stdClass()
+                // 
+                // "request-id" =>"Test-LLNew-API-FF-hhl-KKKhkkh",
+                // "destination"=> "22660484705",
+                // "amount"=> 100,
+                // "remarks"=> "OTP Merchaant",
+                // "extended-data"=>[
+                //     "module"=> "MERCHOTPPAY"
+                // ]
             ];
-
+            //dd($data);
             $curl = curl_init();
             //$acces= base64_encode("MAISON:OjX8eJ9rlCC4"); //Acces de test
-            $acces= base64_encode("MAISON:G7pM3xL9vQ2nT1Fb"); //Acces de Prod
+            $acces = base64_encode(env('USER_API_MOOV') . ':' . env('MDP_API_MOOV')); //Acces de Prod
             $url_prod="https://196.28.245.227/tlcfzc_gw_prod/mbs-gateway/gateway/3pp/transaction/process";
             $url_test="https://196.28.245.227/tlcfzc_gw/api/gateway/3pp/transaction/process";
 
             //https://196.28.245.227/tlcfzc_gw_prod/mbs-gateway/gateway/3pp/transaction/process
             //https://196.28.245.227/tlcfzc_gw/api/gateway/3pp/transaction/process
             curl_setopt_array($curl, [
-                CURLOPT_URL            => "https://196.28.245.227/tlcfzc_gw_prod/mbs-gateway/gateway/3pp/transaction/process",
+                CURLOPT_URL            => env('URL_API_MOOV'),
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING       => "UTF-8",
                 CURLOPT_MAXREDIRS      => 10,
@@ -1627,6 +1700,7 @@ else{
                 CURLOPT_HTTPHEADER     => [
                     "Authorization: Basic ".$acces, // À remplacer par vos credentials
                     "Content-Type: application/json",
+                    "Accept: */*",
                    //"command-id: mror-transaction-ussd" //pour le mode validation par le promoteur
                    //"command-id: process-check-subscriber" //pour checker les infos du promoteur
                    "command-id: process-create-mror-otp" //pour la génération d'OTP par moov
@@ -1644,10 +1718,11 @@ else{
                 session()->flash('error', "Erreur lors de la connexion au service de paiement !");
                 return redirect()->route('demande.liste');
             }
-
             if ($response){
                 //ENregistrement dans la table paiement en cas de response
                 $responseData = json_decode($response, true);
+                $status = $responseData['status'];
+                if($status !=12){
                 // Récupérer les valeurs nécessaires
                 $requestId = $responseData['request-id'];
                 $status = $responseData['status'];
@@ -1705,14 +1780,240 @@ else{
                     session()->flash('error', "une erreur s'est produite, Veuillez Réessayer !");
                     return redirect()->route('demande.liste');
                 }
+                }
+                else{
+                    session()->flash('error', "une erreur s'est produite, Veuillez Réessayer !");
+                    return redirect()->route('demande.liste');
+                }
             }
 
         }
 
+    // public function moov_store(Request $request){
+    //     //
+    //     // Préparation des données
+    //     //dd($request->all());
+    //     $id=Demande::where('id', $request->id)->first();
+    //     $command=$id->numero_command;
+    //     $demande_id=$id->id;
+    //     $montant=$id->montant_total;
+    //     $numero=$request->numero;
+    //     $data = [
+    //         "request-id"    => $command,
+    //         "destination"   => $numero,
+    //         "amount"        => $montant,
+    //         "remarks"       => "OTP TEST",
+    //         "message"       => "GENERATION OTP MOOV",
+    //         "extended-data" =>
+            
+    //          new \stdClass()
+    //         ];
+
+    //         $curl = curl_init();
+    //         //$acces= base64_encode("MAISON:OjX8eJ9rlCC4"); //Acces de test
+    //         $acces= base64_encode("MAISON:G7pM3xL9vQ2nT1Fb"); //Acces de Prod
+    //         $url_prod="https://196.28.245.227/tlcfzc_gw_prod/mbs-gateway/gateway/3pp/transaction/process";
+    //         $url_test="https://196.28.245.227/tlcfzc_gw/api/gateway/3pp/transaction/process";
+
+    //         //https://196.28.245.227/tlcfzc_gw_prod/mbs-gateway/gateway/3pp/transaction/process
+    //         //https://196.28.245.227/tlcfzc_gw/api/gateway/3pp/transaction/process
+    //         curl_setopt_array($curl, [
+    //             CURLOPT_URL            => "https://196.28.245.227/tlcfzc_gw_prod/mbs-gateway/gateway/3pp/transaction/process",
+    //             CURLOPT_RETURNTRANSFER => true,
+    //             CURLOPT_ENCODING       => "UTF-8",
+    //             CURLOPT_MAXREDIRS      => 10,
+    //             CURLOPT_TIMEOUT        => 30,
+    //             CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+    //             CURLOPT_SSL_VERIFYHOST => false,
+    //             CURLOPT_SSL_VERIFYPEER => false,
+    //             CURLOPT_CUSTOMREQUEST  => "POST",
+    //             CURLOPT_POSTFIELDS     => json_encode($data),
+    //             CURLOPT_HTTPHEADER     => [
+    //                 "Authorization: Basic ".$acces, // À remplacer par vos credentials
+    //                 "Content-Type: application/json",
+    //                //"command-id: mror-transaction-ussd" //pour le mode validation par le promoteur
+    //                //"command-id: process-check-subscriber" //pour checker les infos du promoteur
+    //                "command-id: process-create-mror-otp" //pour la génération d'OTP par moov
+    //             ],
+    //         ]);
+    //         $response = curl_exec($curl);
+    //         $err = curl_error($curl);
+    //         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            
+    //         curl_close($curl);
+    //         // Gestion des erreurs
+    //         //dd($response);
+    //         if ($err) {
+                                                        
+    //             session()->flash('error', "Erreur lors de la connexion au service de paiement !");
+    //             return redirect()->route('demande.liste');
+    //         }
+
+    //         if ($response){
+    //             //ENregistrement dans la table paiement en cas de response
+    //             $responseData = json_decode($response, true);
+    //             // Récupérer les valeurs nécessaires
+    //             $requestId = $responseData['request-id'];
+    //             $status = $responseData['status'];
+    //             $transId = $responseData['trans-id'];
+    //             $message = $responseData['message'];
+    //             $paiement=Paiement::create([
+    //                 'numero_demande'=>$command,
+    //                 'statut'=>$status,
+    //                 'mode_paiement'=>'MoovMoney',
+    //                 'paid_sum'=>$montant,
+    //                 'transId'=>$transId,
+    //                 'message'=>$message,
+    //                 'numero_tel'=>$numero,
+    //                 'type'=>0,// Pour initiation du paiement moovMoney
+    //                 'requestId'=>$requestId //peut être égal à numero_demande
+    //             ]);
+
+    //             $date=new \DateTime();
+    //                 $date_format= $date->format("d-m-Y H:i:s");
+    //                 $id->update([
+    //                     'paye'=>2,
+    //                     'date_initiation'=>$date_format
+    //                 ]);
+               
+    //             //dd($status); checked if status is ok
+    //             if($status==0){
+    //                 //dd('ok');
+    //                 $otp=1; //signifie que otp a été envoyé au client, donc on peut le redirigéer ver page OTP
+    //                 //session()->flash('message', "OTP généré avec succès ! Renseigner le code OTP");
+    //                 return view('moov.index', compact('demande_id', 'command', 'montant','otp','transId','requestId','numero'));
+    //             }
+    //             elseif($status==10){
+    //                 $paiement->update([
+    //                     'echec_moov'=>'Oui'
+    //                 ]);
+    //                 $date=new \DateTime();
+    //                 $date_format= $date->format("d-m-Y H:i:s");
+    //                 $id->update([
+    //                     'paye'=>0,
+    //                     'date_initiation'=>$date_format
+    //                 ]);
+    //                 session()->flash('error', "Solde Insuffisant, Veuillez Recharger puis Réessayer !");
+    //                 return redirect()->route('demande.liste');
+    //             }
+    //             else{
+    //                 $paiement->update([
+    //                     'echec_moov'=>'Oui'
+    //                 ]);
+    //                 $date=new \DateTime();
+    //                 $date_format= $date->format("d-m-Y H:i:s");
+    //                 $id->update([
+    //                     'paye'=>0,
+    //                     'date_initiation'=>$date_format
+    //                 ]);
+    //                 session()->flash('error', "une erreur s'est produite, Veuillez Réessayer !");
+    //                 return redirect()->route('demande.liste');
+    //             }
+    //         }
+
+    //     }
+
+        // public function moov_verif_otp(Request $request){
+        //     //dd($request->all());
+        //     $id=Demande::where('id', $request->id)->first();
+        //     $montant=$id->montant_total;
+        //     $date = date('dmy'); // Donnera "170725" pour le 17 juillet 2025 (aujourd'hui)
+        //     $time = date('His');
+        //     //dd($request->otp);
+        //     if($id){
+        //     $data = [
+        //         "request-id"    => $date.'-'.$time.'-'.$id->numero_command,
+        //         "destination"   => $request->numero,
+        //         "amount"        => $montant,
+        //         "remarks"       => "OTP VERIFICATION",
+        //        // "message"       => "PAIEMENT MOOV VEUILLEZ CONFIRMER AVEC LE PIN",
+        //         "extended-data" =>
+        //             [
+        //                  "module"=> "MERCHOTPPAY",
+        //                  "otp"=> $request->otp,
+        //                  "ext1"=> $date.$time,
+        //                  "ext2"=> $date.$time."ext2",
+        //                  "trans-id"=> $request->transId,
+        //             ]
+        //         ];
+
+        //         $curl = curl_init();
+        //         $acces= base64_encode("MAISON:G7pM3xL9vQ2nT1Fb");
+        //         curl_setopt_array($curl, [
+        //             CURLOPT_URL            => "https://196.28.245.227/tlcfzc_gw_prod/mbs-gateway/gateway/3pp/transaction/process",
+        //             CURLOPT_RETURNTRANSFER => true,
+        //             CURLOPT_ENCODING       => "UTF-8",
+        //             CURLOPT_MAXREDIRS      => 10,
+        //             CURLOPT_TIMEOUT        => 30,
+        //             CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+        //             CURLOPT_SSL_VERIFYHOST => false,
+        //             CURLOPT_SSL_VERIFYPEER => false,
+        //             CURLOPT_CUSTOMREQUEST  => "POST",
+        //             CURLOPT_POSTFIELDS     => json_encode($data),
+        //             CURLOPT_HTTPHEADER     => [
+        //                 "Authorization: Basic ".$acces, // À remplacer par vos credentials
+        //                 "Content-Type: application/json",
+        //                //"command-id: mror-transaction-ussd" //pour le mode validation par le promoteur
+        //                //"command-id: process-check-subscriber" //pour checker les infos du promoteur
+        //                "command-id: process-commit-otppay" //pour checker l'OTP
+        //             ],
+        //         ]);
+        //         $response = curl_exec($curl);
+        //         $err = curl_error($curl);
+        //         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                
+        //         curl_close($curl);
+
+        //         if($response){
+        //             //dd($response);
+        //             $responseData = json_decode($response, true);
+        //             // Récupérer les valeurs nécessaires
+        //             $requestId = $responseData['request-id'];
+        //             $status = $responseData['status'];
+        //             $transId = $responseData['trans-id'];
+        //             $message = $responseData['message'];
+        //             $paiement=Paiement::create([
+        //                 'numero_demande'=>$id->numero_command,
+        //                 'statut'=>$status,
+        //                 'mode_paiement'=>'MoovMoney',
+        //                 'paid_sum'=>$montant,
+        //                 'transId'=>$transId,
+        //                 'message'=>$message,
+        //                 'type'=>1,// Pour confirmation du paiement moovMoney
+        //                 'requestId'=>$requestId //peut être égal à numero_demande
+        //             ]);     
+                                            
+        //             //dd($status);
+        //             if($status==0){
+        //                 //dd('ok');
+        //                 $date=new \DateTime();
+        //                 $date_format= $date->format("d-m-Y H:i:s");
+        //                 $id->update([
+        //                     'paye'=>1,
+        //                     'date_paiement'=>$date_format
+        //                 ]);
+        //                 session()->flash('message', "Paiement Effectué avec succès !");
+        //                 return redirect()->route('demande.liste');
+        //                 //return view('moov.index', compact('demande_id', 'command', 'montant','otp','transId','requestId','numero'));
+        //             }
+        //             if($status==900228){
+        //                 $date=new \DateTime();
+        //                 $date_format= $date->format("d-m-Y H:i:s");
+        //                 $id->update([
+        //                     'paye'=>0                                    
+        //                 ]);
+        //                 session()->flash('error', "OTP n'existe pas, Veuillez ressayer !");
+        //                 return redirect()->route('demande.liste');
+        //             }
+        //         }
+        //     }           
+        // }
+
         public function moov_verif_otp(Request $request){
             //dd($request->all());
             $id=Demande::where('id', $request->id)->first();
-            $montant=$id->montant_total;
+            //Convertir le montant en chiffre au cas ou ce n'est pas le cas
+            $montant= (int) $id->montant_total;
             $date = date('dmy'); // Donnera "170725" pour le 17 juillet 2025 (aujourd'hui)
             $time = date('His');
             //dd($request->otp);
@@ -1734,9 +2035,9 @@ else{
                 ];
 
                 $curl = curl_init();
-                $acces= base64_encode("MAISON:G7pM3xL9vQ2nT1Fb");
+                $acces = base64_encode(env('USER_API_MOOV') . ':' . env('MDP_API_MOOV'));
                 curl_setopt_array($curl, [
-                    CURLOPT_URL            => "https://196.28.245.227/tlcfzc_gw_prod/mbs-gateway/gateway/3pp/transaction/process",
+                    CURLOPT_URL            => env('URL_API_MOOV'),
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_ENCODING       => "UTF-8",
                     CURLOPT_MAXREDIRS      => 10,
@@ -1759,16 +2060,23 @@ else{
                 $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
                 
                 curl_close($curl);
-
+                //dd($response);
                 if($response){
                     //dd($response);
+                    
                     $responseData = json_decode($response, true);
                     // Récupérer les valeurs nécessaires
-                    $requestId = $responseData['request-id'];
-                    $status = $responseData['status'];
-                    $transId = $responseData['trans-id'];
+                    //dd($responseData);
+
+                    
+                    $status = $responseData['status'];                           
                     $message = $responseData['message'];
-                    $paiement=Paiement::create([
+                    if($status !=12){
+                        $requestId = $responseData['request-id'];
+                        $transId = $responseData['trans-id'];
+                        $status = $responseData['status'];                           
+                        $message = $responseData['message'];
+                    Paiement::create([
                         'numero_demande'=>$id->numero_command,
                         'statut'=>$status,
                         'mode_paiement'=>'MoovMoney',
@@ -1801,8 +2109,67 @@ else{
                         session()->flash('error', "OTP n'existe pas, Veuillez ressayer !");
                         return redirect()->route('demande.liste');
                     }
+                    }
+                    else{
+                        $id->update([
+                            'paye'=>0                                    
+                        ]);
+                        session()->flash('error', "Une erreur s'est produite lors de l'opération, Veuillez ressayer !");
+                        return redirect()->route('demande.liste');
+                    }
                 }
             }           
-        }  
+        }    
+
+        
+        public function typeEntreprise(Request $request){
+            $usager = Usager::where('user_id', Auth::user()->id)->first();
+            $demande=Demande::where('usager_id', $usager->id)->first();
+            $typeDemande='';
+            if($demande){
+                $typeDemande=$demande->company_type;
+            }
+            
+            return view('demande.type', compact('usager', 'typeDemande'));
+            
+        }
+    
+        public function processTypeEntreprise($type)
+        {
+            //dd($type);
+            // Validation du type
+            if (!in_array($type, ['ei', 'es', 'gie'])) {
+                return redirect()->route('type.entreprise')
+                    ->with('error', 'Type d\'entreprise invalide.');
+            }
+            $user = Auth::user();
+            $usager = Usager::where('user_id', $user->id)->first();
+            // Récupérer toutes les pièces jointes de l'usager
+            $piecejointe_enrs = PieceJointe::where('usager_id', $usager->id)->where('demande_id', null)->get();
+            // Grouper par catégorie pour l'affichage
+            if($piecejointe_enrs){
+                    $documentsParCategorie = $piecejointe_enrs
+                    ->where('type_entreprise', $type) // Filtrer par type d'entreprise                   
+                    ->groupBy('categorie_piece')->map(function ($docs) {
+                        // Prendre le document le plus récent pour chaque catégorie
+                        return $docs->sortByDesc('created_at')->first();
+                    });
+                }
+                else{
+                    $documentsParCategorie = [];
+                }
+            // Stocker le type d'entreprise en session
+            session(['type_entreprise_selectionne' => $type]);
+            
+            // Rediriger directement vers la page des pièces jointes
+            //return redirect()->route('pieces-jointes.create');
+            if($type=='ei'){
+                return view('demande.piecepp', compact('type', 'documentsParCategorie', 'usager'));
+            }else if($type=='es'){
+                return view('demande.piecepm', compact('type', 'documentsParCategorie', 'usager'));
+                }else{
+                    return view('demande.piecepm', compact('type', 'documentsParCategorie', 'usager')); 
+            }
+        }
 
 }

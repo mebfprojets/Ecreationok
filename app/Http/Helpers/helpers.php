@@ -5,6 +5,7 @@ use App\Models\Usager;
 use App\Models\Valeur;
 use App\Models\User;
 use App\Models\Formalite;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 if (!function_exists('returnpieceinfos')) {
@@ -30,6 +31,58 @@ if (!function_exists('returnpieceinfos')) {
     if(!function_exists('format_date')){
         function format_date($date){
             return  date('d-m-Y', strtotime($date));
+        }
+    }
+    if(!function_exists('getvaleur')){
+        function getvaleur($table, $id){
+            //dd($table);
+            if($table=="secteur_villages"){
+                $value=DB::table($table)->where('code', $id)->first();
+            }
+            else{
+            $value=DB::table($table)->where('id', $id)->first();
+            }
+            if($value){
+                $libelle=$value->name;
+            }
+            else{
+                $libelle="";
+            }
+            return  $libelle;
+        }
+    }
+
+    if(!function_exists('EntrepriseUsager')){
+        function EntrepriseUsager($usager_id){
+            $entreprise= Demande::where('usager_id', $usager_id)->first();
+            if($entreprise){
+
+                return array('nom_commercial' => $entreprise->commercial_name,
+                'date_creation' => $entreprise->created_at,
+                'type_entreprise' => $entreprise->company_type,
+                'paye' => $entreprise->paye,
+                'date_paiement'=>$entreprise->date_paiement,
+                'status' => $entreprise->etat,
+                'date_status' => $entreprise->Date_etat_validation);
+            }
+            else{
+                return null;
+            }
+        }
+    }
+    if(!function_exists('CompteUsager')){
+        function CompteUsager($id){
+            $value=User::where('id', $id)->first();
+            //dd($value);
+            if($value){
+                return array('name' => $value->name,
+                'prenom'=>$value->prenom,
+                'email' => $value->email,
+                'date_creation' => $value->created_at);
+            }
+            else{
+                return null;
+            }
         }
     }
 

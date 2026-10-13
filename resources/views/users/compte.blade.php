@@ -1,5 +1,4 @@
 @extends("backend.adminlte.main")
-@section('administration', 'menu-open')
 @section('compte', 'active') 
 
 @section('content')

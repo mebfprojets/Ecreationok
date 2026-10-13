@@ -239,10 +239,10 @@
             </div>
             <div class="modal-body">
 
-                <p>•	<a href="https://me.bf/fr/file/2967/download?token=kziektSF" style="color: blue">Télécharger ici la fiche de déclaration sur l'honneur</a></p>
-                <p>•	<a href="https://me.bf/fr/file/2968/download?token=pI__AZKv" style="color: blue">Télécharger ici le formulaire de demande de carte professionnelle de commerçant (CPC)</a></p>
+                <p>•	<a href="https://www.me.bf/wp-content/uploads/2025/10/DECLARATION-SUR-LHONNEUR-vf-21-10-2025.docx" style="color: blue">Télécharger ici la fiche de déclaration sur l'honneur</a></p>
+                <p>•	<a href="https://www.me.bf/wp-content/uploads/2023/05/Fiche-Carte-Professionnelle-de-Commercant_CPC-SCANNE.pdf" style="color: blue">Télécharger ici le formulaire de demande de carte professionnelle de commerçant (CPC)</a></p>
                 <!-- <p>•	<a href="http://me.bf/fr/file/2893/download?token=P7jVe3E4" style="color: blue">Télécharger ici la fiche de demande de localisation</a></p> -->
-                <p>•	<a href="https://me.bf/fr/file/2969/download?token=yvogbXGZ" style="color: blue">Télécharger ici la fiche de visite</a></p>
+                <p>•	<a href="https://www.me.bf/wp-content/uploads/2024/11/FICHE-DE-VISITE.pdf" style="color: blue">Télécharger ici la fiche de visite</a></p>
                 <p>•	1 photocopie légalisée de la pièce d’identité ou du  passeport du promoteur;</p>
                 <p>•	1 extrait de casier judiciaire (Bulletin N°3) de moins de 3 mois du promoteur. Les personnes ne pouvant pas établir leurs casiers judiciaires à Ouagadougou disposent de 75 jours pour l’apporter au CEFORE afin de compléter leur dossier;</p>
                 <p>•	1 copie de l’acte de mariage (s’il y a lieu) ;</p>
@@ -286,18 +286,18 @@
                 <h4 class="modal-title"><i class="gi gi-pen"></i>Pièces Personne Morale</h4>
             </div>
             <div class="modal-body">
-                <p>•	<a href="https://me.bf/fr/file/2967/download?token=kziektSF" style="color: blue">Télécharger ici la déclaration sur l'honneur</a></p>
-                <p>•	<a href="https://me.bf/fr/file/2968/download?token=pI__AZKv" style="color: blue">Télécharger ici le formulaire de demande de carte professionnelle de commerçant (CPC)</a></p>
+                <p>•	<a href="https://www.me.bf/wp-content/uploads/2025/10/DECLARATION-SUR-LHONNEUR-vf-21-10-2025.docx" style="color: blue">Télécharger ici la déclaration sur l'honneur</a></p>
+                <p>•	<a href="https://www.me.bf/wp-content/uploads/2023/05/Fiche-Carte-Professionnelle-de-Commercant_CPC-SCANNE.pdf" style="color: blue">Télécharger ici le formulaire de demande de carte professionnelle de commerçant (CPC)</a></p>
                 <!-- <p>•	<a href="http://me.bf/fr/file/2893/download?token=P7jVe3E4" style="color: blue">Télécharger ici la fiche de demande de localisation</a></p> -->
-                <p>•	<a href="https://me.bf/fr/file/3481/download?token=avSak-TP" style="color: blue">Télécharger ici le formulaire RCCM</a></p>
-                <p>•	<a href="https://me.bf/fr/file/132/download?token=_Sx15V_e" style="color: blue">Télécharger ici le modèle d'acte de dépôt</a></p>
-                <p>•	<a href="https://me.bf/fr/file/2964/download?token=a02UueF2" style="color: blue">Télécharger ici la fiche de visite</a></p>
-                <p>•	<a href="https://me.bf/fr/file/3481/download?token=avSak-TP" style="color: blue">Télécharger ici le contrat d'apport de bien</a></p>
-                <p>•	<a href="https://me.bf/fr/file/3481/download?token=avSak-TP" style="color: blue">Télécharger ici un exemplaire original des statuts de la société unipersonnel</a></p>
-                <p>•	<a href="https://www.me.bf/fr/file/3087/download?token=pBQrGH2F" style="color: blue">Télécharger ici un exemplaire original des statuts de la société pluripersonnel</a></p>
-                <p>•	<a href="https://www.me.bf/fr/file/129/download?token=v_mx1G_9" style="color: blue">Télécharger ici un exemplaire de déclaration de versement de fonds</a></p>
-                <p>•	<a href="https://www.me.bf/fr/file/133/download?token=wVOcjoWQ" style="color: blue">Télécharger ici un exemplaire de Procès Verbal (PV)</a></p>
-                <p>•	<a href="https://me.bf/fr/file/3481/download?token=avSak-TP" style="color: blue">Télécharger ici un exemplaire de déclaration de régularité et de conformité</a></p>
+                <p>•	<a href="https://www.me.bf/wp-content/uploads/2025/09/model-M1-VF.doc" style="color: blue">Télécharger ici le formulaire RCCM</a></p>
+                <p>•	<a href="https://www.me.bf/wp-content/uploads/2026/03/Acte-de-depot.doc" style="color: blue">Télécharger ici le modèle d'acte de dépôt</a></p>
+                <p>•	<a href="https://www.me.bf/wp-content/uploads/2024/11/FICHE-DE-VISITE.pdf" style="color: blue">Télécharger ici la fiche de visite</a></p>
+                <p>•	<a href="https://www.me.bf/wp-content/uploads/2023/09/Telecharger-ici-le-modele-de-contrat-dapport-de-bien-en-nature.docx" style="color: blue">Télécharger ici le contrat d'apport de bien</a></p>
+                <p>•	<a href="https://www.me.bf/wp-content/uploads/2023/09/Modele-de-statuts-dune-SARL-unipersonnelle.docx" style="color: blue">Télécharger ici un exemplaire original des statuts de la société unipersonnel</a></p>
+                <p>•	<a href="https://www.me.bf/wp-content/uploads/2023/09/Modele-de-statuts-dune-SARL-pluripersonnelle.docx" style="color: blue">Télécharger ici un exemplaire original des statuts de la société pluripersonnel</a></p>
+                <p>•	<a href="https://www.me.bf/wp-content/uploads/2023/09/Modele-de-declaration-de-souscription-et-de-versement-des-fonds.docx" style="color: blue">Télécharger ici un exemplaire de déclaration de versement de fonds</a></p>
+                <p>•	<a href="https://www.me.bf/wp-content/uploads/2023/09/Modele-de-proces-verbal-constitutif.docx" style="color: blue">Télécharger ici un exemplaire de Procès Verbal (PV)</a></p>
+                <p>•	<a href="https://www.me.bf/wp-content/uploads/2023/09/Modele-de-declaration-de-regularite-et-de-conformite.docx" style="color: blue">Télécharger ici un exemplaire de déclaration de régularité et de conformité</a></p>
                 
                 <p>•	Une photocopie de la pièce d’identité ou du passeport du ou des dirigeants de la société;</p>
                 <p>•	Un extrait de casier judiciaire (Bulletin N°3) de moins de 3 mois du ou des dirigeants;</p>
@@ -493,6 +493,8 @@
   <script>
    function verifier_nom_commercial(champ_nom_commercial){
       var nom_commercial= $('#'+champ_nom_commercial).val();
+      $('#pNomindisponible').hide();
+      $('#pNomdisponible').hide();
       var url = "{{ route('verifier_nom_commercial') }}";
       $.ajaxSetup({
             headers: {
@@ -504,7 +506,14 @@
                     type:'POST',
                     dataType:'json',
                     data: {nom_commercial: nom_commercial} ,
-                    error:function(){alert('error');},
+                    beforeSend: function(){
+                      $('#loading').show();
+                    },
+                    complete: function(){
+                      $('#loading').hide();
+                    },
+                    error:function(xhr, status, error)
+                    {alert('Une erreur est survenue lors de la vérification, Veuillez réessayer plus tard !');},
                     success:function(data){
                      // alert('oko');
                      if(data.status=='200'){
@@ -930,10 +939,10 @@ if (arrayExtensions.lastIndexOf(ext) == -1) {
 <script>
 $(function(){
     var today = new Date();
-   startDate= new Date(today.getFullYear()-20, today.getMonth(), today.getDate());
+   startDate= new Date(today.getFullYear()-18, today.getMonth(), today.getDate());
     $('.date_nais_usager').datepicker({
             autoclose: true,
-            endDate: new Date(today.getFullYear()-20, today.getMonth(), today.getDate()),
+            endDate: new Date(today.getFullYear()-18, today.getMonth(), today.getDate()),
             language: 'fr',
             dateFormat: 'dd-mm-yy',
 });

@@ -32,8 +32,9 @@
                                 </label>                                
                             </div>                                          
                         </div>
-                        <div class="col-md-4" style="margin-top: -7%;">       
+                        <div class="col-md-4" style="margin-top: 1px;">       
                             <div class="mb-3">
+                                <!-- Old Paiement par moov qui dirigeait vers l'intégrateur Intouch -->
                                 <!-- <button  onclick="calltouchpay('{{$command}}','{{$montant_telm}}')" class="btn btn-outline-info me-2">
                                     <img src="{{asset('frontend/images/Moov.png')}}" width="100" height="100" alt="">
                                 </button><br><br> -->

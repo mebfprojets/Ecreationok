@@ -1,6 +1,74 @@
 @extends('layouts.frontend')
 @section('content')
+<style>
+  /* Styles pour les boîtes de coût */
+  .cout-container {
+      margin-top: 30px;
+  }
 
+  .cout-box {
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      height: 100%;
+      color: #fff;
+      text-align: center;
+  }
+
+  .cout-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .cout-box.pp {
+      background: linear-gradient(135deg, #3498db, #2980b9);
+  }
+
+  .cout-box.pm {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+  }
+
+  .cout-box.gie {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+  }
+
+  .cout-titre {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+  }
+
+  .cout-montant {
+      font-size: 21px;
+      font-weight: 700;
+      margin: 15px 0;
+      padding: 10px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .cout-details {
+      font-size: 16px;
+      margin: 10px 0;
+      line-height: 1.4;
+  }
+
+  .cout-option {
+      font-size: 14px;
+      margin-top: 5px;
+      opacity: 0.9;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+      .cout-box {
+          margin-bottom: 20px;
+      }
+  }
+</style>
 <div class="banner-carousel banner-carousel-1 mb-0">
   <div class="banner-carousel-item" style="background-image:url(frontend/images/slider-main/bg1.jpeg); height: 300px;">
     <div class="slider-content">
@@ -227,39 +295,38 @@ du Conseiller CEFORE si vous êtes dans une localité disposant d'un bureau CEFO
 <center>
 <div class="container">
   
-    <div class="row" style="margin-top:30px;">
-
-        <div class="col-md-4 col-sm-5" >
-                <div class="service text-center">
-                    <div class="cout-formalite">
-                    <p  style="color:#fafafa; margin-bottom: -10px;font-size: 18px;">Personne Physique (PP)</p><hr>
-                    <p class="montant" style="margin-bottom:-20px; font-weight:700;font-size: 21px;">44.880 FCFA</p><hr>
-                    <p class="montant" style="margin-bottom:-20px; font-weight:700;font-size: 21px;">RCCM + IFU + CNSS + CPC</p>
-                    </div>
-                </div><!-- End .service -->
-          </div><!-- End .col-md-3 -->
-
-        <div class="col-md-4 col-sm-6" >
-                <div class="service text-center">
-                    <div class="cout-formalite">
-                    <p style="color:#fafafa; margin-bottom: -10px;font-size: 18px;">Personne Morale (PM)</p><hr>
-                    <p style="margin-top: -20px; font-weight:700;font-size: 21px; margin-bottom:-20px;">RCCM + IFU + CNSS : 53.040 F CFA</p><hr>
-                    <p style="margin-top: -20px; font-weight:700;font-size: 18px; margin-bottom:-20px;">RCCM + IFU + CNSS + CPC: 70.890 F CFA</p>
-                    </div>
-                </div><!-- End .service -->
-          </div><!-- End .col-md-3 -->
-
-          <div class="col-md-4 col-sm-6" >
-                <div class="service text-center">
-                    <div class="cout-formalite">
-                    <p style="color:#fafafa; margin-bottom: -10px; font-size: 18px;">Groupement d'Intérêt Economique (GIE)</p><hr>
-                    <p style="margin-top: -20px; font-weight:700;font-size: 21px; margin-bottom:-20px;">RCCM + IFU + CNSS : 53.040 F CFA</p><hr>
-                    <p style="margin-top: -20px; font-weight:700;font-size: 18px; margin-bottom:-20px;">RCCM + IFU + CNSS + CPC: 70.890 F CFA</p>
-                    </div>
-                </div><!-- End .service -->
-            </div><!-- End .col-md-3 -->
-            
+<div class="row cout-container">
+      <div class="col-md-4 col-sm-6">
+          <div class="cout-box pp">
+              <div class="cout-titre">Personne Physique (PP)</div>
+              <div class="cout-montant">47.380 FCFA</div>
+              <div class="cout-details">RCCM + IFU + CNSS + CPC</div>
+          </div>
       </div>
+
+      <div class="col-md-4 col-sm-6">
+          <div class="cout-box pm">
+              <div class="cout-titre">Personne Morale (PM)</div>
+              <div class="cout-montant">65.540 F CFA</div>
+              <div class="cout-details">RCCM + IFU + CNSS</div>
+              <div class="cout-option">ou</div>
+              <div class="cout-montant">83.430 F CFA</div>
+              <div class="cout-details">RCCM + IFU + CNSS + CPC</div>
+          </div>
+      </div>
+
+      <div class="col-md-4 col-sm-6">
+          <div class="cout-box gie">
+              <div class="cout-titre">Groupement d'Intérêt Économique (GIE)</div>
+              <div class="cout-montant">65.540 F CFA</div>
+              <div class="cout-details">RCCM + IFU + CNSS</div>
+              <div class="cout-option">ou</div>
+              <div class="cout-montant">83.430 F CFA</div>
+              <div class="cout-details">RCCM + IFU + CNSS + CPC</div>
+          </div>
+      </div>
+    </div>
+  </div>
   </center>
   <!--/ Container end -->
 
@@ -276,7 +343,7 @@ du Conseiller CEFORE si vous êtes dans une localité disposant d'un bureau CEFO
                 <img loading="lazy" src="frontend/images/icon-image/fact1.png" alt="facts-img">
               </div>
               <div class="ts-facts-content">
-                <h2 class="ts-facts-num"><span class="counterUp" data-count="{{$total}}">0</span></h2>
+                <h2 class="ts-facts-num"><span class="counterUp" data-count="{{ $total ?? 0 }}">0</span></h2>
                 <h3 class="ts-facts-title">Entreprises créées</h3>
               </div>
           </div><!-- Col end -->

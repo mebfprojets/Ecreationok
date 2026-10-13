@@ -120,6 +120,7 @@
                         <input id="nom_commercial" placeholder="Entrez le nom commercial" class="form-control input-lg" type="text" name="name" required />
                       </div>
               </div>
+              <div id="loading" style="display: none;">Vérification en cours...</div>
                   <p id='pNomdisponible' style="color:green; display:none"> Ce Nom commercial est disponible</p>
                   <p id='pNomindisponible' style="color:red; display:none"> Ce Nom commercial n'est pas disponible</p>
                 <div class="text-center">

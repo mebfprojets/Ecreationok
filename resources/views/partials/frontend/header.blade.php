@@ -130,6 +130,58 @@ FACEBOOK: https://www.facebook.com/themefisher
     text-transform: uppercase;
 } */
 </style>
+<style>
+                
+         .inline-warning {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .warning-icon {
+            flex-shrink: 0;
+            color: #d32f2f;
+            font-size: 20px;
+            margin-right: 20px;
+            background-color: #ffebee;
+            border-radius: 50%;
+            width: 10px;
+            height: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .warning-content {
+            flex-grow: 1;
+        }
+        
+        .warning-content h3 {
+            color: #d32f2f;
+            margin-bottom: 8px;
+            font-size: 20px;
+        }
+        
+        .warning-content p {
+            color: #856404;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .warning-note {
+            background-color: #fff;
+            padding: 12px 15px;
+            border-radius: 6px;
+            border-left: 4px solid #4caf50;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+    </style>
     <!-- <link rel="stylesheet" type="text/css" href="http://keith-wood.name/css/jquery.signature.css"> -->
 </head>
 <body>
@@ -171,11 +223,28 @@ FACEBOOK: https://www.facebook.com/themefisher
                 </ul><!-- Ul end -->
             </div><!-- header right end -->
           </div><!-- logo area end -->
+
+          
           <!-- <center><h3 style="color:#FFF; background:#FF0000;">EN RAISON DE LA MAUVAISE QUALITE DE LA CONNEXION INTERNET,
               LA PLATEFORME EST TEMPORAIREMENT SUSPENDUE JUSQU'A NOUVEL ORDRE.          
           </h3>
           </center> -->
       </div><!-- Row end -->
+
+      <div class="page-container">
+        <!-- Message d'avertissement en ligne -->
+        <div class="inline-warning">
+            <div class="warning-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="warning-content">
+                <p>Un compte utilisateur est valable pour une seule demande. Pour toute nouvelle demande, merci de créer un nouveau compte utilisateur
+                  
+                </p>
+            </div>
+        </div>
+
+
     </div><!-- Container end -->
   </div>
 

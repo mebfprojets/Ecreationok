@@ -1,78 +1,22 @@
 @extends('layouts.frontend')
 @section('content')
-<!--<!doctype html>
-<html lang="en">
-
-    <head>
-        
-        <meta charset="utf-8" />
-        <title>Form Wizard | Nazox - Admin & Dashboard Template</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
-        <meta content="Themesdesign" name="author" />
-        <!-- App favicon 
-        <link rel="shortcut icon" href="{{asset('backend/images/favicon.ico')}}">
-        <!-- twitter-bootstrap-wizard css 
-        <link rel="stylesheet" href="{{asset('backend/libs/twitter-bootstrap-wizard/prettify.css')}}">
-        <!-- Bootstrap Css 
-        <link href="{{asset('backend/css/bootstrap.min.css')}}" id="bootstrap-style" rel="stylesheet" type="text/css" />
-        <!-- Icons Css 
-        <link href="{{asset('backend/css/icons.min.css')}}" rel="stylesheet" type="text/css" />
-        <!-- App Css
-        <link href="{{asset('backend/css/app.min.css')}}" id="app-style" rel="stylesheet" type="text/css" />
-
-    </head>
-
-    <body data-sidebar="dark">
-    
-    <!-- <body data-layout="horizontal" data-topbar="dark"> -->
-
-
-    <!-- <style>
-fieldset {
-  background-color: #eeeeee;
-}
-
-legend {
-  background-color: gray;
-  color: white;
-  padding: 5px 10px;
-}
-
-input {
-  margin: 5px;
-}
-</style>
-</head>
-<body>
-
-<h1>The fieldset element + CSS</h1>
-
-<form action="/action_page.php">
- <fieldset>
-  <legend>Personalia:</legend>
-  <label for="fname">First name:</label>
-  <input type="text" id="fname" name="fname"><br><br>
-  <label for="lname">Last name:</label>
-  <input type="text" id="lname" name="lname"><br><br>
-  <label for="email">Email:</label>
-  <input type="email" id="email" name="email"><br><br>
-  <label for="birthday">Birthday:</label>
-  <input type="date" id="birthday" name="birthday"><br><br>
-  <input type="submit" value="Submit">
- </fieldset>
-</form> -->
 
 
                     <div class="container-fluid" id="taille" style="width:90%; margin-top:40px;">
                       <div class="taille">
-                        <div class="row" id="choix_demande">
+                        <div class="row" style="display: none" id="choix_demande">
                        
                                                    <center> <h3 class="font-size-14 mb-4">Choisir le type d'Entreprise</h3></center>
+                                                    @php
+                                                        // Déterminer quel bouton doit être coché en fonction de $type
+                                                        $isEI = ($type_dem == 'ei');
+                                                        $isES = ($type_dem == 'es'); 
+                                                        $isGIE = ($type_dem == 'gie');
+                                                    @endphp
                                                    @if($nbr_demande_pp==0)
                                                    <div class="form-check mb-3 col-md-4" id="switch1">
                                                         <input class="form-check-input" type="radio" onchange="changer_demande()" switch="bool" name="formRadios"
-                                                            id="formRadios1" checked>
+                                                            id="formRadios1" {{ $isEI ? 'checked' : '' }}>
                                                         <label for="formRadios1" data-on-label="Oui" data-off-label="Non"></label>
                                                         <p>Entreprise Individuelle</p>
                                                         
@@ -80,24 +24,18 @@ input {
                                                     @endif
                                                     <input type="hidden" class="nbr_demande" name="" value="{{$nbr_demande_pp}}">
                                                     <div class="col-md-4">
-                                                    <input class="form-check-input" type="radio" onchange="changer_demande()" switch="bool" name="formRadios"
-                                                            id="formRadios2">
-                                                            <label for="formRadios2" data-on-label="Oui" data-off-label="Non"></label>
-                                                            <p>Entreprise Sociétaire</p>
+                                                        <input class="form-check-input" type="radio" onchange="changer_demande()" switch="bool" name="formRadios"
+                                                                id="formRadios2" {{ $isES ? 'checked' : '' }}>
+                                                                <label for="formRadios2" data-on-label="Oui" data-off-label="Non"></label>
+                                                                <p>Entreprise Sociétaire</p>
                                                     </div>
                                                     <div class="col-md-4">
                                                     <input class="form-check-input" type="radio" onchange="changer_demande()" switch="bool" name="formRadios"
-                                                            id="formRadios3">
+                                                            id="formRadios3" {{ $isGIE ? 'checked' : '' }}>
                                                             <label for="formRadios3" data-on-label="Oui" data-off-label="Non"></label>
                                                             <p>Groupement d'intérêt Economique</p>
                                                     </div>
-                                                    <!-- <div class="form-check">
-                                                        <input class="form-check-input" type="radio" name="formRadios"
-                                                            id="formRadios2">
-                                                        <label class="form-check-label" for="formRadios2">
-                                                            Form Radio checked
-                                                        </label>
-                                                    </div> -->
+                                                    
                         </div>
                        @include('demande.personne_physique')
                         <!-- end row -->
@@ -710,8 +648,40 @@ form.children("div").steps({
         console.log('test');
     }
 </script>
-<script>
-    
+<script>    
+    function changer_demande(){
+        if($('#formRadios2').is(':checked')){
+            $('#progrss-wizar').hide();
+            $('#progrss-wizar2').show();
+            $('#formjuridiquees').show();
+            $('#formjuridiquegie').hide();
+            $('#type_demande').val('M1');
+        }  
+        else if($('#formRadios1').is(':checked')){
+            $('#progrss-wizar').show();
+            $('#progrss-wizar2').hide();
+        }
+        else if($('#formRadios3').is(':checked')){
+            $('#progrss-wizar').hide();
+            $('#progrss-wizar2').show();
+            $('#formjuridiquees').hide();
+            $('#formjuridiquegie').show();
+            $('#type_demande').val('G1');
+        }
+    }
+
+    $(document).ready(function(){
+        var nbr_demande = $('.nbr_demande').val();
+        
+        // Si nbr_demande > 0 ET aucun radio n'est déjà sélectionné via PHP
+        if(nbr_demande > 0 && !$('input[name="formRadios"]:checked').length) {
+            $('#formRadios2').prop("checked", true);
+        }        
+        // Appeler changer_demande() pour initialiser l'affichage
+        changer_demande();
+    });
+</script>
+<!-- <script>    
 
     function changer_demande(){
         if($('#formRadios2').is(':checked')){
@@ -746,9 +716,7 @@ form.children("div").steps({
     })
 
       // Pour la signature Personne Physique
-     
-    
-</script>
+</script> -->
 <script>
     //alert('signa');
     $(document).ready(function()
@@ -867,13 +835,13 @@ $(document).ready(function()
            $('#nbre_action').val(nbreaction);
         }
     </script>
-    <script>
+    <!-- <script>
         data(){
             return {
                 load: false,
             }
         }
-    </script>
+    </script> -->
 <script>
     function chiffre_daffaire(){
         var val_pm=$('#chiffre_daffaire_prev_pm').val();
@@ -893,26 +861,9 @@ $(document).ready(function()
     }
 </script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Sélectionner tous les inputs et textareas
-      const inputs = document.querySelectorAll('input[type="text"], input:not([type]), textarea');
-      
-      inputs.forEach(input => {
-          // Transformer en majuscules lors de la saisie
-          input.addEventListener('input', function() {
-              this.value = this.value.toUpperCase();
-          });
-          
-          // Transformer en majuscules lors de la perte de focus (au cas où)
-          input.addEventListener('blur', function() {
-              this.value = this.value.toUpperCase();
-          });
-          
-          // Transformer la valeur initiale si elle existe
-          if (input.value) {
-              input.value = input.value.toUpperCase();
-          }
-      });
-    });
+    // Ajouter la classe à vos inputs
+inputs.forEach(input => {
+    input.classList.add('uppercase-input');
+});
 </script>
 @endsection

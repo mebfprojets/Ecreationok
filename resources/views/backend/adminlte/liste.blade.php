@@ -18,11 +18,11 @@
                     <th>Promoteur</th>
                     <th>Statut</th>
                     <th>Nom Commercial</th>
-                    <th>Dénomination Sociale</th>
                     <th>Date Création</th>
                     <th>Date Paiement</th>
                     <th>Date Validation</th>                 
-                    <th>Actions</th>                                       
+                    <th>Actions</th> 
+                    <th>Valider Par</th>                                      
                     <th>Objet Social</th>
                     <th>CEFORE</th>
                     
@@ -35,18 +35,28 @@
                    @foreach ($demandes as $demande)
                         @php
                         $i++;
+                        $has_motif= !is_null($demande->motif);
+                        $user= CompteUsager($demande->User_ayant_valide);
+                        $hasUserValidate = !is_null($user);
                         @endphp
-                  <tr>
+                  <tr class="{{ $has_motif ? 'table-warning' : '' }}">
                     <td>{{$i}}</td>
                     <td>{{$demande->numero_demande}}</td>
                     <td>{{$demande->legal_rep_name}}</td>
                     <td>@if($demande->paye==1) Payé @elseif($demande->paye==2) Attente Validation du Paiement @else Non Payé @endif</td>
                     <td>{{$demande->commercial_name}}</td>
-                    <td>{{$demande->denomination_social}}</td>
                     <td>{{date("d-m-Y à H:i", strtotime($demande->created_at))}}</td>
                     <td>{{date("d-m-Y à H:i", strtotime($demande->date_paiement))}}</td>
-                    <td>{{date("d-m-Y à H:i", strtotime($demande->Date_etat_validation))}}</td>
+                    <td> @if($demande->Date_etat_validation)
+                      {{date("d-m-Y à H:i", strtotime($demande->Date_etat_validation))}}
+                    @else Aucune Date @endif</td>
                     <td><a href="{{ route('detail.demande', $demande->id) }}" class="btn btn-sm btn-success" style="background:#3393FF" title="Afficher les détais"> <i class="fa fa-eye"></i></a></td>
+                    <td>@if($hasUserValidate)
+                        {{$user['prenom']}} {{$user['name']}}
+                     
+                      @else <span class="text-muted">Aucun compte associé</span>
+                      @endif
+                    </td>
                     <td>{{$demande->objet_social}}</td>
                     <td>{{$demande->organisation_code}}</td>
                   </tr>
@@ -58,12 +68,12 @@
                     <th>Numero Demande</th>
                     <th>Promoteur</th>
                     <th>Statut</th>
-                    <th>Nom Commercial</th>
-                    <th>Dénomination Sociale</th>  
+                    <th>Nom Commercial</th> 
                     <th>Date Création</th>
                     <th>Date Paiement</th>
                     <th>Date Validation</th>                              
-                    <th>Actions</th>                    
+                    <th>Actions</th>      
+                    <th>Valider Par</th>              
                     <th>Objet Social</th>
                     <th>CEFORE</th>
                     

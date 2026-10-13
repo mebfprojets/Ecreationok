@@ -13,5 +13,11 @@ class Usager extends Model
     public function user(){
         return $this->belongsTo(User::class);
      }
-    
+     public function demandes(){
+        return $this->hasMany(Demande::class, 'usager_id');
+     }
+
+     public function users(){
+        return $this->hasMany(User::class, 'id');
+     }
 }

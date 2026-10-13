@@ -6,38 +6,7 @@
                                 <div class="card">  
                                     <div class="card-body">
                                     <h2 class="font-size-20 mb-4 text-center">Formulaire Personne Morale</h2>
-                                        <div id="progrss-wizard" class="twitter-bs-wizard">
-                                            {{-- <ul class="twitter-bs-wizard-nav nav-justified">
-                                                <li class="nav-item">
-                                                    <a href="#progress-seller-detailss" class="nav-link" data-toggle="tab">
-                                                        <span class="step-number">01</span>
-                                                        <span class="step-title">Formalités et Pièces</span>
-                                                    </a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a href="#progress-company-documents" class="nav-link" data-toggle="tab">
-                                                        <span class="step-number">02</span>
-                                                        <span class="step-title">Entreprise</span>
-                                                    </a>
-                                                </li>
-
-                                                <li class="nav-item">
-                                                    <a href="#progress-bank-details" class="nav-link" data-toggle="tab">
-                                                        <span class="step-number">03</span>
-                                                        <span class="step-title">Signature</span>
-                                                    </a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a href="#progress-confirm-details" class="nav-link" data-toggle="tab">
-                                                        <span class="step-number">04</span>
-                                                        <span class="step-title">Validation</span>
-                                                    </a>
-                                                </li>
-                                            </ul> --}}
-
-                                            {{-- <div id="bar" class="progress mt-4">
-                                                <div class="progress-bar bg-success progress-bar-striped progress-bar-animated"></div>
-                                            </div> --}}
+                                        <div id="progrss-wizard" class="twitter-bs-wizard">                                            
                                          <form action="{{ route('demande.store') }}" id="morale" method="post" class='moral'>
                                             @csrf
                                             <input type="hidden" value='{{ $usager->id }}'name="usager_id">
@@ -50,7 +19,7 @@
                                                       <br>
                                                 
                                                     <div class="row">
-                                                            <h5 class="font-size-14 mb-4 text-center">Enregistrer les pièces requises</h5>
+                                                            <!-- <h5 class="font-size-14 mb-4 text-center">Enregistrer les pièces requises</h5> -->
                                                             <div class="row text-center" style="border: 1px solid rgb(116, 116, 105); margin-bottom:5px;"  class="mb-2">
                                                                 <h4 class="font-size-14 mb-4">Formalités</h4>
                                                                 
@@ -68,19 +37,107 @@
                                                                     {{ $prestation_PM->type }}
                                                                 </label>
                                                             </div>
-                                                        @endforeach
-                                                           
+                                                        @endforeach                                                        
                                                            
                                                         </div>
                                                         </div>
-                                                            <!-- <center><p class='alerte_piece' style="color:red; display:none; background:"> Veuillez renseigner les pièces obligatoires</p></center> -->
+                                                        <div class="col-12">
+                                                                <center><h5 class="font-size-14 mb-3">Informations du Promoteur Lié au Compte Utilisateur</h5></center>
+                                                                <div class="card">
+                                                                    <div class="card-body">
+                                                                        <div class="row">
+                                                                            <div class="col-md-6">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Nom</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->NomRaisonSociale ?? 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Prénom</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->Prenom ?? 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        
+                                                                        <div class="row">
+                                                                            <div class="col-md-4">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Date de Naissance</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->DateNaissance ?? 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-4">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Lieu de Naissance</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->LieuNaissance ?? 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-4">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>N° Pièce Identité</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->CIN ?? 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        
+                                                                        <div class="row">
+                                                                            <div class="col-md-4">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Mobile 1</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->Phone_No_ ?? 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-4">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Mobile 2</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->Tel_Bureau ?? 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-4">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Email</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->{'E-Mail'} ?? 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        
+                                                                        <div class="row">
+                                                                            <div class="col-md-6">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Adresse</strong></label>
+                                                                                    <p class="form-control-static">
+                                                                                        {{ getvaleur('regions',$usager->Region_Code) ?? 'Non renseigné' }} - 
+                                                                                        {{ getvaleur('provinces',$usager->Province_Code) ?? 'Non renseigné' }} - 
+                                                                                        {{ getvaleur('commune_departements',$usager->Commun_Departement_Code) ?? 'Non renseigné' }} -
+                                                                                        {{ getvaleur('secteur_villages',$usager->Code_Secteur_Village) ?? 'Non renseigné' }}
+                                                                                    </p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-3">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Créé le</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->created_at ? $usager->created_at->format('d/m/Y H:i') : 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-3">
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label"><strong>Modifié le</strong></label>
+                                                                                    <p class="form-control-static">{{ $usager->updated_at ? $usager->updated_at->format('d/m/Y H:i') : 'Non renseigné' }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div style="display: none">
                                                             <center><div class="alert-warning alerte_piece_pm" style="color:red; display:none;">
                                                                 <p>Veuillez renseigner les pièces obligatoires</p>
                                                             </div>
                                                             </center>
                                                             <div class="col-lg-6">
                                                                 <div class="form-group">
-                                                                    <label class="form-label" for="progress-basicpill-firstname-input">Déclaration sur l'honneur/Casier</label>
+                                                                    <label class="form-label" for="progress-basicpill-firstname-input">Déclaration sur l'honneur + Casier Judiciaire + Attestation de Reservation</label>
                                                                     <div class="input-group declaration_group_edit" style="display: none" >
                                                                         <input type="text" id="input_declaration" name="declaration_sur_lhonneur" disabled class="form-control col-md-7 input_declaration"  value="Declaration sur l'honneur" >
                                                                          <div class="col-md-5">
@@ -224,7 +281,7 @@
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <div class="form-group">
-                                                                    <label class="form-label" for="progress-basicpill-firstname-input">Titre de Propriete/Jouissance</label>
+                                                                    <label class="form-label" for="progress-basicpill-firstname-input">Titre de Propriete/Jouissance + Fiche de Visite des Impôts</label>
                                                                     <div class="input-group titre_de_propriete_group_edit" style="display: none">
                                                                         <input type="text" name="titre_de_propriete" id="titre_de_propriete_input" disabled class="form-control col-md-7 titre_de_propriete_input"  value="Titre de propriété" >
                                                                          <div class="col-md-5">
@@ -277,6 +334,7 @@
                                                                     </div>
                                                                 @endif
                                                                 </div>
+                                                            </div>
                                                             </div>
                                                         </div>
                                                      
@@ -904,5 +962,3 @@
 
                             
                         </div>
-                        
-                    
