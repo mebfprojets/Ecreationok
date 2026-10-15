@@ -58,7 +58,6 @@ FACEBOOK: https://www.facebook.com/themefisher
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.full.min.js"></script>
-<link rel="stylesheet" href="assets/css/form-elements.css">
 
   <!-- Bootstrap -->
 
@@ -213,7 +212,7 @@ FACEBOOK: https://www.facebook.com/themefisher
                     <div class="info-box">
                       <div class="info-box-content">
                           <p class="info-box-title">E-mail</p>
-                          <p class="info-box-subtitle">info@me.bf</p>
+                          <p class="info-box-subtitle"><a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#105;&#110;&#102;&#111;&#64;&#109;&#101;&#46;&#98;&#102;">&#105;&#110;&#102;&#111;&#64;&#109;&#101;&#46;&#98;&#102;</a></p>
                       </div>
                     </div>
                   </li>                  
@@ -233,16 +232,28 @@ FACEBOOK: https://www.facebook.com/themefisher
 
       <div class="page-container">
         <!-- Message d'avertissement en ligne -->
-        <div class="inline-warning">
-            <div class="warning-icon">
-                <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            <div class="warning-content">
-                <p>Un compte utilisateur est valable pour une seule demande. Pour toute nouvelle demande, merci de créer un nouveau compte utilisateur
-                  
-                </p>
-            </div>
-        </div>
+        @if(config('app.maintenance_banner'))
+<div class="alerte-maintenance" role="alert">
+  <div class="container">
+    <i class="fas fa-tools"></i>
+    <strong>Maintenance en cours :</strong>
+    des perturbations peuvent survenir. Merci de votre compréhension.
+  </div>
+</div>
+<style>
+  .alerte-maintenance {
+      background: #fff3cd;
+      color: #664d03;
+      border-bottom: 2px solid #ffc107;
+      padding: 12px 0;
+      text-align: center;
+      font-size: 16px;
+  }
+  .alerte-maintenance i {
+      margin-right: 8px;
+  }
+</style>
+@endif
 
 
     </div><!-- Container end -->

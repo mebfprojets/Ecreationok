@@ -105,11 +105,9 @@
                                                         <div class="row field_wrapper2">
                                                             <div class="col-md-9  ">
                                                                 <div class="mb-3">
-                                                                    <select id="conjoints"  name="conjoints[]" data-placeholder="Selectionner votre conjoint ..." class="form-control select2 conjoints" style="width: 100%;" required >
+                                                                    <select id="conjoints"  name="conjoints[]" data-placeholder="Selectionner votre conjoint ..." class="form-control recherche-usager conjoints" style="width: 100%;" required >
                                                                         <option></option>
-                                                                            @foreach ($all_usagers as $all_usager )
-                                                                                <option value="{{ $all_usager->id }}">{{ $all_usager->CIN }} - {{ $all_usager->NomRaisonSociale }} {{ $all_usager->Prenom }}</option>
-                                                                            @endforeach                                                                  
+                                                                                                                                             
                                                                     </select>
                                                                 </div>
                                                                                                                 

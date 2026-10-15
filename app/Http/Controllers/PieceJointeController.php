@@ -56,6 +56,19 @@ class PieceJointeController extends Controller
     public function store(Request $request)
     {
         //
+        $regle = 'nullable|'.self::REGLE_FICHIER;
+        $request->validate([
+            'declaration'             => $regle,
+            'acte_de_depot'           => $regle,
+            'statut'                  => $regle,
+            'formulaire_rccm'         => $regle,
+            'piece_didentite'         => $regle,
+            'titre_de_propriete'      => $regle,
+            'formulaire_cpc_es'       => $regle,
+            'formulaire_dem_cpc'      => $regle,
+            'certificat_de_residence' => $regle,
+            'photo_didentite'         => 'nullable|file|mimes:jpg,jpeg,png',
+        ]);
        // dd($request->all());
       //dd($request->statut);
         $user = Auth::user();
@@ -130,7 +143,8 @@ class PieceJointeController extends Controller
     {
         //dd($file, $category, $usager, $type_entreprise, $reference, $date_etablissement, $date_expiration);
         
-        $extension = $file->getClientOriginalExtension();
+        //$extension = $file->getClientOriginalExtension();
+        $extension = strtolower($file->extension());
         //dd($extension);
         $type_doc = $this->getTypePiece($category);
         $date= now()->format('Y-m-d');

@@ -33,27 +33,6 @@ use App\Http\Controllers\PieceJointeController;
 // Route::get('/', function () {
 //     return view('index');
 // });
-
-Route::get('/admin', function () {
-    return view('backend.index');
-});
-
-Route::get('/createdemande', function () {
-    return view('demande.create');
-})->name('create');
-
-Route::get('/signature', function () {
-    return view('sign');
-});
-Route::get('/api', function () {
-    return view('api');
-});
-Route::get('/facture', function () {
-    return view('pdf.facture');
-});
-Route::get('/dash', function () {
-    return view('backend.adminlte.main');
-})->name('backend');
  
 // Ajout BARRO
 Route::get('/show/demande', [DemandeController::class,'liste'])->name('demande.liste');
@@ -104,7 +83,7 @@ Route::post('/store/demande', [DemandeController::class, 'store'])->name("demand
 Route::get('/valeur', [ValeurController::class, 'selection'])->name("valeur.selection");
 // Activite
 Route::get('/valeur/activite', [ValeurController::class, 'activite'])->name("valeur.activite");
-Route::get('/Valider/Paiement{iddemande}', [DemandeController::class, 'valider_paiement'])->name("valider.paiement");
+//Route::get('/Valider/Paiement{iddemande}', [DemandeController::class, 'valider_paiement'])->name("valider.paiement");
 
 Route::post('/user/store', [UserController::class, 'store_user'])->name("user.store");
 Route::get('/tour', [DemandeController::class, 'ourr']);
@@ -125,6 +104,7 @@ Route::resource("role",RoleController::class);
 
 //Ajout BARRO
 //Commente
+Route::middleware(['auth', 'admin'])->group(function () {
 Route::get('/backend/liste', [DemandeController::class, 'liste_demande'])->name("list");
 Route::get('/backend/liste/all', [DemandeController::class, 'all'])->name("all.list");
 Route::get('/backend/liste/attentedepqrtenaire', [DemandeController::class, 'liste_en_attente_de_partenaire'])->name("list.en_attente_de_partenaire");
@@ -141,8 +121,33 @@ Route::get('/liste/filtre', [DemandeController::class, 'liste_filtre'])->name("l
 Route::get('/piecejointe/liste/{piecejointe}', [DemandeController::class, 'showpj'])->name("show.pj");
 Route::get('/piecejointe/edit/{piecejointe}', [DemandeController::class, 'editpj'])->name("edit.pj");
 Route::post('/piecejointe/update/{piecejointe}', [DemandeController::class, 'updatepj'])->name("update.pj");
-Route::post('/piecejointecorrect/update', [DemandeController::class, 'updatepj_correct'])->name("update.pjcorrect");
 
+// Autre Routes
+Route::get('/admin', function () {
+    return view('backend.index');
+});
+
+Route::get('/createdemande', function () {
+    return view('demande.create');
+})->name('create');
+
+Route::get('/signature', function () {
+    return view('sign');
+});
+Route::get('/api', function () {
+    return view('api');
+});
+Route::get('/facture', function () {
+    return view('pdf.facture');
+});
+Route::get('/dash', function () {
+    return view('backend.adminlte.main');
+})->name('backend');
+});
+Route::post('/piecejointecorrect/update', [DemandeController::class, 'updatepj_correct'])->name("update.pjcorrect");
+Route::get('/usagers/recherche', [UsagerController::class, 'rechercher'])
+    ->name('usager.recherche')
+    ->middleware('throttle:30,1');
 // Route::middleware([
 //     'auth:sanctum',
 //     config('jetstream.auth_session'),

@@ -41,7 +41,7 @@
 
             <div class="col-md-6">
 
-                <input type="password" id="password" class="form-control" name="password" required autofocus>
+                <input type="password" id="password" class="form-control" name="password" autocomplete="new-password" required autofocus>
 
                 @if ($errors->has('password'))
 

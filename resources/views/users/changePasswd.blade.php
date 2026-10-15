@@ -10,7 +10,7 @@
                     <label class="col-md-4 control-label" for="val_username">Mot de Passe <span class="text-danger">*</span></label>
                     <div class="col-md-6">
                         <div class="input-group">
-                            <input type="password" id="password" name="password" class="form-control" placeholder="Mot de passe" required title="Entrez le mot de passe">
+                            <input type="password" id="password" name="password" class="form-control" placeholder="Mot de passe" autocomplete="new-password" required title="Entrez le mot de passe">
                             <span class="input-group-addon" id="View"><i class="gi gi-eye_close" id="icone"></i></span>
                         </div>
                     </div>

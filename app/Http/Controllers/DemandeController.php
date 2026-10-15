@@ -108,7 +108,7 @@ class DemandeController extends Controller
             $FJ_ES= DB::table('forme_juridiques')->where('company_type','ES')->get();
             $FJ_GIE= DB::table('forme_juridiques')->where('company_type','GIE')->get();
             $usage_terrains= DB::table('usage_terrains')->get();
-            $all_usagers= Usager::all();
+            $all_usagers = collect();
             $civilites=DB::table('valeurs')->where('parametre_id',15)->get();
     
             $prestation_PPs= Prestation::where('type_demande','P1')->get();
@@ -512,32 +512,66 @@ class DemandeController extends Controller
  );
  return json_encode($data);
 }
+// public function updatepj_correct(Request $request){
+//     $usager= Usager::where('user_id',Auth::user()->id)->first();
+//     if ($request->hasFile('piece_jointe')) {
+//         $piecejointe= PieceJointe::find($request->piece_id_correct);
+//         $file = $request->file('piece_jointe');
+//         $extension=$file->getClientOriginalExtension();
+//         $fileName = $piecejointe->type_piece.'.'.$extension;
+//         $emplacement='public/files/'.$usager->id;
+//         $file_url= $request['piece_jointe']->storeAs($emplacement, $fileName);
+//         $url_local=$usager->id.'/'.$fileName;
+//         $pj= $piecejointe->update([
+//             'url'=> $file_url,
+//             'numero'=> $request->numero_ref,
+//             'date_etablissement'=> $request->date_detablissment,
+//             'lieu_etablissement' => $request->lieu_etablissment,
+//             'url_local'=>$url_local
+//            // 'categorie_piece'=> $request->categorie_piece
+//         ]);
+    
+//     }
+//     if ($pj) {
+//        // $data_json= array('data'=>'success','status'=>'201', 'type_doc'=>$type_doc);
+//         return redirect()->back();
+//     }
+    
+// }
+
 public function updatepj_correct(Request $request){
-    $usager= Usager::where('user_id',Auth::user()->id)->first();
-    if ($request->hasFile('piece_jointe')) {
-        $piecejointe= PieceJointe::find($request->piece_id_correct);
-        $file = $request->file('piece_jointe');
-        $extension=$file->getClientOriginalExtension();
-        $fileName = $piecejointe->type_piece.'.'.$extension;
-        $emplacement='public/files/'.$usager->id;
-        $file_url= $request['piece_jointe']->storeAs($emplacement, $fileName);
-        $url_local=$usager->id.'/'.$fileName;
-        $pj= $piecejointe->update([
-            'url'=> $file_url,
-            'numero'=> $request->numero_ref,
-            'date_etablissement'=> $request->date_detablissment,
-            'lieu_etablissement' => $request->lieu_etablissment,
-            'url_local'=>$url_local
-           // 'categorie_piece'=> $request->categorie_piece
-        ]);
-    
+    $request->validate([
+        'piece_id_correct' => 'required|integer',
+        'piece_jointe'     => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        'numero_ref'       => 'nullable|string|max:255',
+    ]);
+
+    $usager = Usager::where('user_id', Auth::user()->id)->firstOrFail();
+    $piecejointe = PieceJointe::findOrFail($request->piece_id_correct);
+
+    // La pièce doit appartenir à une demande du promoteur connecté
+    if (!$piecejointe->demande || $piecejointe->demande->usager_id != $usager->id) {
+        abort(403);
     }
-    if ($pj) {
-       // $data_json= array('data'=>'success','status'=>'201', 'type_doc'=>$type_doc);
-        return redirect()->back();
-    }
-    
+
+    $file = $request->file('piece_jointe');
+    $extension = strtolower($file->extension());
+    $fileName = $piecejointe->type_piece.'.'.$extension;
+    $emplacement = 'public/files/'.$usager->id;
+    $file_url = $file->storeAs($emplacement, $fileName);
+    $url_local = $usager->id.'/'.$fileName;
+
+    $piecejointe->update([
+        'url' => $file_url,
+        'numero' => $request->numero_ref,
+        'date_etablissement' => $request->date_detablissment,
+        'lieu_etablissement' => $request->lieu_etablissment,
+        'url_local' => $url_local,
+    ]);
+
+    return redirect()->back();
 }
+
  public function verifier_nom_commercial(Request $request){
     if (isset($request['nom_commercial'])) {
         $nom_commercial = $request['nom_commercial'];
@@ -599,7 +633,8 @@ public function updatepj_correct(Request $request){
  }
 
 public function laodpiecejointe(Request $request){
-$usager= Usager::where('user_id',Auth::user()->id)->first();
+    `$request->validate(['piece_jointe_1' => 'nullable'.self::REGLE_FICHIER]);`;
+    $usager= Usager::where('user_id',Auth::user()->id)->first();
 //dd($request->type_document_identite);
     if($request->type_document){
             $type_doc= $request->type_document;
@@ -656,6 +691,7 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
         }
     }
     public function updatepiecejointe(Request $request){
+        `$request->validate(['piece_jointe_u' => 'nullable'.self::REGLE_FICHIER]);`;
         $usager= Usager::where('user_id',Auth::user()->id)->first();
         if($request->type_document){
             $type_doc= $request->type_document;
@@ -669,7 +705,7 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
       
         if ($request->hasFile('piece_jointe_u')) {
             $piecejointe= PieceJointe::find($request->piece_id);
-           
+            $this->autoriserUsager($piecejointe->usager_id);
             if($type_doc==null){
                 $type_doc=$piecejointe->type_piece;
             }
@@ -729,6 +765,7 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
         //$usager= Usager::where('user_id',Auth::user()->id)->first();
         //$demande=Demande::where('usager_id',$usager->id)->first();
         $piecejointe= Formalite::find($id);
+        $this->autoriserDemande(Demande::find($piecejointe->demande_id));
         //->first();
          // return Response::make(file_get_contents($piecejointe->url), 200, [
          //     'Content-Type' => 'application/pdf',
@@ -740,6 +777,7 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
 
     public function detaildocument_affiche($id){
         $piecejointe= PieceJointe::find($id);
+        $this->autoriserUsager($piecejointe->usager_id);
         return $path = Storage::download($piecejointe->url);
 
     }
@@ -810,6 +848,7 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
             
             
             $demandes=Demande::where('id', $id)->first();
+            $this->autoriserDemande($demandes);
             $usager=Usager::where('id', $demandes->usager_id)->first();
            $activites= DB::table('activites')->where('Code', $demandes->primary_activity)->first();
            $forme_juridiques= DB::table('forme_juridiques')->where('code', $demandes->forme_juridique)->first();
@@ -850,32 +889,33 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
         
         }
 
-        public function valider_paiement (Request $request)
-        {
-            //dd($request->all());
-            $date=new \DateTime();
-            //$id=$request->id;
-            $date_initiation= $date->format("d-m-Y H:i:s");
-            $numero_demande=$request->num_command;
-            $numero=substr($numero_demande, 0, -5);
-            //dd($numero);    
-           $demande=Demande::where('numero_command',$numero)->first();
-           $usager=Usager::where('id',$demande->usager_id)->first();
-           if($demande->date_initiation==null){
-            $demande->update([               
-                'date_initiation'=>$date_initiation
-                ]);
-           }
-           if($demande->paye!="1"){
-           $demande->update([
-            'paye'=>2            
-            ]);
-            }           
-            return redirect()->route('demande.liste');
-        }
+        // public function valider_paiement (Request $request)
+        // {
+        //     //dd($request->all());
+        //     $date=new \DateTime();
+        //     //$id=$request->id;
+        //     $date_initiation= $date->format("d-m-Y H:i:s");
+        //     $numero_demande=$request->num_command;
+        //     $numero=substr($numero_demande, 0, -5);
+        //     //dd($numero);    
+        //    $demande=Demande::where('numero_command',$numero)->first();
+        //    $usager=Usager::where('id',$demande->usager_id)->first();
+        //    if($demande->date_initiation==null){
+        //     $demande->update([               
+        //         'date_initiation'=>$date_initiation
+        //         ]);
+        //    }
+        //    if($demande->paye!="1"){
+        //    $demande->update([
+        //     'paye'=>2            
+        //     ]);
+        //     }           
+        //     return redirect()->route('demande.liste');
+        // }
         public function facture($id)
         {
             $demande=Demande::where('id', $id)->first();
+            $this->autoriserDemande($demande); 
             $usager=Usager::where('id', $demande->usager_id)->first();
             $content = $demande->numero_demande.'
 '.$usager->NomRaisonSociale.' '.$usager->Prenom; // Remplacez par le contenu que vous souhaitez dans le code QR.
@@ -894,6 +934,7 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
         public function update_demande(Request $request, $id)
         {//
             $demande=Demande::find($id);
+            $this->autoriserDemande($demande); 
             $demande->commercial_name=$request->nom_commercial;
             $demande->enseigne=$request->enseigne;
             $demande->sigle=$request->sigle;
@@ -937,7 +978,8 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
         public function update_usager(Request $request, $id)
         {//
             //dd($request->province_usager);
-            $usager=Usager::find($id);                       
+            $usager=Usager::find($id);   
+            $this->autoriserUsager($usager->id);                      
             $usager->update([
                 'NomRaisonSociale'=>$request->nom,
                 'Prenom'=>$request->prenom,
@@ -1171,6 +1213,7 @@ $usager= Usager::where('user_id',Auth::user()->id)->first();
 
 
     public function add_formalite_retour(Request $request){
+        `$request->validate(['copie_de_la_formalite' => 'nullable'.self::REGLE_FICHIER]);`;
     if (Auth::user()->can('save_formalite_retour'))
         {
         if ($request->hasFile('copie_de_la_formalite')) {
@@ -1196,6 +1239,7 @@ else{
 
 
 public function update_formalite_retour(Request $request){
+    `$request->validate(['copie_de_la_formalite' => 'nullable'.self::REGLE_FICHIER]);`;
     if (Auth::user()->can('save_formalite_retour'))
      {
         if ($request->hasFile('copie_de_la_formalite'))
@@ -1304,6 +1348,7 @@ else{
         public function update_rejet(Request $request, $id){
             //dd($id);
             $demande=Demande::find($id);
+            $this->autoriserDemande($demande); 
             $demande->update([
                 'etat'=>0,             
                ]);
@@ -1325,6 +1370,7 @@ else{
             return view("demande.editPj", compact('piecejointe'));
         }
         public function updatepj(Piecejointe $piecejointe, Request $request){
+            `$request->validate(['piece_jointe_u' => 'nullable'.self::REGLE_FICHIER]);`;
             $type_doc=$piecejointe->type_piece;
             $usager= $piecejointe->demande->usager;
             $file = $request->file('piece_jointe_u');

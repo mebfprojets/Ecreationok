@@ -49,7 +49,7 @@ class UsagerController extends Controller
             $civilites = DB::table('valeurs')->where('parametre_id',15)->get();
             $nationalites = DB::table('valeurs')->where('parametre_id',6)->orderby('libelle','asc')->get();
             $professions = DB::table('valeurs')->where('parametre_id',8)->orderby('libelle','asc')->get();
-            $all_usagers = Usager::all();
+            $all_usagers = collect();
             return view('usager.create', compact('civilites','nationalites','regions', 'pays', 'professions','all_usagers'));
         }
         else{
@@ -103,6 +103,7 @@ class UsagerController extends Controller
        
     }
     public function store(Request $request){
+        `$request->validate(['piece_jointe_m' => 'nullable'.self::REGLE_FICHIER]);`;
         //dd($request->all());
         // $this->validate($request, [
     	// 	'nom_usager'=> "required",
@@ -334,5 +335,23 @@ class UsagerController extends Controller
         //->take(100)
         ->get();
         return view('usager.adminliste', compact('usagers'));
+    }
+
+    public function rechercher(Request $request)
+    {
+        $request->validate(['q' => 'required|string|min:6|max:30']);
+
+        // Correspondance EXACTE uniquement : impossible de parcourir la base
+        $usager = Usager::where('CIN', trim($request->q))
+            ->first(['id', 'CIN', 'NomRaisonSociale', 'Prenom']);
+
+        if (!$usager) {
+            return response()->json(['results' => []]);
+        }
+
+        return response()->json(['results' => [[
+            'id'   => $usager->id,
+            'text' => $usager->CIN.' - '.$usager->NomRaisonSociale.' '.mb_substr((string) $usager->Prenom, 0, 1).'.',
+        ]]]);
     }
 }

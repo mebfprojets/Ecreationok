@@ -27,19 +27,25 @@
 
               <form role="form" action="{{ route('login') }}" method="post" class="login-form">
                   @csrf
+                  <input type="hidden" name="_form" value="login">
+                  @if ($errors->any() && old('_form') === 'login')
+                      <div class="alert alert-danger" role="alert">
+                          {{ $errors->first() }}
+                      </div>
+                  @endif
                   <div class="form-group">
                     <label class="sr-only" for="form-password">Email</label>
-                    <input id="email" placeholder="Entrez Votre Email"class="form-control input-lg" type="email" name="email" :value="old('email')" required autofocus />
+                    <input id="email" placeholder="Entrez Votre Email" class="form-control input-lg" type="email" name="email" value="{{ old('email') }}" required autofocus />
 
 
                   </div>
                     <div class="form-group">
                       <label class="sr-only" for="form-password">Mot de passe</label>
-                      <input id="password" placeholder="Entrez Votre Mot de passe" class="form-control input-lg" type="password" name="password" required autocomplete="current-password" />
+                      <input id="password" placeholder="Entrez Votre Mot de passe" class="form-control input-lg" type="password" name="password" required autocomplete="off" />
                     </div>
                     <div class="col-xs-4">
                       <label class="switch switch-primary" data-toggle="tooltip" title="Remember Me?">
-                          <input type="checkbox" id="login-remember-me" name="login-remember-me" checked>
+                          <input type="checkbox" id="login-remember-me" name="remember" checked>
                           <span>Se souvenir de moi</span>
                       </label>
                   </div>
@@ -161,6 +167,16 @@
             <div class="col-md-9 form-login">
             <form role="form" action="{{ route('register') }}" method="post" class="login-form">
                 @csrf
+                <input type="hidden" name="_form" value="register">
+                @if ($errors->any() && old('_form') === 'register')
+                    <div class="alert alert-danger" role="alert">
+                        <ul class="mb-0" style="padding-left: 18px;">
+                            @foreach ($errors->all() as $erreur)
+                                <li>{{ $erreur }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <div class="form-group" >
                   <label class="control-label login-label" for="val_username">Nom Complet: <span class="text-danger">*</span></label>
                       <div class="input-group">
@@ -177,14 +193,14 @@
                 <div class="form-group">
                   <label class="control-label login-label" for="val_username">Mot de passe: <span class="text-danger">*</span></label>
                       <div class="input-group">
-                        <input id="password" placeholder="Entrez Votre Mot de passe" class="form-control input-lg password" type="password" name="password" onchange="verifier_password();" required autocomplete="current-password" />
+                        <input id="password" placeholder="Entrez Votre Mot de passe" class="form-control input-lg password" type="password" name="password" onchange="verifier_password();" required autocomplete="new-password" />
                       </div>
                       <p style="background-color: red; display:none" id='mot_de_passe'>Le mot de passe doit contenir au moins 8 caractères </p>
               </div>
               <div class="form-group">
                 <label class="control-label login-label" for="val_username">Retaper le mot de passe: <span class="text-danger">*</span></label>
                     <div class="input-group">
-                    <input id="password" placeholder="Retaper le même Mot de passe" class="form-control input-lg" type="password" name="password_confirmation" required autocomplete="current-password" />
+                    <input id="password" placeholder="Retaper le même Mot de passe" class="form-control input-lg" type="password" name="password_confirmation" required autocomplete="new-password" />
                     </div>
               </div>
                 <div class="text-center">
@@ -269,4 +285,11 @@
     </div>
 </div>
 @yield('modal_parpage')
-@include('partials.frontend.footer') 
+@include('partials.frontend.footer')
+@if ($errors->any() && in_array(old('_form'), ['login', 'register'], true))
+<script>
+    $(function () {
+        $('#{{ old('_form') === 'login' ? 'modal-login' : 'modal-create-compte' }}').modal('show');
+    });
+</script>
+@endif

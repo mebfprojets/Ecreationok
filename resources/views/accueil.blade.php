@@ -504,7 +504,7 @@ du Conseiller CEFORE si vous êtes dans une localité disposant d'un bureau CEFO
                       </div>
                         <div class="form-group">
                           <label class="sr-only" for="form-password">Mot de passe</label>
-                          <input id="password" placeholder="Entrez Votre Mot de passe" class="form-control input-lg" type="password" name="password" required autocomplete="current-password" />
+                          <input id="password" placeholder="Entrez Votre Mot de passe" class="form-control input-lg" type="password" name="password" required autocomplete="off" />
 
                         </div>
                         <div class="col-xs-4">

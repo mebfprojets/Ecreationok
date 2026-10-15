@@ -849,9 +849,6 @@
 </script>
  @yield('additionnel_script')
 
- <!-- API DE PAIEMENT -->
- <script src=https://api.gutouch.net/touchpayv2/script/touchpaynr/prod_touchpay-0.0.1.js  type='text/javascript'>
-</script>
 
   <script type="text/javascript">
     function makeid(length) {
@@ -864,32 +861,6 @@
       counter += 1;
     }
     return result;
-  }
-  function calltouchpay(numero_demande,montant_demande){
-    //alert(id);
-    var id= $('#demande_id').val();
-    //var numero_demande=$('#'+numero).val();
-    //alert(numero_demande);
-    var route_sucess= '{{ route("valider.paiement",":id")}}';
-    var rout_fiche = route_sucess.replace(':id', id);
-    var aleatoirestring=makeid(5)
-    var order_number=numero_demande+aleatoirestring;
-    var agence_code='MSENT2793';
-    var secure_code='suzYy19U3ev2TIsabnK6JtKaFG75oZjc1zD36Mc4QPgcVXRZAM';
-    var domaine='maison.com';
-    var url_redirection_success=rout_fiche;
-    var url_redirection_failed="{{route('index')}}";
-    var amount=montant_demande;
-    var city='Ouagadougou';
-    var email='test@gmail.com';
-    var clientFirstName='kk';
-    var clientLastName='jhkk';
-    //var clientPhone='65678787';
-    sendPaymentInfos(order_number, agence_code, secure_code,
-       domaine, url_redirection_success, url_redirection_failed,
-       amount, 'dakar', email, 'firstname', 'lastname'
-    );
-    
   }
 </script>
 <script>
@@ -998,6 +969,28 @@ $(function(){
             });
         }, 5000); // 5000 ms = 5 secondes
     });
+</script>
+<script>
+function initRechercheUsager(selecteur) {
+    $(selecteur).select2({
+        width: '100%',
+        placeholder: 'Saisir le N° complet de la CNIB / du passeport',
+        minimumInputLength: 6,
+        language: {
+            inputTooShort: function () { return 'Saisissez le numéro complet de la pièce'; },
+            noResults:     function () { return 'Aucun promoteur avec ce numéro'; },
+            searching:     function () { return 'Recherche…'; }
+        },
+        ajax: {
+            url: "{{ route('usager.recherche') }}",
+            dataType: 'json',
+            delay: 400,
+            data: function (params) { return { q: params.term }; },
+            processResults: function (data) { return data; }
+        }
+    });
+}
+$(function () { initRechercheUsager('select.recherche-usager'); });
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {

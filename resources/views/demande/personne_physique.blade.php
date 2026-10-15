@@ -489,11 +489,9 @@
                                                         <div class="col-md-6  ">
                                                                 <div class="mb-3" >                                                            
                                                                     <label class="form-label" for="progress-basicpill-vatno-input">Dirigeant</label>                                                                    
-                                                                    <select id="dirigeants"  name="conjoints[]" data-placeholder="Selectionner le dirigeant..." class="form-control select conjoints" style="width: 100%;" >
+                                                                    <select id="dirigeants"  name="conjoints[]" data-placeholder="Selectionner le dirigeant..." class="form-control recherche-usager conjoints" style="width: 100%;" >
                                                                         <option></option>
-                                                                            @foreach ($all_usagers as $all_usager )
-                                                                                <option value="{{ $all_usager->id }}">{{ $all_usager->CIN }} - {{ $all_usager->NomRaisonSociale }} {{ $all_usager->Prenom }} - {{ $all_usager->Phone_No_ }}</option>
-                                                                            @endforeach                                                                  
+                                                                                                                                             
                                                                     </select>
                                                                 </div>                                                                
                                                             </div>                                                            
