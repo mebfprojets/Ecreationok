@@ -1,3 +1,14 @@
+# Interdire l'accès aux fichiers de configuration / sensibles (VUL-011)
+<FilesMatch "^(web\.config|\.env.*|\.git.*|\.htpasswd|composer\.(json|lock)|package(-lock)?\.json|yarn\.lock)$|\.(log|sql|bak|old|orig|swp|ini|config|dist)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

@@ -278,9 +278,9 @@
             </div>         <br>   
             @if($demandes->paye==1 && $demandes->etat==2)                      
           <center>
-            <a  style="margin-left:10px;" id="declaration_edit"  data-toggle="modal" class="btn btn-md btn-success declaration edit_demande" onclick="editdemande()" > <i class="fas fa-pen"></i> Corriger Entreprise </a>
-            <button type="submit" style="margin-left:10px;display:none" id="declaration_edit"  data-toggle="modal" class="btn btn-md btn-success save_demande" > <i class="fas fa-pen"></i> Enregistrer </button>
-            <!-- <a  style="margin-left:10px;" id="declaration_edit"  data-toggle="modal" style="display:none" class="btn btn-md btn-danger declaration save_demande" onclick="editdemande()" > <i class="fa fa-window-close"></i> Annuler </a> -->
+            <a  style="margin-left:10px;" id="declaration_edit" class="btn btn-md btn-success declaration edit_demande" onclick="editdemande()" > <i class="fas fa-pen"></i> Corriger Entreprise </a>
+            <button type="submit" style="margin-left:10px;display:none" id="declaration_edit" class="btn btn-md btn-success save_demande" > <i class="fas fa-pen"></i> Enregistrer </button>
+            <!-- <a  style="margin-left:10px;" id="declaration_edit" style="display:none" class="btn btn-md btn-danger declaration save_demande" onclick="editdemande()" > <i class="fa fa-window-close"></i> Annuler </a> -->
           </center>
           @endif
             <!-- /.row -->
@@ -467,9 +467,9 @@
               <!-- /.col -->
             </div>
             @if($demandes->paye==1 && $demandes->etat==2)                      
-          <center><a  style="margin-left:10px; color:black;" id="declaration_edit"  data-toggle="modal" class="btn btn-md btn-success declaration edit_usager" onclick="editusager()" > <i class="fas fa-pen"></i> Corriger Dirigeant</a>
-            <button type="submit" style="margin-left:10px;display:none" id="declaration_edit"  data-toggle="modal" class="btn btn-md btn-success save_usager" > <i class="fas fa-pen"></i> Enregistrer </button>
-            <!-- <a  style="margin-left:10px;" id="declaration_edit"  data-toggle="modal" style="display:none;" class="btn btn-md btn-danger save_usager" onclick="editusager()" > <i class="fa fa-window-close"></i> Annuler </a> -->
+          <center><a  style="margin-left:10px; color:black;" id="declaration_edit" class="btn btn-md btn-success declaration edit_usager" onclick="editusager()" > <i class="fas fa-pen"></i> Corriger Dirigeant</a>
+            <button type="submit" style="margin-left:10px;display:none" id="declaration_edit" class="btn btn-md btn-success save_usager" > <i class="fas fa-pen"></i> Enregistrer </button>
+            <!-- <a  style="margin-left:10px;" id="declaration_edit" style="display:none;" class="btn btn-md btn-danger save_usager" onclick="editusager()" > <i class="fa fa-window-close"></i> Annuler </a> -->
           </center>
           @endif
             <!-- /.row -->
@@ -498,7 +498,7 @@
                 <!-- <label>Nom Pièce</label> -->
                 <input class="form-control"  disabled="disabled" type="text" value="{{$piecejointe->type_piece}}">
                 @if($demandes->paye==1 && $demandes->etat==2)  
-                <a href="#updatepiecejointe_correction" style="margin-left:10px;" data-toggle="modal" class="btn btn-md btn-success declaration" onclick="editpiecejointes('{{ $piecejointe->categorie_piece }}')" > <i class="fas fa-pen"></i> </a>
+                <a href="#updatepiecejointe_correction" style="margin-left:10px;" data-bs-toggle="modal" class="btn btn-md btn-success declaration" onclick="editpiecejointes('{{ $piecejointe->categorie_piece }}')" > <i class="fas fa-pen"></i> </a>
                 @endif
                 <a href="{{ route('detaildocument_affiche', $piecejointe->id) }}" style="margin-left:10px;" id="declaration_view"   class="btn btn-md btn-success declaration_view"> <i class="fas fa-eye"></i> </a>
                 <!-- <a href="{{ route('detaildocument',$piecejointe->id)}}"title="Visualiser le document" class="btn btn-xs btn-default" ><i class="fa fa-eye"></i> </a> -->

@@ -117,7 +117,7 @@
                                                                 <div class="mb-"> 
                                                                     <a href="javascript:void(0);"  class="btn btn-md btn-success add_button2"> <i class="fas fa-plus"></i> </a>
                                                                 </div>
-                                                                <a href="#addusager" style="margin-left: 45px; margin-top:-34px;" id="addusager" data-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" > Créé Conjoint </a>
+                                                                <a href="#addusager" style="margin-left: 45px; margin-top:-34px;" id="addusager" data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" > Créé Conjoint </a>
 
                                                             </div> 
                                                                                                  
@@ -314,7 +314,7 @@
                                                      </fieldset> <br>  
                                                      <div class="panel-footer text-center">
                         <input type="reset" class="btn btn-md btn-danger"  value="Annuler">
-                        <a href="#modal-confirm" data-toggle="modal" data-dismiss="modal"  class="btn btn-md btn-success"  value="Enregister mes données">Valider</a>
+                        <a href="#modal-confirm" data-bs-toggle="modal" data-bs-dismiss="modal"  class="btn btn-md btn-success"  value="Enregister mes données">Valider</a>
             </div>     
             </div>
         </div>
@@ -378,7 +378,7 @@
  
         <center><h3 class="modal-title text-center" id="modal-login-label">  Confirmer les données correctes <i class="fa fa-key"></i></h3></center>
 
-          <button type="button" class="close" data-dismiss="modal">
+          <button type="button" class="close" data-bs-dismiss="modal">
             <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
           </button>
         </div>
@@ -386,7 +386,7 @@
         <div class="modal-body">
           <div class="row">
               <div class="col-md-12">
-                <button type="button" class="btn btn-warning" data-dismiss="modal">Annuler <i class="fa fa-unlock"></i></button>
+                <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Annuler <i class="fa fa-unlock"></i></button>
                 <button type="button" class="btn btn-success" onclick="soumettre('form_usager_personne_physique')" >Valider </i></button>
               </div>
           </div>
@@ -403,7 +403,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" >Enregistrer un usager</h5>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="formusager" action="javascript:void(0)" class="form-horizontal form-bordered" enctype="multipart/form-data">
@@ -532,7 +532,7 @@
             <span class="upload_image"> </span>
             </div>
             <div class="panel-footer text-center">
-                <input type="button" data-dismiss="modal"  class="btn btn-sm btn-warning"  value="Fermer">
+                <input type="button" data-bs-dismiss="modal"  class="btn btn-sm btn-warning"  value="Fermer">
                 <input   type="submit"   class="btn btn-sm btn-success"  value="Enregister">
             </div>
             

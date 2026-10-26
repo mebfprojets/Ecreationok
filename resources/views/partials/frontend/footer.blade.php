@@ -74,7 +74,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" >Modifier une  pièce jointe</h5>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="fileUploadForm_u" action="javascript:void(0)" class="form-horizontal form-bordered" enctype="multipart/form-data">
@@ -161,7 +161,7 @@
             </div> 
             </div>
             <div class="panel-footer text-center">
-                <input type="button" data-dismiss="modal"  class="btn btn-sm btn-warning"  value="Fermer la fenetre">
+                <input type="button" data-bs-dismiss="modal"  class="btn btn-sm btn-warning"  value="Fermer la fenetre">
                 <input  id='saveData' type="submit"   class="btn btn-sm btn-success"  value="Enregister mes données">
             </div>
             
@@ -174,7 +174,7 @@
       <div class="modal-content">
           <div class="modal-header">
               <h5 class="modal-title" >Modifier une pièce jointe</h5>
-              <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
               <form action="{{ route('update.pjcorrect') }}" method="POST"  class="form-horizontal form-bordered" enctype="multipart/form-data">
@@ -222,7 +222,7 @@
           </div> 
           </div>
           <div class="panel-footer text-center">
-              <input type="button" data-dismiss="modal"  class="btn btn-sm btn-warning"  value="Annuler">
+              <input type="button" data-bs-dismiss="modal"  class="btn btn-sm btn-warning"  value="Annuler">
               <input  type="submit"   class="btn btn-sm btn-success"  value="Modifier">
           </div>
           
@@ -234,7 +234,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <!-- <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> -->
+                <!-- <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button> -->
                 <h4 class="modal-title"><i class="gi gi-pen"></i>Pièces Personne Physique</h4>
             </div>
             <div class="modal-body">
@@ -273,7 +273,7 @@
                 
               </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal">Fermer</button>
             </div>
         </div>
     </div>
@@ -282,7 +282,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <!-- <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> -->
+                <!-- <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button> -->
                 <h4 class="modal-title"><i class="gi gi-pen"></i>Pièces Personne Morale</h4>
             </div>
             <div class="modal-body">
@@ -331,7 +331,7 @@
                 
               </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal">Fermer</button>
             </div>
         </div>
     </div>
@@ -340,7 +340,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <!-- <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> -->
+                <!-- <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button> -->
                 <h4 class="modal-title"><i class="gi gi-pen"></i>Avant de commencer</h4>
             </div>
             <div class="modal-body">
@@ -356,7 +356,7 @@
                 
               </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal">Fermer</button>
             </div>
         </div>
     </div>
@@ -368,11 +368,8 @@
   <script src="{{asset('adminlte/dist/js/adminlte.min.js')}}"></script>
   <!-- initialize jQuery Library -->
   <script src="{{asset('frontend/js/vendor/jquery.min.js')}}"></script>
-  <script src="{{asset('frontend/js/vendor/bootstrap.min.js')}}"></script>
 
   <script src="{{asset('frontend/plugins/jQuery/jquery.min.js')}}"></script>
-  <!-- Bootstrap jQuery -->
-  <script src="{{asset('frontend/plugins/bootstrap/bootstrap.min.js')}}" defer></script>
   <!-- Slick Carousel -->
   <script src="{{asset('frontend/plugins/slick/slick.min.js')}}"></script>
   <script src="{{asset('frontend/plugins/slick/slick-animation.min.js')}}"></script>
@@ -401,8 +398,7 @@
 
   <script src="{{asset('js/jquery.steps.js')}}"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <!-- Bootstrap 5.3 (unique, Popper inclus) -->
   <script src="{{asset('backend/libs/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
   <script src="{{asset('backend/libs/metismenu/metisMenu.min.js')}}"></script>
   <script src="{{asset('backend/libs/simplebar/simplebar.min.js')}}"></script>
@@ -423,16 +419,11 @@
   
   <!-- Pour la signature -->
   <!--  -->
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+  <script src="{{asset('adminlte/plugins/jquery-ui/jquery-ui.min.js')}}"></script>
   <script src="{{asset('backend/js/signature.js')}}"></script>
   <script src="{{asset('frontend/js/front-personal.js')}}"></script>
   <script src="{{asset('backend/js/loaddata.js')}}"></script>
   <script>$(function(){ Login.init(); });</script>
-  <script
-			  src="https://code.jquery.com/ui/1.7.0/jquery-ui.min.js"
-			  integrity="sha256-CkxUCXQ5bBbS+VV9O06NQWvw/odbX/kf3aTCVI86HWA="
-			  crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.fr.min.js"></script>
   <script>$(document).ready(function()

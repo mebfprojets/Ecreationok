@@ -99,7 +99,7 @@
                     <h4 class="service-title">Avant de commencer</h4>
                     <br class="mt-4">
                     <p>Avant de créer votre entreprise, vous devez d'abord vérifier la disponibilité du nom commercial...</p>
-                    <a class="btn btn-success btn-block" data-toggle="modal" href="#modal-infos">Lire Plus</a>
+                    <a class="btn btn-success btn-block" data-bs-toggle="modal" href="#modal-infos">Lire Plus</a>
                     <!-- <a href="/contacter-le-centre-de-formalites-des-entreprises-cfe-togo.html" class="btn btn-success btn-block">Lire Plus</a> -->
                 </div><!-- End .service -->
             </div><!-- End .col-md-3 -->
@@ -112,7 +112,7 @@
                     <br class="mt-5"><br>
                     <p>
                         <!-- <br class="mt-5"><br> -->
-                        <a class="btn btn-success btn-block" data-toggle="modal" href="#modal-piece_pp">Pièces à fournir</a>
+                        <a class="btn btn-success btn-block" data-bs-toggle="modal" href="#modal-piece_pp">Pièces à fournir</a>
                         <a class="btn btn-success btn-block" target="_blank" href="https://www.me.bf/wp-content/uploads/2024/01/Formalite-personne-physique.pdf">Formulaire de renseignement</a>
                         <!-- <a class="btn btn-success btn-block"  target="_blank" href="/documents/download-renseignements_po">Pièces à fournir</a> -->
                         <!-- <a class="btn btn-success btn-block"  href="http://me.bf/fr/file/2967/download?token=kziektSF">Déclaration sur honneur</a>
@@ -127,7 +127,7 @@
                     <h5 class="service-title">(Entreprise Sociétaire)</h5>
                     <br class="mt-5"><br>
                     <p>
-                        <a class="btn btn-success btn-block" data-toggle="modal" href="#modal-piece_pm">Pièces à fournir</a>
+                        <a class="btn btn-success btn-block" data-bs-toggle="modal" href="#modal-piece_pm">Pièces à fournir</a>
                         <a class="btn btn-success btn-block" target="_blank" href="https://www.me.bf/wp-content/uploads/2024/01/Formalite-personne-morale.pdf">Formulaire de renseignement</a>
                         <!-- <a class="btn btn-success btn-block" target="_blank" href="/documents/download-renseignements_mo" style="margin-top: 22px;">Pièces à fournir</a> -->
                         <!-- <a class="btn btn-success btn-block"  href="http://me.bf/fr/file/3481/download?token=avSak-TP">Formulaire RCCM</a>
@@ -157,13 +157,13 @@
               <div class="card">
                 <div class="card-header p-0 bg-transparent" id="headingOne">
                     <h2 class="mb-0">
-                      <button class="btn btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                      <button class="btn btn-block text-left" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                           Entreprise Indviduelle
                       </button>
                     </h2>
                 </div>
               
-                <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#our-values-accordion">
+                <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-bs-parent="#our-values-accordion">
                     <div class="card-body">
                     Une entreprise individuelle est une forme simplifiée d’entreprise créée par une personne physique. 
                     Toute personne de plus de 20 ans peut créer ce type d’entreprise et devient alors entrepreneur individuel. 
@@ -174,12 +174,12 @@
               <div class="card">
                 <div class="card-header p-0 bg-transparent" id="headingTwo">
                     <h2 class="mb-0">
-                      <button class="btn btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                      <button class="btn btn-block text-left collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                       Entreprise Sociétaire
                       </button>
                     </h2>
                 </div>
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#our-values-accordion">
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-bs-parent="#our-values-accordion">
                     <div class="card-body">
                     La société commerciale est créée par deux (2) ou plusieurs personnes qui conviennent, par un contrat,
                     d'affecter à une activité des biens en numéraire ou en nature, ou en industrie, dans le but de partager
@@ -197,12 +197,12 @@ Il existe plusieurs formes de sociétés commerciales :
               <div class="card">
                 <div class="card-header p-0 bg-transparent" id="headingThree">
                     <h2 class="mb-0">
-                      <button class="btn btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                      <button class="btn btn-block text-left collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
                           Groupement d'intérêt Economique
                       </button>
                     </h2>
                 </div>
-                <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#our-values-accordion">
+                <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-bs-parent="#our-values-accordion">
                     <div class="card-body">
                     Organisation qui a pour but exclusif de mettre en œuvre pour une durée déterminée, tous les moyens propres 
                     à faciliter ou à développer l’activité économique de ses membres, à améliorer ou à accroître les résultats de cette activité.
@@ -488,7 +488,7 @@ du Conseiller CEFORE si vous êtes dans une localité disposant d'un bureau CEFO
 
               <h3 class="modal-title text-center" id="modal-login-label">  Connexion <i class="fa fa-key"></i></h3>
       
-              <button type="button" class="close" data-dismiss="modal">
+              <button type="button" class="close" data-bs-dismiss="modal">
                 <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
               </button>
             </div>

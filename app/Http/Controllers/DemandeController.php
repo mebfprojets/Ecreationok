@@ -198,7 +198,10 @@ class DemandeController extends Controller
        // $num=$request->type_request.
         //Pour la signature
             //$path = 'C:\wamp64/www/Zip Ecreation/Ecreation_sanou/storage/app/public/files/Signature/';
-            $path='C:\wamp64/www/Ecreation/storage/app/public/files/'.$usager->id.'/';
+            $path=storage_path('app/public/files/'.$usager->id.'/');
+            if(!is_dir($path)){
+                mkdir($path, 0755, true);
+            }
          //$request->signed->store('public','upload');
         // $path = Storage::putFile('photos', new File('public/upload/'));
         // $path = $request->file('signed')->store('upload', 'public');

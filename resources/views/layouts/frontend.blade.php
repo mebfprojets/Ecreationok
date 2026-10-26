@@ -9,7 +9,7 @@
         <div class="modal-header">
  
         <center><h3 class="modal-title text-center" style="margin-left: 130px" id="modal-login-label">  Connexion <i class="fa fa-key"></i></h3></center>
-          <button type="button" class="close" data-dismiss="modal">
+          <button type="button" class="close" data-bs-dismiss="modal">
             <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
           </button>
         </div>
@@ -19,7 +19,7 @@
           
             <div class="col-md-5 login-left">
                   <img src="{{ 'assets/img/user.png' }}" alt="" style="margin-bottom: 50px" width="150" height="150">
-                  <a  class="btn btn-danger"data-dismiss="modal"  href="#modal-create-compte" data-toggle="modal" style="background-color:rgb(224, 106, 106)"> Creer compte <i class="fa fa-unlock"></i></a> 
+                  <a  class="btn btn-danger"data-bs-dismiss="modal"  href="#modal-create-compte" data-bs-toggle="modal" style="background-color:rgb(224, 106, 106)"> Creer compte <i class="fa fa-unlock"></i></a> 
 
             </div>
               <div class="col-md-7">
@@ -50,7 +50,7 @@
                       </label>
                   </div>
                   <div class="col-xs-6">
-                  <a  class="" data-dismiss="modal"  href="#modal-forget-password" data-toggle="modal"> Mot de passe oublié ?</a>
+                  <a  class="" data-bs-dismiss="modal"  href="#modal-forget-password" data-bs-toggle="modal"> Mot de passe oublié ?</a>
 
                   </div>
                     <button type="submit" class="btn btn-success">Se Connecter <i class="fa fa-unlock"></i></button>
@@ -72,7 +72,7 @@
  
         <center><h3 class="modal-title text-center" id="modal-login-label">  Récupérer le mot de passe <i class="fa fa-key"></i></h3></center>
 
-          <button type="button" class="close" data-dismiss="modal">
+          <button type="button" class="close" data-bs-dismiss="modal">
             <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
           </button>
         </div>
@@ -109,7 +109,7 @@
         <div class="modal-header">
           <h3 class="text-center" style="margin-left: 200px" id="modal-login-label"> Vérification de nom commercial <i class="fa fa-key"></i></h3>
             
-          <button type="button" class="close" data-dismiss="modal">
+          <button type="button" class="close" data-bs-dismiss="modal">
             <span aria-hidden="true">&times;</span><span class="sr-only">Fermer</span>
           </button>
         </div>
@@ -154,7 +154,7 @@
         <div class="modal-header">
           <h3 class="text-center" style="margin-left: 250px" id="modal-login-label">  Créer un compte <i class="fa fa-key"></i></h3>
             
-          <button type="button" class="close" data-dismiss="modal">
+          <button type="button" class="close" data-bs-dismiss="modal">
             <span aria-hidden="true">&times;</span><span class="sr-only">Fermer</span>
           </button>
         </div>
@@ -229,7 +229,7 @@
         <div class="modal-header">
           <h3 class="modal-title text-center" id="modal-login-label">  Créer un compte <i class="fa fa-key"></i></h3>
             
-          <button type="button" class="close" data-dismiss="modal">
+          <button type="button" class="close" data-bs-dismiss="modal">
             <span aria-hidden="true">&times;</span><span class="sr-only">Fermer</span>
           </button>
         </div>

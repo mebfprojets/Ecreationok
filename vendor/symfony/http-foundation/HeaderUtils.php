@@ -58,9 +58,12 @@ class HeaderUtils
                         "(?:[^"\\\\]|\\\\.)*(?:"|\\\\|$)
                     |
                         # token
-                        [^"'.$quotedSeparators.']+
-                    )+
-                (?<!\s)
+                        [^"\s'.$quotedSeparators.']++
+                    |
+                        # whitespace that is not a separator, only when more of the value follows it,
+                        # so that a value never ends on whitespace and none of it ever has to be given back
+                        [^\S'.$quotedSeparators.']++(?!['.$quotedSeparators.']|$)
+                    )++
             |
                 # separator
                 \s*
@@ -286,7 +289,11 @@ class HeaderUtils
         }
 
         foreach ($partMatches as $matches) {
-            $parts[] = '' === $separators ? self::unquote($matches[0][0]) : self::groupParts($matches, $separators, false);
+            if ('' === $separators && '' !== $unquoted = self::unquote($matches[0][0])) {
+                $parts[] = $unquoted;
+            } elseif ($groupedParts = self::groupParts($matches, $separators, false)) {
+                $parts[] = $groupedParts;
+            }
         }
 
         return $parts;

@@ -48,21 +48,15 @@ FACEBOOK: https://www.facebook.com/themefisher
 <!-- Styles -->
 
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <!-- Or for RTL support -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" />
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.full.min.js"></script>
 
-  <!-- Bootstrap -->
-
-  
-  <link rel="stylesheet" href="{{asset('frontend/plugins/bootstrap/bootstrap.min.css')}}">
+  <!-- Bootstrap : feuille unique backend/css/bootstrap.min.css (v5, thème) chargée plus bas -->
   <!-- FontAwesome -->
   <link rel="stylesheet" href="{{asset('frontend/plugins/fontawesome/css/all.min.css')}}">
   <!-- Animation -->
@@ -217,7 +211,7 @@ FACEBOOK: https://www.facebook.com/themefisher
                     </div>
                   </li>                  
                   <li class="header-get-a-quote">
-                    <a class="btn btn-primary" data-toggle="modal" href="#modal-verifier-nomCommercial">Vérifier un nom commerical</a>
+                    <a class="btn btn-primary" data-bs-toggle="modal" href="#modal-verifier-nomCommercial">Vérifier un nom commerical</a>
                   </li>
                 </ul><!-- Ul end -->
             </div><!-- header right end -->
@@ -264,7 +258,7 @@ FACEBOOK: https://www.facebook.com/themefisher
         <div class="row">
           <div class="col-lg-12">
               <nav class="navbar navbar-expand-lg navbar-dark p-0">
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 
@@ -282,13 +276,13 @@ FACEBOOK: https://www.facebook.com/themefisher
                       <li class="nav-item"><a class="nav-link" href="#">Contacts</a></li>
         @guest
           <li id="contenu" class="nav-item dropdown pull-right">
-            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">MON COMPTE</a>
-            <ul class="dropdown-menu dropdown-custom dropdown-menu-right">
+            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">MON COMPTE</a>
+            <ul class="dropdown-menu dropdown-custom dropdown-menu-right dropdown-menu-end">
 
                 <li class="divider"></li>
                 <li>
                     <!-- Opens the user settings modal that can be found at the bottom of each page (page_footer.html in PHP version) -->
-                    <a href="#modal-login" data-toggle="modal">
+                    <a href="#modal-login" data-bs-toggle="modal">
                       <i class="fa fa-sign-in"></i>
                        Se Connecter
                     </a>
@@ -299,7 +293,7 @@ FACEBOOK: https://www.facebook.com/themefisher
                 </li> --}}
                 <li>
                   <!-- Opens the user settings modal that can be found at the bottom of each page (page_footer.html in PHP version) -->
-                 <a href="#modal-create-compte" data-toggle="modal">
+                 <a href="#modal-create-compte" data-bs-toggle="modal">
                     <i class="fa fa-user"></i>
                      Créer un compte
                   </a> 
@@ -308,13 +302,13 @@ FACEBOOK: https://www.facebook.com/themefisher
         </li>
        @else 
        <li id="contenu" class="nav-item dropdown pull-right">
-            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">{{Auth::user()->name}}</a>
-            <ul class="dropdown-menu dropdown-custom dropdown-menu-right">
+            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">{{Auth::user()->name}}</a>
+            <ul class="dropdown-menu dropdown-custom dropdown-menu-right dropdown-menu-end">
 
                 <li class="divider"></li>
                 <li>
                     <!-- Opens the user settings modal that can be found at the bottom of each page (page_footer.html in PHP version) -->
-                    <!-- <a href="#modal-user-settings" data-toggle="modal">
+                    <!-- <a href="#modal-user-settings" data-bs-toggle="modal">
                         <i class="fa fa-cog fa-fw pull-right"></i>
                         Profil utilisateur
                     </a> -->

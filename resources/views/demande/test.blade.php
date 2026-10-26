@@ -50,7 +50,7 @@
         <div class="modal-content">
             <div class="modal-header">
             <h5 class="modal-title" >Modifier <span id="piece_name_update"></span> </h5>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="fileUploadForm_u" action="javascript:void(0)" class="form-horizontal form-bordered" enctype="multipart/form-data">
@@ -142,7 +142,7 @@
             </div> 
             </div>
             <div class="panel-footer text-center">
-                <input type="button" data-dismiss="modal"  class="btn btn-sm btn-warning"  value="Fermer la fenetre">
+                <input type="button" data-bs-dismiss="modal"  class="btn btn-sm btn-warning"  value="Fermer la fenetre">
                 <input  id='saveData' type="submit"   class="btn btn-sm btn-success"  value="Enregister mes données">
             </div>
             
@@ -155,7 +155,7 @@
         <div class="modal-content">
             <div class="modal-header">
             <h5 class="modal-title" >Enregistrer  <span id="piece_name_create"></h5>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="fileUploadForm" action="javascript:void(0)" class="form-horizontal form-bordered" enctype="multipart/form-data">
@@ -245,7 +245,7 @@
             </div> 
             </div>
             <div class="panel-footer text-center">
-                <input type="button" data-dismiss="modal"  class="btn btn-sm btn-warning"  value="Fermer la fenetre">
+                <input type="button" data-bs-dismiss="modal"  class="btn btn-sm btn-warning"  value="Fermer la fenetre">
                 <input  id='saveData' type="submit"   class="btn btn-sm btn-success"  value="Enregister mes données">
             </div>
             
@@ -258,7 +258,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" >Enregistrer un usager</h5>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="formusager" action="javascript:void(0)" class="form-horizontal form-bordered" enctype="multipart/form-data">
@@ -396,7 +396,7 @@
             <span class="upload_image"> </span>
             </div>
             <div class="panel-footer text-center">
-                <input type="button" data-dismiss="modal"  class="btn btn-sm btn-warning"  value="Fermer">
+                <input type="button" data-bs-dismiss="modal"  class="btn btn-sm btn-warning"  value="Fermer">
                 <input   type="submit"   class="btn btn-sm btn-success"  value="Enregister">
             </div>
             

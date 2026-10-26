@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="http://keith-wood.name/js/jquery.signature.js"></script>
-    <link rel="stylesheet" type="text/css" href="http://keith-wood.name/css/jquery.signature.css">
+    <script type="text/javascript" src="{{asset('adminlte/plugins/jquery/jquery.min.js')}}"></script>
+    <script type="text/javascript" src="{{asset('adminlte/plugins/jquery-ui/jquery-ui.min.js')}}"></script>
+    <script type="text/javascript" src="{{asset('backend/js/signature.js')}}"></script>
+    <link rel="stylesheet" type="text/css" href="{{asset('backend/css/signature.css')}}">
     <title>Signature</title>
 
     <style>

@@ -4,7 +4,7 @@
                                 <div class="card">
                                     <div class="card-body taille">
                                     <h2 class="font-size-20 mb-4 text-center">Formulaire Personne Physique</h2>
-                                        {{-- <a href="#modal-confirm-devis" id="declaration"  data-toggle="modal"  class="btn btn-md btn-success"  > <i class=" fas fa-plus"></i> </a> --}}
+                                        {{-- <a href="#modal-confirm-devis" id="declaration"  data-bs-toggle="modal"  class="btn btn-md btn-success"  > <i class=" fas fa-plus"></i> </a> --}}
                                         <div >
                                             {{-- <ul class="twitter-bs-wizard-nav nav-justified">
                                                 <li class="nav-item">
@@ -167,7 +167,7 @@
                                                                     <div class="input-group declaration_group_edit" style="display: none" >
                                                                         <input type="text" name="declaration_sur_lhonneur" id='input_certificat_de_residence' disabled class="form-control col-md-7"  value="declaration_sur_lhonneur" >
                                                                          <div class="col-md-5">
-                                                                            <a href="#updatepiecejointe" id="declaration_group_edit" data-toggle="modal" class="btn btn-md btn-success" onclick="editpiecejointe('declaration')"> <i class="fas fa-pen"></i> </a>
+                                                                            <a href="#updatepiecejointe" id="declaration_group_edit" data-bs-toggle="modal" class="btn btn-md btn-success" onclick="editpiecejointe('declaration')"> <i class="fas fa-pen"></i> </a>
                                                                             <a href="{{ route('detaildocument') }}?categoriepiece=declaration" id="declaration_view" class="btn btn-md btn-success declaration_view"> <i class="fas fa-eye"></i> </a>
                                                                         </div>
                                                                     </div>
@@ -175,7 +175,7 @@
                                                                         <div class="input-group">
                                                                             <input type="text" id="input_declaration" name="declaration_sur_lhonneur" disabled class="form-control col-md-7 input_declaration piece_declaration" value="declaration">
                                                                             <div class="col-md-5">
-                                                                                <a href="#updatepiecejointe" id="declaration_edit"  data-toggle="modal" class="btn btn-md btn-success declaration_edit" onclick="editpiecejointe('declaration')" > <i class="fas fa-pen"></i> </a>
+                                                                                <a href="#updatepiecejointe" id="declaration_edit"  data-bs-toggle="modal" class="btn btn-md btn-success declaration_edit" onclick="editpiecejointe('declaration')" > <i class="fas fa-pen"></i> </a>
                                                                                 <a href="{{ route('detaildocument') }}?categoriepiece=declaration" id="declaration_view"  class="btn btn-md btn-success declaration_view"> <i class="fas fa-eye"></i> </a>
                                                                             </div>
                                                                         </div>
@@ -183,7 +183,7 @@
                                                                     <div class="input-group declaration_group_add">
                                                                         <input type="text" id="input_declaration" name="declaration_sur_lhonneur" disabled class="form-control col-md-7 input_declaration piece_declaration">
                                                                         <div class="col-md-5">
-                                                                            <a href="#addpiecejointe" id="declaration"  data-toggle="modal"  class="btn btn-md btn-success declaration"> <i class=" fas fa-plus"></i> </a>
+                                                                            <a href="#addpiecejointe" id="declaration"  data-bs-toggle="modal"  class="btn btn-md btn-success declaration"> <i class=" fas fa-plus"></i> </a>
                                                                         </div>
                                                                     </div>
                                                                 @endif
@@ -195,7 +195,7 @@
                                                                     <div class="input-group certificat_de_residence_group_edit" style="display: none" >
                                                                         <input type="text" name="certificat_de_residence" id='input_certificat_de_residence' disabled class="form-control col-md-7"  value="certificat_de_residence" >
                                                                          <div class="col-md-5">
-                                                                            <a href="#updatepiecejointe" id="certificat_de_residence_edit" data-toggle="modal" class="btn btn-md btn-success" onclick="editpiecejointe('certificat_de_residence')"> <i class="fas fa-pen"></i> </a>
+                                                                            <a href="#updatepiecejointe" id="certificat_de_residence_edit" data-bs-toggle="modal" class="btn btn-md btn-success" onclick="editpiecejointe('certificat_de_residence')"> <i class="fas fa-pen"></i> </a>
                                                                             <a href="{{ route('detaildocument') }}?categoriepiece=certificat_de_residence" id="certificat_de_residence_view" class="btn btn-md btn-success"> <i class="fas fa-eye"></i> </a>
                                                                         </div>
                                                                     </div>
@@ -203,7 +203,7 @@
                                                                     <div class="input-group">
                                                                         <input type="text" name="certificat_de_residence" id='input_certificat_de_residence' disabled class="form-control col-md-7 input_certificat_de_residence piece_certificat"  value="certificat_de_residence">
                                                                          <div class="col-md-5">
-                                                                            <a href="#updatepiecejointe" id="certificat_de_residence_edit" data-toggle="modal" class="btn btn-md btn-success" onclick="editpiecejointe('certificat_de_residence')"> <i class="fas fa-pen"></i> </a>
+                                                                            <a href="#updatepiecejointe" id="certificat_de_residence_edit" data-bs-toggle="modal" class="btn btn-md btn-success" onclick="editpiecejointe('certificat_de_residence')"> <i class="fas fa-pen"></i> </a>
                                                                             <a href="{{ route('detaildocument') }}?categoriepiece=certificat_de_residence" id="certificat_de_residence_view" class="btn btn-md btn-success"> <i class="fas fa-eye"></i> </a>
                                                                         </div>
                                                                     </div>
@@ -211,7 +211,7 @@
                                                                 <div class="input-group certificat_de_residence_group_add">
                                                                     <input type="text" name="certificat_de_residence" id='input_certificat_de_residence' disabled class="form-control col-md-7 input_certificat_de_residence piece_certificat">
                                                                      <div class="col-md-5">
-                                                                        <a href="#addpiecejointe" id='certificat_de_residence' data-toggle="modal" class="btn btn-md btn-success" > <i class=" fas fa-plus"></i> </a>
+                                                                        <a href="#addpiecejointe" id='certificat_de_residence' data-bs-toggle="modal" class="btn btn-md btn-success" > <i class=" fas fa-plus"></i> </a>
                                                                     </div>
                                                                 </div>
                                                                 @endif
@@ -223,7 +223,7 @@
                                                                     <div class="input-group formulaire_dem_cpc_group_edit" style="display: none">
                                                                         <input type="text" name="formulaire_dem_cpc" id="formulaire_dem_cpc_input" disabled class="form-control col-md-7" value="formulaire de demande CPC formulaire_dem_cpc_input" >
                                                                          <div class="col-md-5">
-                                                                            <a href="#updatepiecejointe" data-toggle="modal" id="formulaire_dem_cpc_edit" class="btn btn-md btn-success formulaire_dem_cpc_edit" onclick="editpiecejointe('formulaire_dem_cpc')"> <i class="fas fa-pen"></i> </a>
+                                                                            <a href="#updatepiecejointe" data-bs-toggle="modal" id="formulaire_dem_cpc_edit" class="btn btn-md btn-success formulaire_dem_cpc_edit" onclick="editpiecejointe('formulaire_dem_cpc')"> <i class="fas fa-pen"></i> </a>
                                                                              <a  href="{{ route('detaildocument') }}?categoriepiece=formulaire_dem_cpc" id="formulaire_dem_cpc_view" class="btn btn-md btn-success formulaire_dem_cpc_view"> <i class="fas fa-eye"></i> </a> 
                                                                         </div>
                                                                     </div>
@@ -231,7 +231,7 @@
                                                                     <div class="input-group">
                                                                         <input type="text" name="formulaire_dem_cpc" id="formulaire_dem_cpc_input" disabled class="form-control col-md-7 formulaire_dem_cpc_input piece_cpc" value="formulaire de demande CPC" >
                                                                          <div class="col-md-5">
-                                                                            <a href="#updatepiecejointe" data-toggle="modal" id="formulaire_dem_cpc_edit" class="btn btn-md btn-success" onclick="editpiecejointe('formulaire_dem_cpc')"> <i class="fas fa-pen"></i> </a>
+                                                                            <a href="#updatepiecejointe" data-bs-toggle="modal" id="formulaire_dem_cpc_edit" class="btn btn-md btn-success" onclick="editpiecejointe('formulaire_dem_cpc')"> <i class="fas fa-pen"></i> </a>
                                                                             <a href="{{ route('detaildocument') }}?categoriepiece=formulaire_dem_cpc"  id="formulaire_dem_cpc_view" class="btn btn-md btn-success"> <i class="fas fa-eye"></i> </a>
                                                                         </div>
                                                                     </div>
@@ -239,7 +239,7 @@
                                                                     <div class="input-group formulaire_dem_cpc_group_add">
                                                                         <input type="text" name="formulaire_dem_cpc" id="formulaire_dem_cpc_input" disabled class="form-control col-md-7 formulaire_dem_cpc_input piece_cpc"  >
                                                                         <div class="col-md-5">
-                                                                            <a href="#addpiecejointe" id='formulaire_dem_cpc' data-toggle="modal" class="btn btn-md btn-success formulaire_dem_cpc"   > <i class=" fas fa-plus"></i> </a>
+                                                                            <a href="#addpiecejointe" id='formulaire_dem_cpc' data-bs-toggle="modal" class="btn btn-md btn-success formulaire_dem_cpc"   > <i class=" fas fa-plus"></i> </a>
                                                                         </div>
                                                                     </div>
                                                                 @endif
@@ -251,7 +251,7 @@
                                                                     <div class="input-group photo_didentite_group_edit" style="display: none">
                                                                         <input type="text" name="photo_identite" id="photo_didentite_input" disabled class="form-control col-md-7"  value="photo_didentite" >
                                                                          <div class="col-md-5">
-                                                                            <a href="#updatepiecejointe" id='photo_didentite_edit' data-toggle="modal"  class="btn btn-md btn-success" onclick="editpiecejointe('photo_didentite')"> <i class="fas fa-pen"></i> </a>
+                                                                            <a href="#updatepiecejointe" id='photo_didentite_edit' data-bs-toggle="modal"  class="btn btn-md btn-success" onclick="editpiecejointe('photo_didentite')"> <i class="fas fa-pen"></i> </a>
                                                                             <a href="{{ route('detaildocument') }}?categoriepiece=photo_didentite"  id='photo_didentite_view'   class="btn btn-md btn-success"> <i class="fas fa-eye"></i> </a> 
                                                                         </div>
                                                                     </div>
@@ -259,7 +259,7 @@
                                                                     <div class="input-group">
                                                                         <input type="text" name="photo_identite" id="photo_didentite_input" disabled class="form-control col-md-7 photo_didentite_input piece_photo"  value="photo_didentite" >
                                                                          <div class="col-md-5">
-                                                                            <a href="#updatepiecejointe" id='photo_didentite_edit' data-toggle="modal"  class="btn btn-md btn-success" onclick="editpiecejointe('photo_didentite')"> <i class="fas fa-pen"></i> </a>
+                                                                            <a href="#updatepiecejointe" id='photo_didentite_edit' data-bs-toggle="modal"  class="btn btn-md btn-success" onclick="editpiecejointe('photo_didentite')"> <i class="fas fa-pen"></i> </a>
                                                                             <a  href="{{ route('detaildocument') }}?categoriepiece=photo_didentite"  id='photo_didentite_view'   class="btn btn-md btn-success"> <i class="fas fa-eye"></i> </a>
                                                                         </div>
                                                                     </div>
@@ -267,7 +267,7 @@
                                                                 <div class="input-group photo_didentite_group_add">
                                                                     <input type="text" name="photo_identite" id="photo_didentite_input" disabled class="form-control col-md-7 photo_didentite_input piece_photo">
                                                                      <div class="col-md-5">
-                                                                        <a href="#addpiecejointe" id='photo_didentite' data-toggle="modal" class="btn btn-md btn-success photo_didentite"> <i class=" fas fa-plus"></i> </a>
+                                                                        <a href="#addpiecejointe" id='photo_didentite' data-bs-toggle="modal" class="btn btn-md btn-success photo_didentite"> <i class=" fas fa-plus"></i> </a>
                                                                     </div>
                                                                 </div>
                                                                 @endif
@@ -279,7 +279,7 @@
                                                                     <div class="input-group piece_didentite_group_edit " style="display: none">
                                                                         <input type="text" name="piece_didentite" id="piece_didentite_input" disabled class="form-control col-md-7 piece_didentite_input" value="pièce_didentite" >
                                                                         <div class="col-md-5">
-                                                                            <a href="#updatepiecejointe" id="piece_didentite_edit"  data-toggle="modal"  class="btn btn-md btn-success piece_didentite_edit" onclick="editpiecejointe('piece_didentite')"> <i class="fas fa-pen"></i> </a>
+                                                                            <a href="#updatepiecejointe" id="piece_didentite_edit"  data-bs-toggle="modal"  class="btn btn-md btn-success piece_didentite_edit" onclick="editpiecejointe('piece_didentite')"> <i class="fas fa-pen"></i> </a>
                                                                             <a  href="{{ route('detaildocument') }}?categoriepiece=piece_didentite" id="piece_didentite_view"  class="btn btn-md btn-success piece_didentite_view"> <i class="fas fa-eye"></i> </a> 
                                                                         </div>
                                                                     </div>
@@ -287,7 +287,7 @@
                                                                         <div class="input-group">
                                                                             <input type="text" name="piece_didentite" id="piece_didentite_input" disabled class="form-control col-md-7 piece_didentite_input piece_identite" value="pièce_didentite" >
                                                                             <div class="col-md-5">
-                                                                                <a href="#updatepiecejointe" id="piece_didentite_edit"  data-toggle="modal"  class="btn btn-md btn-success piece_didentite_edit" onclick="editpiecejointe('piece_didentite')"> <i class="fas fa-pen"></i> </a>
+                                                                                <a href="#updatepiecejointe" id="piece_didentite_edit"  data-bs-toggle="modal"  class="btn btn-md btn-success piece_didentite_edit" onclick="editpiecejointe('piece_didentite')"> <i class="fas fa-pen"></i> </a>
                                                                                 <a  href="{{ route('detaildocument') }}?categoriepiece=piece_didentite"  id="piece_didentite_view"  class="btn btn-md btn-success piece_didentite_view"> <i class="fas fa-eye"></i> </a>
                                                                             </div>
                                                                         </div>
@@ -295,7 +295,7 @@
                                                                     <div class="input-group piece_didentite_group_add">
                                                                         <input type="text" name="piece_didentite" id="piece_didentite_input" disabled class="form-control col-md-7 piece_didentite_input piece_identite">
                                                                         <div class="col-md-5">
-                                                                            <a href="#addpiecejointe" id='piece_didentite' data-toggle="modal" class="btn btn-md btn-success piece_didentite" onclick="redefinir_formulaire('formulaire_dem_cpc')"  > <i class=" fas fa-plus"></i> </a>                                                                           
+                                                                            <a href="#addpiecejointe" id='piece_didentite' data-bs-toggle="modal" class="btn btn-md btn-success piece_didentite" onclick="redefinir_formulaire('formulaire_dem_cpc')"  > <i class=" fas fa-plus"></i> </a>                                                                           
                                                                         </div>                                                                  
                                                                 </div>
                                                                 @endif
@@ -307,7 +307,7 @@
                                                                     <div class="input-group titre_de_propriete_group_edit" style="display: none">
                                                                         <input type="text" name="titre_de_propriete" id="titre_de_propriete_input" disabled class="form-control col-md-7 titre_de_propriete_input"  value="titre_de_propriete" >
                                                                         <div class="col-md-5">
-                                                                            <a href="#updatepiecejointe" id="titre_de_propriete_edit" data-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" onclick="editpiecejointe('titre_de_propriete')"> <i class="fas fa-pen"></i> </a>
+                                                                            <a href="#updatepiecejointe" id="titre_de_propriete_edit" data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" onclick="editpiecejointe('titre_de_propriete')"> <i class="fas fa-pen"></i> </a>
                                                                             <a  href="{{ route('detaildocument') }}?categoriepiece=titre_de_propriete" id="titre_de_propriete_view" class="btn btn-md btn-success titre_de_propriete_view"> <i class="fas fa-eye"></i> </a>
                                                                         </div>
                                                                     </div>
@@ -315,7 +315,7 @@
                                                                         <div class="input-group">
                                                                             <input type="text" name="titre_de_propriete" id="titre_de_propriete_input" disabled class="form-control col-md-7 titre_de_propriete_input piece_propriete"  value="Titre de jouissance">
                                                                             <div class="col-md-5">
-                                                                                <a href="#updatepiecejointe" id="titre_de_propriete_edit" data-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" onclick="editpiecejointe('titre_de_propriete')"> <i class="fas fa-pen"></i> </a>
+                                                                                <a href="#updatepiecejointe" id="titre_de_propriete_edit" data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" onclick="editpiecejointe('titre_de_propriete')"> <i class="fas fa-pen"></i> </a>
                                                                                 <a  href="{{ route('detaildocument') }}?categoriepiece=titre_de_propriete" id="titre_de_propriete_view" class="btn btn-md btn-success titre_de_propriete_view"> <i class="fas fa-eye"></i> </a>
                                                                             </div>
                                                                         </div>
@@ -323,7 +323,7 @@
                                                                         <div class="input-group titre_de_propriete_group_add">
                                                                             <input type="text" name="titre_de_propriete" id="titre_de_propriete_input" disabled class="form-control col-md-7 titre_de_propriete_input piece_propriete" >
                                                                             <div class="col-md-5">
-                                                                                <a href="#addpiecejointe" id='titre_de_propriete' data-toggle="modal" class="btn btn-md btn-success titre_de_propriete"   > <i class=" fas fa-plus"></i> </a>
+                                                                                <a href="#addpiecejointe" id='titre_de_propriete' data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete"   > <i class=" fas fa-plus"></i> </a>
                                                                             </div>
                                                                         </div>
                                                                     @endif
@@ -483,7 +483,7 @@
                                                      <fieldset>
                                                         <legend><span class="legend-fieldest">Personne(s) Pouvant engager la responsabilité de l'entreprise</span></legend>
                                                         <!-- <div class="row">                                                        
-                                                        <a href="#addusager" id="addusager" data-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" > Ajouter usager </a>
+                                                        <a href="#addusager" id="addusager" data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" > Ajouter usager </a>
                                                         </div> -->
                                                         <div class="row">                                                        
                                                         <div class="col-md-6  ">
@@ -508,8 +508,8 @@
                                                             </div>
                                                             <div class="col-lg-2 ">
                                                                 <div class="mb-4" style="margin-top: 30px;">                                                                                                                              
-                                                                <a href="#addusager" id="addusager" data-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" >Créer Dirigeant</a>                                                                        
-                                                                <!-- <a href="#updatepiecejointe" id="certificat_de_residence_edit" data-toggle="modal" class="btn btn-md btn-success add-line"  onclick="editpiecejointe('certificat_de_residence')"> <i class="fas fa-plus"></i> </a> -->
+                                                                <a href="#addusager" id="addusager" data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" >Créer Dirigeant</a>                                                                        
+                                                                <!-- <a href="#updatepiecejointe" id="certificat_de_residence_edit" data-bs-toggle="modal" class="btn btn-md btn-success add-line"  onclick="editpiecejointe('certificat_de_residence')"> <i class="fas fa-plus"></i> </a> -->
                                                                 </div>
                                                             </div>                                                      
                                                         </div>
