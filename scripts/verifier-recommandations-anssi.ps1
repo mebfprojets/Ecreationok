@@ -38,17 +38,34 @@ function Ajouter($vul, $controle, $ok, $detail) {
     Write-Host ("  [{0,-10}] {1} {2}" -f $statut, $controle, $(if ($detail) { "-> $detail" })) -ForegroundColor $couleur
 }
 
-# Code HTTP sans suivre les redirections (curl.exe est fourni avec Windows 10/11)
-function CodeHttp($chemin) {
-    (curl.exe -s -o NUL -w '%{http_code}' --max-time 20 "$Url$chemin") -as [int]
+# Requête HTTP en .NET pur (aucune dépendance à curl.exe, absent des anciens Windows Server)
+function Requete($u, [switch]$Suivre) {
+    $res = @{ Code = 0; Contenu = ''; Entetes = $null; Cookies = @() }
+    try {
+        $req = [Net.HttpWebRequest]::Create($u)
+        $req.AllowAutoRedirect = [bool]$Suivre
+        $req.Timeout = 30000
+        $req.UserAgent = 'Mozilla/5.0 (verification ANSSI)'
+        try { $rep = $req.GetResponse() } catch [Net.WebException] { $rep = $_.Exception.Response }
+        if ($rep) {
+            $res.Code = [int]$rep.StatusCode
+            $res.Entetes = $rep.Headers
+            $c = $rep.Headers.GetValues('Set-Cookie'); if ($c) { $res.Cookies = $c }
+            $lecteur = New-Object IO.StreamReader($rep.GetResponseStream())
+            $res.Contenu = $lecteur.ReadToEnd()
+            $lecteur.Close(); $rep.Close()
+        }
+    } catch {}
+    return $res
 }
+
+# Code HTTP sans suivre les redirections
+function CodeHttp($chemin) { (Requete "$Url$chemin").Code }
 
 function Telecharger($u) {
     if ($u.StartsWith('//')) { $u = 'https:' + $u }
     elseif ($u -notmatch '^https?://') { $u = $Url + '/' + $u.TrimStart('/') }
-    $txt = curl.exe -s -L --max-time 30 $u
-    if ($null -eq $txt) { $txt = '' } elseif ($txt -is [array]) { $txt = $txt -join "`n" }
-    return @{ Url = $u; Contenu = [string]$txt }
+    return @{ Url = $u; Contenu = [string](Requete $u -Suivre).Contenu }
 }
 
 Write-Host "`nVérification de $Url  ($(Get-Date -Format 'dd/MM/yyyy HH:mm'))`n" -ForegroundColor Cyan
@@ -60,7 +77,8 @@ if (([Uri]$Url).Scheme -ne 'https') {
 } else { try {
     $tcp = New-Object Net.Sockets.TcpClient($hote, 443)
     $ssl = New-Object Net.Security.SslStream($tcp.GetStream(), $false, { $true })
-    $ssl.AuthenticateAsClient($hote)
+    # TLS 1.2 forcé : par défaut les anciens Windows négocient TLS 1.0, refusé par le serveur (erreur SSPI)
+    $ssl.AuthenticateAsClient($hote, $null, [Security.Authentication.SslProtocols]::Tls12, $false)
     $cert = New-Object Security.Cryptography.X509Certificates.X509Certificate2($ssl.RemoteCertificate)
     $chaineOk = (New-Object Security.Cryptography.X509Certificates.X509Chain).Build($cert)
     $jours = [int]($cert.NotAfter - (Get-Date)).TotalDays
@@ -154,13 +172,9 @@ foreach ($a in $anciens) {
 
 # ---------------------------------------------------------------- Non-régression (vulnérabilités déjà approuvées)
 Write-Host "`nNon-régression  En-têtes et cookies" -ForegroundColor Cyan
-$entetes = curl.exe -s -D - -o NUL --max-time 20 "$Url$PageAccueil"
-$h = @{}; $cookies = @()
-foreach ($ligne in $entetes) {
-    if ($ligne -match '^([\w-]+):\s*(.*)$') {
-        if ($matches[1] -ieq 'Set-Cookie') { $cookies += $matches[2] } else { $h[$matches[1].ToLower()] = $matches[2].Trim() }
-    }
-}
+$accueil = Requete "$Url$PageAccueil"
+$h = @{}; $cookies = $accueil.Cookies
+if ($accueil.Entetes) { foreach ($nom in $accueil.Entetes.AllKeys) { $h[$nom.ToLower()] = $accueil.Entetes[$nom].Trim() } }
 Ajouter 'VUL-008' 'X-Frame-Options' ([bool]$h['x-frame-options']) $h['x-frame-options']
 Ajouter 'VUL-008' 'X-Content-Type-Options: nosniff' ($h['x-content-type-options'] -eq 'nosniff') $h['x-content-type-options']
 Ajouter 'VUL-007' 'X-Powered-By masqué' (-not $h['x-powered-by']) $h['x-powered-by']
@@ -170,9 +184,47 @@ foreach ($c in $cookies) {
     Ajouter 'VUL-006' "Cookie $nom : Secure" ($c -match ';\s*secure') $null
     if ($nom -notmatch 'XSRF') { Ajouter 'VUL-006' "Cookie $nom : HttpOnly" ($c -match ';\s*httponly') $null }
 }
-$code404 = curl.exe -s --max-time 20 "$Url/page-inexistante-verification-anssi"
-Ajouter 'VUL-001' 'Pas de trace d''erreur détaillée (APP_DEBUG)' (-not (($code404 -join ' ') -match 'Whoops|Stack trace|vendor[\\/]laravel|SQLSTATE')) $null
+$page404 = (Requete "$Url/page-inexistante-verification-anssi").Contenu
+Ajouter 'VUL-001' 'Pas de trace d''erreur détaillée (APP_DEBUG)' (-not ($page404 -match 'Whoops|Stack trace|vendor[\\/]laravel|SQLSTATE')) $null
+# ---------------------------------------------------------------- Contrôles complémentaires
+Write-Host "`nVUL-004 / 005 / 009  Contrôles complémentaires" -ForegroundColor Cyan
 
+# VUL-004 : /admin doit rediriger ou refuser
+$adm = Requete "$Url/admin"
+Ajouter 'VUL-004' '/admin protégé' ($adm.Code -in 301, 302, 401, 403) ("HTTP {0} {1}" -f $adm.Code, $(if ($adm.Entetes) { $adm.Entetes['Location'] }))
+
+# VUL-005 : un en-tête Host arbitraire ne doit pas être repris dans la page
+try {
+    $r = [Net.HttpWebRequest]::Create("$Url/")
+    $r.Host = 'attaquant.example'
+    $r.AllowAutoRedirect = $false
+    try { $rep = $r.GetResponse() } catch [Net.WebException] { $rep = $_.Exception.Response }
+    $corps = ''
+    if ($rep) { $corps = (New-Object IO.StreamReader($rep.GetResponseStream())).ReadToEnd(); $codeH = [int]$rep.StatusCode; $rep.Close() }
+    Ajouter 'VUL-005' 'Host arbitraire non repris' (-not ($corps -match 'attaquant\.example')) "HTTP $codeH"
+} catch { Ajouter 'VUL-005' 'Test Host' $null $_.Exception.Message }
+
+# VUL-009 : security.txt
+Ajouter 'VUL-009' 'security.txt publié' ((CodeHttp '/.well-known/security.txt') -eq 200) $null
+
+# HSTS (remarque faite sur www.me.bf, probablement attendue ici aussi)
+Ajouter 'HSTS' 'includeSubDomains' ($h['strict-transport-security'] -match 'includeSubDomains') $h['strict-transport-security']
+
+# VUL-010 : AdminLTE 3 (Bootstrap 4) et versions de jQuery
+Write-Host "`nVUL-010  jQuery et AdminLTE" -ForegroundColor Cyan
+$fichiers = [regex]::Matches($html, '(?:src|href)\s*=\s*["'']([^"''?]+\.(?:js|css))') | ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique
+$nbJq = 0
+foreach ($lien in $fichiers) {
+    $c = (Telecharger $lien).Contenu
+    if (-not $c) { continue }
+    $e = $c.Substring(0, [Math]::Min(400, $c.Length))
+    $jq = [regex]::Match($e, 'jQuery v(\d+\.\d+\.\d+)')
+    if ($jq.Success) { $nbJq++; $v = [version]$jq.Groups[1].Value; Ajouter 'jQuery' "jQuery $v" ($v -ge [version]'3.5.0') $lien }
+    if ($e -match 'AdminLTE v3') { Ajouter 'VUL-010' 'AdminLTE 3 (embarque Bootstrap 4)' $false $lien }
+    $bs = [regex]::Match($e, '(?<!for\s)\bBootstrap\s+v(\d+\.\d+\.\d+)')
+    if ($bs.Success -and [version]$bs.Groups[1].Value -lt [version]'5.3.0') { Ajouter 'VUL-010' "Bootstrap $($bs.Groups[1].Value) à mettre à jour (5.3.x)" $false $lien }
+}
+if ($nbJq -gt 1) { Ajouter 'jQuery' "$nbJq copies de jQuery chargées" $null "n'en garder qu'une" }
 # ---------------------------------------------------------------- Synthèse + rapport
 $aCorriger = @($resultats | Where-Object Statut -eq 'A CORRIGER')
 Write-Host "`n======================================================" -ForegroundColor Cyan

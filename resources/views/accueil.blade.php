@@ -353,7 +353,7 @@ du Conseiller CEFORE si vous êtes dans une localité disposant d'un bureau CEFO
                 <img loading="lazy" src="frontend/images/icon-image/fact2.png" alt="facts-img">
               </div>
               <div class="ts-facts-content">
-                <h2 class="ts-facts-num"><span class="counterUp" data-count="{{$nbr_pp}}">0</span></h2>
+                <h2 class="ts-facts-num"><span class="counterUp" data-count="{{ $nbr_pp ?? 0 }}">0</span></h2>
                 <h3 class="ts-facts-title">Entreprises Individuelles</h3>
               </div>
           </div><!-- Col end -->
@@ -363,7 +363,7 @@ du Conseiller CEFORE si vous êtes dans une localité disposant d'un bureau CEFO
                 <img loading="lazy" src="frontend/images/icon-image/service-icon1.png" alt="facts-img">
               </div>
               <div class="ts-facts-content">
-                <h2 class="ts-facts-num"><span class="counterUp" data-count="{{$nbr_pm}}">0</span></h2>
+                <h2 class="ts-facts-num"><span class="counterUp" data-count="{{ $nbr_pm ?? 0 }}">0</span></h2>
                 <h3 class="ts-facts-title">Entreprises Sociétaires</h3>
               </div>
           </div><!-- Col end -->

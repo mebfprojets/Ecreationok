@@ -1,0 +1,62 @@
+﻿Vérification de https://creerentreprise.me.bf le 26/10/2026 19:38 depuis SRV-ECREATION
+
+
+VUL     Controle                                                             Statut     Detail                                                                                            
+---     --------                                                             ------     ------                                                                                            
+VUL-002 Certificat valide et reconnu                                         OK         expire le 04/04/2027 (160 jours)                                                                  
+VUL-003 Port 21                                                              A CORRIGER OUVERT sur Internet                                                                               
+VUL-003 Port 22                                                              A CORRIGER OUVERT sur Internet                                                                               
+VUL-003 Port 53                                                              OK         filtré/fermé                                                                                      
+VUL-003 Port 80                                                              INFO       ouvert (attendu)                                                                                  
+VUL-003 Port 135                                                             A CORRIGER OUVERT sur Internet                                                                               
+VUL-003 Port 139                                                             A CORRIGER OUVERT sur Internet                                                                               
+VUL-003 Port 443                                                             INFO       ouvert (attendu)                                                                                  
+VUL-003 Port 445                                                             A CORRIGER OUVERT sur Internet                                                                               
+VUL-003 Port 1433                                                            A CORRIGER OUVERT sur Internet                                                                               
+VUL-003 Port 3306                                                            A CORRIGER OUVERT sur Internet                                                                               
+VUL-003 Port 3389                                                            OK         filtré/fermé                                                                                      
+VUL-003 Port 5985                                                            A CORRIGER OUVERT sur Internet                                                                               
+VUL-003 Port 5986                                                            OK         filtré/fermé                                                                                      
+VUL-011 /web.config                                                          OK         HTTP 403                                                                                          
+VUL-011 /.env                                                                OK         HTTP 403                                                                                          
+VUL-011 /.git/config                                                         OK         HTTP 403                                                                                          
+VUL-011 /composer.json                                                       OK         HTTP 403                                                                                          
+VUL-011 /backend/libs/gmaps/yarn-error.log                                   OK         HTTP 403                                                                                          
+VUL-010 Bootstrap 5.1.3                                                      OK         https://creerentreprise.me.bf/backend/css/bootstrap.min.css                                       
+VUL-010 Bootstrap 5.3.8                                                      OK         https://creerentreprise.me.bf/backend/libs/bootstrap/js/bootstrap.bundle.min.js                   
+VUL-012 jQuery UI 1.14.1                                                     OK         https://creerentreprise.me.bf/adminlte/plugins/jquery-ui/jquery-ui.min.js                         
+VUL-010 /frontend/plugins/bootstrap/bootstrap.min.js                         OK         HTTP 404                                                                                          
+VUL-010 /frontend/plugins/bootstrap/bootstrap.min.css                        OK         HTTP 404                                                                                          
+VUL-010 /frontend/js/vendor/bootstrap.min.js                                 OK         HTTP 404                                                                                          
+VUL-010 /frontend/css/bootstrap.min.css                                      OK         HTTP 404                                                                                          
+VUL-010 /assets/bootstrap/js/bootstrap.min.js                                OK         HTTP 404                                                                                          
+VUL-010 /css/bootstrap.min.css                                               OK         HTTP 404                                                                                          
+VUL-010 /js/bootstrap.min.js                                                 OK         HTTP 404                                                                                          
+VUL-010 /backend/libs/twitter-bootstrap-wizard/bootstrap/js/bootstrap.min.js OK         HTTP 404                                                                                          
+VUL-012 /backend/libs/jquery-ui-dist/jquery-ui.min.js                        OK         HTTP 404                                                                                          
+VUL-008 X-Frame-Options                                                      OK         SAMEORIGIN                                                                                        
+VUL-008 X-Content-Type-Options: nosniff                                      OK         nosniff                                                                                           
+VUL-007 X-Powered-By masqué                                                  OK                                                                                                           
+VUL-007 Server sans version                                                  OK         Apache                                                                                            
+VUL-006 Cookie laravel_session : Secure                                      OK                                                                                                           
+VUL-006 Cookie laravel_session : HttpOnly                                    OK                                                                                                           
+VUL-001 Pas de trace d'erreur détaillée (APP_DEBUG)                          OK                                                                                                           
+VUL-004 /admin protégé                                                       OK         HTTP 302 https://creerentreprise.me.bf                                                            
+VUL-005 Host arbitraire non repris                                           OK         HTTP 404                                                                                          
+VUL-009 security.txt publié                                                  OK                                                                                                           
+HSTS    includeSubDomains                                                    A CORRIGER max-age=31536000                                                                                  
+jQuery  jQuery 3.5.0                                                         OK         https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.slim.min.js                                 
+VUL-010 AdminLTE 3 (embarque Bootstrap 4)                                    A CORRIGER https://creerentreprise.me.bf/adminlte/dist/css/adminlte.min.css                                  
+VUL-010 Bootstrap 4.6.1 à mettre à jour (5.3.x)                              A CORRIGER https://creerentreprise.me.bf/adminlte/dist/css/adminlte.min.css                                  
+VUL-010 Bootstrap 5.1.3 à mettre à jour (5.3.x)                              A CORRIGER https://creerentreprise.me.bf/backend/css/bootstrap.min.css                                       
+jQuery  jQuery 3.6.0                                                         OK         https://creerentreprise.me.bf/adminlte/plugins/jquery/jquery.min.js                               
+VUL-010 AdminLTE 3 (embarque Bootstrap 4)                                    A CORRIGER https://creerentreprise.me.bf/adminlte/dist/js/adminlte.min.js                                    
+jQuery  jQuery 2.2.4                                                         A CORRIGER https://creerentreprise.me.bf/frontend/js/vendor/jquery.min.js                                    
+jQuery  jQuery 3.5.1                                                         OK         https://creerentreprise.me.bf/frontend/plugins/jQuery/jquery.min.js                               
+jQuery  jQuery 1.12.4                                                        A CORRIGER https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js                                 
+jQuery  jQuery 3.6.0                                                         OK         https://creerentreprise.me.bf/backend/libs/jquery/jquery.min.js                                   
+jQuery  jQuery 1.3.2                                                         A CORRIGER https://creerentreprise.me.bf/backend/libs/twitter-bootstrap-wizard/jquery.bootstrap.wizard.min.js
+jQuery  7 copies de jQuery chargées                                          INFO       n'en garder qu'une                                                                                
+
+
+

@@ -53,7 +53,8 @@ FACEBOOK: https://www.facebook.com/themefisher
 <!-- Or for RTL support -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" />
 <!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.slim.min.js"></script>
+<script src="{{ asset('frontend/plugins/jQuery/jquery.min.js') }}"></script>
+{{-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.slim.min.js"></script> --}}
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.full.min.js"></script>
 
   <!-- Bootstrap : feuille unique backend/css/bootstrap.min.css (v5, thème) chargée plus bas -->
@@ -74,7 +75,7 @@ FACEBOOK: https://www.facebook.com/themefisher
   <!-- The main stylesheet of this template. All Bootstrap overwrites are defined in here -->
 
  
-<link rel="stylesheet" href="{{asset('adminlte/dist/css/adminlte.min.css')}}">
+  {{--<link rel="stylesheet" href="{{asset('adminlte/dist/css/adminlte.min.css')}}">--}}
   
 <!-- Pour test de formulaire demande -->
 <link href="{{asset('backend/libs/select2/css/select2.min.css')}}" rel="stylesheet" type="text/css">

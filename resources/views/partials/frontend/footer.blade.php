@@ -364,12 +364,12 @@
 
   <!-- Javascript Files
   ================================================== -->
-  <script src="{{asset('adminlte/plugins/jquery/jquery.min.js')}}"></script>
-  <script src="{{asset('adminlte/dist/js/adminlte.min.js')}}"></script>
+  {{-- <script src="{{asset('adminlte/plugins/jquery/jquery.min.js')}}"></script> --}}
+  {{-- <script src="{{asset('adminlte/dist/js/adminlte.min.js')}}"></script> --}}
   <!-- initialize jQuery Library -->
-  <script src="{{asset('frontend/js/vendor/jquery.min.js')}}"></script>
+  {{-- <script src="{{asset('frontend/js/vendor/jquery.min.js')}}"></script> --}}
 
-  <script src="{{asset('frontend/plugins/jQuery/jquery.min.js')}}"></script>
+  {{-- <script src="{{asset('frontend/plugins/jQuery/jquery.min.js')}}"></script> --}}
   <!-- Slick Carousel -->
   <script src="{{asset('frontend/plugins/slick/slick.min.js')}}"></script>
   <script src="{{asset('frontend/plugins/slick/slick-animation.min.js')}}"></script>
@@ -390,8 +390,8 @@
   <!-- Pour test formulaire demande -->
   <!-- <script src="{{asset('frontend/js/plugins.js')}}"></script>
   <script src="{{asset('frontend/js/app.js')}}"></script> -->
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script src="{{asset('backend/libs/jquery/jquery.min.js')}}"></script>
+  {{-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> --}}
+  {{-- <script src="{{asset('backend/libs/jquery/jquery.min.js')}}"></script> --}}
   <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
   {{-- <script src=https://cdnjs.cloudflare.com/ajax/libs/formvalidation/0.6.2-dev/js/formValidation.min.js></script> --}}
 
