@@ -133,15 +133,15 @@ return [
 
     'features' => [
         Features::registration(),
-        Features::resetPasswords(),
+        // Réinitialisation du mot de passe gérée par App\Http\Controllers\AccountController (lien valable 60 min) :
+        // celle de Fortify, inutilisée, est désactivée pour ne pas laisser une seconde porte d'entrée.
+        // Features::resetPasswords(),
         // Features::emailVerification(),
-        Features::updateProfileInformation(),
-        Features::updatePasswords(),
-        Features::twoFactorAuthentication([
-            'confirm' => true,
-            'confirmPassword' => true,
-            // 'window' => 0,
-        ]),
+        // Modification du profil, du mot de passe et double authentification : aucune page ne s'en sert
+        // (anciennes pages Jetstream retirées). Désactivées pour ne pas laisser de routes ouvertes.
+        // Features::updateProfileInformation(),
+        // Features::updatePasswords(),
+        // Features::twoFactorAuthentication(['confirm' => true, 'confirmPassword' => true]),
     ],
 
 ];

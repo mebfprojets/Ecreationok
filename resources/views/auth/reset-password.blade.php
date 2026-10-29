@@ -1,91 +1,40 @@
 @extends('layouts.frontend')
 @section('content')
-<div class="container" style="margin-top:-30px">
-    
-    <div class="alert-warning">
-        <p>Les champs en étoile rouge <span style="color: red">(*)</span> sont obligatoires</p>
+<div class="container my-4">
+    <div class="card shadow-sm mx-auto fenetre-compte" style="max-width: 520px; border-top: 4px solid #1b6b3a;">
+        <form action="{{ route('reset.password.post') }}" method="POST">
+            @csrf
+            <input type="hidden" name="token" value="{{ $token }}">
+
+            <div class="card-body p-4">
+                <h3 class="modal-title mb-1"><i class="fas fa-key me-2" aria-hidden="true"></i>Nouveau mot de passe</h3>
+                <p class="small text-muted mb-4">Saisissez l’adresse e-mail de votre compte puis choisissez un nouveau mot de passe.</p>
+
+                <div class="champ">
+                    <label class="form-label" for="reset_email">Adresse e-mail</label>
+                    <input id="reset_email" class="form-control" type="email" name="email" value="{{ old('email') }}"
+                           placeholder="Exemple : nom@gmail.com" required autocomplete="username">
+                </div>
+
+                <div class="champ">
+                    <label class="form-label" for="reset_password">Nouveau mot de passe</label>
+                    <input id="reset_password" class="form-control" type="password" name="password" placeholder="8 caractères minimum"
+                           minlength="8" required autocomplete="new-password">
+                </div>
+
+                <div class="champ">
+                    <label class="form-label" for="reset_password_confirmation">Confirmer le mot de passe</label>
+                    <input id="reset_password_confirmation" class="form-control" type="password" name="password_confirmation"
+                           placeholder="Saisissez à nouveau le mot de passe" minlength="8" required autocomplete="new-password">
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-success fw-semibold">
+                        <i class="fas fa-check me-1" aria-hidden="true"></i>Enregistrer le mot de passe
+                    </button>
+                </div>
+            </div>
+        </form>
     </div>
-<div class="content-form" >
-
-    <form action="{{ route('reset.password.post') }}" method="POST">
-
-        @csrf
-          
-        <input type="hidden" name="token" value="{{ $token }}">
-
-
-
-        <div class="form-group row">
-
-            <label for="email_address" class="col-md-4 col-form-label text-md-right">E-Mail Address</label>
-
-            <div class="col-md-6">
-
-                <input type="text" id="email_address" class="form-control" name="email" required autofocus>
-
-                @if ($errors->has('email'))
-
-                    <span class="text-danger">{{ $errors->first('email') }}</span>
-
-                @endif
-
-            </div>
-
-        </div>
-
-
-
-        <div class="form-group row">
-
-            <label for="password" class="col-md-4 col-form-label text-md-right">Password</label>
-
-            <div class="col-md-6">
-
-                <input type="password" id="password" class="form-control" name="password" autocomplete="new-password" required autofocus>
-
-                @if ($errors->has('password'))
-
-                    <span class="text-danger">{{ $errors->first('password') }}</span>
-
-                @endif
-
-            </div>
-
-        </div>
-
-
-
-        <div class="form-group row">
-
-            <label for="password-confirm" class="col-md-4 col-form-label text-md-right">Confirm Password</label>
-
-            <div class="col-md-6">
-
-                <input type="password" id="password-confirm" class="form-control" name="password_confirmation" required autofocus>
-
-                @if ($errors->has('password_confirmation'))
-
-                    <span class="text-danger">{{ $errors->first('password_confirmation') }}</span>
-
-                @endif
-
-            </div>
-
-        </div>
-
-
-
-        <div class="col-md-6 offset-md-4">
-
-            <button type="submit" class="btn btn-primary">
-
-                Reset Password
-
-            </button>
-
-        </div>
-
-    </form>
-</div>
 </div>
 @endsection

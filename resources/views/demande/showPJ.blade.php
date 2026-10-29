@@ -1,8 +1,9 @@
 @extends("backend.adminlte.main")
+@section('title', 'Pièce jointe')
 @section('dashboard', 'active')
 @section('content')
 
-  <div class="card card-success col-md-12 col-md-offset-2">
+  <div class="card card-success col-md-12">
     <div class="card-header">
       <h3 class="card-title">Detail sur la pièce</h3>
     </div>
@@ -45,7 +46,7 @@
     </div>
         <div class="col-lg-7 img-bg" style="cursor: pointer;">
                 <div style="box-shadow: 1px 2px 5px 1px #999">
-                  <embed src= "{{ Storage::disk('local')->url($piecejointe->url) }}" height=600 type='application/pdf' style="width: 100%;" />
+                  <iframe src="{{ route('piecejointe.voir', $piecejointe->id) }}" title="Pièce jointe" height="600" style="width: 100%; border: none;"></iframe>
             </div>
         </div>
         </div>

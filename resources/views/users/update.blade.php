@@ -1,11 +1,12 @@
 @extends("backend.adminlte.main")
+@section('title', 'Modifier un agent')
 @section('administration', 'menu-open')
 @section('administration-user', 'active')
 
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="card card-success col-md-12 col-md-offset-2">
+        <div class="card card-success col-md-12">
             <div class="card-header">
               <h3 class="card-title">Créer un utilisateur</h3>
             </div>
@@ -46,15 +47,15 @@
                     <div class="form-group{{ $errors->has('organisation') ? ' has-error' : '' }}">
                         <label class="col-md-4 control-label" for="organisation">Cefore </label>
                         <div class="col-md-6">
-                                <div class=" col-md-12 input-group ">
+                                <div class="col-md-12 input-group">
                                     <select  id="organisation" name="organisation" class="form-control">
                                     <option value="">Sélectionner une zone</option>
                                         <option value="001000"@if ($user->organisation=="001000")
                                             selected
                                         @endif>Central</option>
                                             @foreach ($organisations as $organisation)
-                                                <option value="{!!old('organisation') ?? $organisation->CodeOrganisation!!}"
-                                                    @if ($organisation->CodeOrganisation==$user->organisation)
+                                                <option value="{{ $organisation->CodeOrganisation }}"
+                                                    @if (old('organisation', $user->organisation) == $organisation->CodeOrganisation)
                                                         selected
                                                     @endif>{{ $organisation->Ville}}
                                                 </option>
@@ -101,12 +102,12 @@
                    <div class="form-group{{ $errors->has('organisation') ? ' has-error' : '' }}">
                             <label class="col-md-4 control-label" for="organisation">Zone<span class="text-success">*</span></label>
                             <div class="col-md-6">
-                                    <div class=" col-md-12 input-group ">
+                                    <div class="col-md-12 input-group">
                                         <select  id="organisation" name="organisation" class="form-control">
                                                 <option value="00100">Coordination</option>
                                                 @foreach ($zones as $zone)
-                                                    <option value="{!!old('organisation') ?? $zone->id!!}"
-                                                            @if ($user->zone==$zone->id)
+                                                    <option value="{{ $zone->id }}"
+                                                            @if (old('zone', $user->zone) == $zone->id)
                                                                         selected
                                                             @endif>{{ $zone->libelle}}
                                                     </option>
@@ -128,11 +129,11 @@
                 <div class="form-group{{ $errors->has('structure_rep') ? ' has-error' : '' }} structure_rep" >
                     <label class="col-md-4 control-label" for="structure_rep">Réprésentant : </label>
                     <div class="col-md-6">
-                            <div class=" col-md-12 input-group ">
+                            <div class="col-md-12 input-group">
                                 <select  id="" name="structure_rep" class="form-control" placeholder="Selectionner">
                                     <option></option>
                                         @foreach ($strucure_representees as $strucure_representee)
-                                            <option value="{!!old('structure_rep') ?? $strucure_representee->id!!}" @if($user->structure_represente== $strucure_representee->id)
+                                            <option value="{{ $strucure_representee->id }}" @if(old('structure_rep', $user->structure_represente) == $strucure_representee->id)
                                                 selected
                                             @endif>{{ $strucure_representee->libelle}}</option>
                                         @endforeach
@@ -151,12 +152,12 @@
                 <div class="form-group{{ $errors->has('banques') ? ' has-error' : '' }} banque" >
                     <label class="col-md-4 control-label" for="banque">Compte banque : </label>
                     <div class="col-md-6">
-                            <div class=" col-md-12 input-group ">
+                            <div class="col-md-12 input-group">
                                 <select  id="" name="banque" class="form-control select-select2" placeholder="Selectionner">
                                     <option></option>
                                         @foreach ($banques as $banque)
-                                            <option value="{!!old('banque') ?? $banque->id!!}"
-                                                 @if($user->banque_id == $banque->id)
+                                            <option value="{{ $banque->id }}"
+                                                 @if(old('banque', $user->banque_id) == $banque->id)
                                                 selected
                                             @endif>{{ $banque->nom}}</option>
                                         @endforeach
@@ -197,7 +198,7 @@
                         </div>
                 </fieldset>
                 <div class="form-group form-actions">
-                    <div class="col-md-8 col-md-offset-4">
+                    <div class="col-md-8">
                         <button type="submit" class="btn btn-sm btn-success"><i class="fa fa-arrow-right"></i> Modifier</button>
                         <a href="{{ route('user.index') }}" class="btn btn-sm btn-warning"><i class="fa fa-repeat"></i> Annuler</a>
                     </div>

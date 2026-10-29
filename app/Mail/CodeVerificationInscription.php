@@ -22,6 +22,7 @@ class CodeVerificationInscription extends Mailable
     public function build()
     {
         return $this->subject('Votre code de vérification e-Création : '.$this->code)
-            ->view('emails.code_inscription');
+            ->view('emails.code_inscription')
+            ->text('emails.texte.code_inscription');
     }
 }

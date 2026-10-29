@@ -2,35 +2,18 @@
 
 namespace App\Mail;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Mail\Mailable;
-use Illuminate\Queue\SerializesModels;
-
-class NotifyRejet extends Mailable
+/** E-mail au promoteur : sa demande est rejetée et doit être corrigée (motif saisi par l'agent). */
+class NotifyRejet extends NotificationDemande
 {
-    use Queueable, SerializesModels;
-
-    /**
-     * Create a new message instance.
-     *
-     * @return void
-     */
-    public $details;
-    public function __construct($details)
-    {
-        //
-        $this->details = $details;
-    }
- 
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
     public function build()
     {
-        $det=$this->details;
-        return $this->view('mail.notify_rejet',compact('det'))->subject("Notification de Rejet de Votre Demande sur la plateforme e-création");
+        $donnees = $this->donnees();
+        $donnees['motif'] = (string) $this->demande->motif;
+        $donnees['lien'] .= '#correction';
+
+        return $this->subject('Votre demande « '.$donnees['entreprise'].' » doit être corrigée')
+            ->view('emails.demande_rejetee')
+            ->text('emails.texte.demande_rejetee')
+            ->with($donnees);
     }
 }

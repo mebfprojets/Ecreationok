@@ -10,6 +10,13 @@ class PermissionController extends Controller
      public function __construct()
      {
          $this->middleware('auth');
+         // Gestion des permissions : réservée aux administrateurs (même droit que le menu « Administration »)
+         $this->middleware(function ($request, $next) {
+             if (!$request->user()->can('user.create')) {
+                 return $this->refuserAcces();
+             }
+             return $next($request);
+         });
      }
     /**
      * Display a listing of the resource.

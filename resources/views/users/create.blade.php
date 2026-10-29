@@ -1,11 +1,12 @@
 @extends("backend.adminlte.main")
+@section('title', 'Nouvel agent')
 @section('administration', 'menu-open')
 @section('administration-user', 'active') 
 
 @section('content')
 <div class="container">
     <div class="row">
-                <div class="card card-success col-md-12 col-md-offset-2">
+                <div class="card card-success col-md-12">
                     <div class="card-header">
                       <h3 class="card-title">Créer un utilisateur</h3>
                     </div>
@@ -45,12 +46,12 @@
                              <div class="form-group{{ $errors->has('organisation') ? ' has-error' : '' }}">
                                     <label class="col-md-4 control-label" for="organisation">Cefore </label>
                                     <div class="col-md-6">
-                                            <div class=" col-md-12 input-group ">
+                                            <div class="col-md-12 input-group">
                                                 <select  id="organisation" name="organisation" class="form-control">
                                                 <option value="">Sélectionner une zone</option>
                                                     <option value="001000">Central</option>
                                                         @foreach ($organisations as $organisation)
-                                                            <option value="{!!old('organisation') ?? $organisation->CodeOrganisation!!}">{{ $organisation->Ville}}
+                                                            <option value="{{ $organisation->CodeOrganisation }}" @if (old('organisation') == $organisation->CodeOrganisation) selected @endif>{{ $organisation->Ville}}
                                                             </option>
                                                             @endforeach
                                                         </select>
@@ -110,7 +111,7 @@
     
                         </fieldset>
                         <div class="form-group form-actions">
-                            <div class="col-md-8 col-md-offset-4">
+                            <div class="col-md-8">
                                 <button type="submit" class="btn btn-sm btn-sucess"><i class="fa fa-arrow-right"></i> Submit</button>
                                 <a href="{{ route('user.index') }}" class="btn btn-sm btn-warning"><i class="fa fa-repeat"></i> Annuler</a>
                             </div>

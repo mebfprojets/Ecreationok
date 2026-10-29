@@ -1,25 +1,24 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head><meta charset="utf-8"><title>Code de vérification</title></head>
-<body style="margin:0; padding:24px; background:#f4f6f5; font-family:Arial, Helvetica, sans-serif; color:#2b2b2b;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:520px; margin:0 auto; background:#ffffff; border-radius:10px; border-top:6px solid #1b6b3a;">
+@extends('emails.layout')
+
+@section('titre', 'Code de vérification')
+@section('apercu', 'Votre code de vérification e-Création : '.$code.' (valable '.$dureeMinutes.' minutes).')
+
+@section('contenu')
+    <p style="margin:0 0 14px;">Bonjour,</p>
+    <p style="margin:0 0 18px;">
+        Vous créez un compte sur la plateforme <strong>e-Création</strong>.
+        Pour confirmer votre adresse e-mail, saisissez ce code dans le formulaire d’inscription :
+    </p>
+
+    <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto 18px;">
         <tr>
-            <td style="padding:28px;">
-                <h1 style="font-size:20px; margin:0 0 12px;">Vérification de votre adresse e-mail</h1>
-                <p style="margin:0 0 16px; line-height:1.5;">
-                    Vous créez un compte sur la plateforme <strong>e-Création</strong> de la Maison de l’Entreprise du Burkina Faso.
-                    Saisissez le code ci-dessous dans le formulaire d’inscription :
-                </p>
-                <p style="text-align:center; margin:24px 0;">
-                    <span style="display:inline-block; font-size:32px; font-weight:bold; letter-spacing:8px; padding:12px 20px; background:#eef7f1; border:1px dashed #1b6b3a; border-radius:8px; color:#1b6b3a;">{{ $code }}</span>
-                </p>
-                <p style="margin:0 0 8px; line-height:1.5;">Ce code est valable <strong>{{ $dureeMinutes }} minutes</strong>.</p>
-                <p style="margin:0; line-height:1.5; color:#666; font-size:13px;">
-                    Si vous n’êtes pas à l’origine de cette demande, ignorez simplement ce message : aucun compte ne sera créé.
-                    Ne communiquez jamais ce code à personne.
-                </p>
-            </td>
+            <td style="background:#f3f9f5; border:2px dashed #1b6b3a; border-radius:8px; padding:14px 26px; font-size:32px; font-weight:bold; letter-spacing:8px; color:#1b6b3a; font-family:'Courier New', Courier, monospace;">{{ $code }}</td>
         </tr>
     </table>
-</body>
-</html>
+
+    <p style="margin:0 0 8px; text-align:center;">Ce code est valable <strong>{{ $dureeMinutes }} minutes</strong>.</p>
+    <p style="margin:18px 0 0; font-size:13px; color:#6b7570;">
+        Vous n’êtes pas à l’origine de cette demande ? Ignorez simplement ce message : aucun compte ne sera créé.
+        Ne communiquez jamais ce code à personne.
+    </p>
+@endsection

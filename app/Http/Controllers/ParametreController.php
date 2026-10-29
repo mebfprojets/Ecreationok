@@ -124,7 +124,12 @@ class ParametreController extends Controller
      */
     public function destroy( $id)
     {
+        // Même droit que pour modifier un paramètre
+        if (!Auth::user()->can('parametre.create')) {
+            return $this->refuserAcces();
+        }
         Parametre::destroy($id);
+        flash('Le paramètre a été supprimé.')->success();
         return redirect( route('parametres.index'));
     }
 }

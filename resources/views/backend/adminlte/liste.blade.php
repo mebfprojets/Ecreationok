@@ -1,4 +1,5 @@
 @extends('backend.adminlte.main')
+@section('title'){{ $dem === 'demande_a_valider' ? 'Demandes à valider' : 'Demandes validées' }}@endsection
 @section('demandes', 'menu-open')
 @section($dem, 'active')
 @section('content')

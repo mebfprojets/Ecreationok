@@ -1,126 +1,30 @@
-<footer class="main-footer">
-    <strong>Copyright &copy; 2023 <a href="https://me.bf">MEBF</a></strong>
-    All rights reserved.
-    
+  <footer class="app-footer">
+    <div class="float-end d-none d-sm-inline small text-secondary">Espace agents des CEFORE</div>
+    <strong>&copy; {{ date('Y') }} <a href="https://me.bf" class="text-decoration-none">Maison de l’Entreprise du Burkina Faso</a></strong>
   </footer>
-
-  <!-- Control Sidebar -->
-  <aside class="control-sidebar control-sidebar-dark">
-    <!-- Control sidebar content goes here -->
-  </aside>
-  <!-- /.control-sidebar -->
 </div>
-<!-- ./wrapper -->
 
-<!-- jQuery -->
-<!-- For Backend -->
-<!-- Gestionnaires data-csp-* (remplacent les onclick/onchange interdits par la CSP) -->
-<script src="{{asset('js/csp-handlers.js')}}"></script>
-<!-- Messages lisibles pour les erreurs des appels AJAX -->
-<script src="{{asset('js/erreurs-ajax.js')}}"></script>
-<script src="{{asset('adminlte/plugins/jquery/jquery.min.js')}}"></script>
-<script src="{{asset('adminlte/plugins/datatables/jquery.dataTables.min.js')}}"></script>
-<script src="{{asset('adminlte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
-<script src="{{asset('adminlte/plugins/datatables-responsive/js/dataTables.responsive.min.js')}}"></script>
-<script src="{{asset('adminlte/plugins/datatables-responsive/js/responsive.bootstrap4.min.js')}}"></script>
-<script src="{{asset('adminlte/plugins/datatables-buttons/js/dataTables.buttons.min.js')}}"></script>
-<script src="{{asset('adminlte/plugins/datatables-buttons/js/buttons.bootstrap4.min.js')}}"></script>
-<script src="{{asset('adminlte/plugins/jszip/jszip.min.js')}}"></script>
-<script src="{{asset('adminlte/plugins/pdfmake/pdfmake.min.js')}}"></script>
-<script src="{{asset('adminlte/plugins/pdfmake/vfs_fonts.js')}}"></script>
-<script src="{{asset('adminlte/plugins/datatables-buttons/js/buttons.html5.min.js')}}"></script>
-<script src="{{asset('adminlte/plugins/datatables-buttons/js/buttons.print.min.js')}}"></script>
-<script src="{{asset('adminlte/plugins/datatables-buttons/js/buttons.colVis.min.js')}}"></script>
-<!-- End Backend -->
-<!-- jQuery UI -->
-<script src="{{asset('adminlte/plugins/jquery-ui/jquery-ui.min.js')}}"></script>
-<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
-<script nonce="{{ $cspNonce ?? '' }}">
-  $.widget.bridge('uibutton', $.ui.button)
-</script>
-<!-- Bootstrap 4 -->
-<script src="{{asset('adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
-<!-- ChartJS -->
-<script src="{{asset('adminlte/plugins/chart.js/Chart.min.js')}}"></script>
-<!-- Sparkline -->
-<script src="{{asset('adminlte/plugins/sparklines/sparkline.js')}}"></script>
-<!-- JQVMap -->
-<script src="{{asset('adminlte/plugins/jqvmap/jquery.vmap.min.js')}}"></script>
-<script src="{{asset('adminlte/plugins/jqvmap/maps/jquery.vmap.usa.js')}}"></script>
-<!-- jQuery Knob Chart -->
-<script src="{{asset('adminlte/plugins/jquery-knob/jquery.knob.min.js')}}"></script>
-<!-- daterangepicker -->
-<script src="{{asset('adminlte/plugins/moment/moment.min.js')}}"></script>
-<!-- <script src="plugins/daterangepicker/daterangepicker.js"></script> -->
-<!-- Tempusdominus Bootstrap 4 -->
-<script src="{{asset('adminlte/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js')}}"></script>
-<!-- Summernote -->
-<script src="{{asset('adminlte/plugins/summernote/summernote-bs4.min.js')}}"></script>
-<!-- overlayScrollbars -->
-<script src="{{asset('adminlte/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js')}}"></script>
-
-
-
-
-
-<!-- AdminLTE App -->
-<script src="{{asset('adminlte/dist/js/adminlte.js')}}"></script>
-<!-- AdminLTE for demo purposes -->
-<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-<script src="{{asset('adminlte/dist/js/pages/dashboard.js')}}"></script>
-<script src="{{asset('backend/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js')}}"></script>
-
-
-<script nonce="{{ $cspNonce ?? '' }}">
-  $(function(){
-      $('.date_piecejointe').datepicker({
-              autoclose: true,
-              endDate: new Date(),
-              language: 'fr',
-              dateFormat: 'dd-mm-yy',
-             
-  });
-  });
-</script>
-<script nonce="{{ $cspNonce ?? '' }}">
-  $(function () {
-    $("#example1").DataTable({
-      "responsive": true, "lengthChange": false, "autoWidth": false,
-      "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-    $('#example2').DataTable({
-      "paging": true,
-      "lengthChange": false,
-      "searching": false,
-      "ordering": true,
-      "info": true,
-      "autoWidth": false,
-      "responsive": true,
-    });
-  });
-</script>
-
-<script nonce="{{ $cspNonce ?? '' }}">
-  $('#flash-overlay-modal').modal();
-</script>
-<script nonce="{{ $cspNonce ?? '' }}">
-  $('div.alert').not('.alert-important').delay(3000).fadeOut(350);
-  </script>
-      <script nonce="{{ $cspNonce ?? '' }}">
-        $(document).ready(function() {
-           /** add active class and stay opened when selected */
-          var url = window.location;
-
-          // for sidebar menu entirely but not cover treeview
-          $('ul.sidebar-menu a').filter(function() {
-            return this.href == url;
-          }).parent().addClass('active');
-
-          // for treeview
-          $('ul.treeview-menu a').filter(function() {
-            return this.href == url;
-          }).parentsUntil(".sidebar-menu > .treeview-menu").addClass('active');
-        });
-        </script>
+{{-- Bibliothèques servies depuis public/vendor (versions listées dans public/vendor/VERSIONS.md) --}}
+<script src="{{ asset('vendor/bootstrap-5.3.8/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('vendor/adminlte-4.10.0/adminlte.min.js') }}"></script>
+<script src="{{ asset('vendor/datatables-2.3.8/dataTables.min.js') }}"></script>
+<script src="{{ asset('vendor/datatables-2.3.8/dataTables.bootstrap5.min.js') }}"></script>
+<script src="{{ asset('vendor/datatables-2.3.8/dataTables.responsive.min.js') }}"></script>
+<script src="{{ asset('vendor/datatables-2.3.8/responsive.bootstrap5.min.js') }}"></script>
+<script src="{{ asset('vendor/datatables-2.3.8/dataTables.buttons.min.js') }}"></script>
+<script src="{{ asset('vendor/datatables-2.3.8/buttons.bootstrap5.min.js') }}"></script>
+<script src="{{ asset('vendor/jszip-3.10.2/jszip.min.js') }}"></script>
+<script src="{{ asset('vendor/pdfmake-0.2.23/pdfmake.min.js') }}"></script>
+<script src="{{ asset('vendor/pdfmake-0.2.23/vfs_fonts.js') }}"></script>
+<script src="{{ asset('vendor/datatables-2.3.8/buttons.html5.min.js') }}"></script>
+<script src="{{ asset('vendor/datatables-2.3.8/buttons.print.min.js') }}"></script>
+<script src="{{ asset('vendor/datatables-2.3.8/buttons.colVis.min.js') }}"></script>
+<script src="{{ asset('backend/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+{{-- Gestionnaires data-csp-* (remplacent les onclick/onchange interdits par la CSP) --}}
+<script src="{{ asset_version('js/csp-handlers.js') }}"></script>
+{{-- Messages lisibles pour les erreurs des appels AJAX --}}
+<script src="{{ asset_version('js/erreurs-ajax.js') }}"></script>
+{{-- Tableaux, calendriers et messages de l'espace agents --}}
+<script src="{{ asset_version('js/espace-agents.js') }}"></script>
 </body>
 </html>

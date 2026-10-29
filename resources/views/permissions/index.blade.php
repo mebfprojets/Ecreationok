@@ -1,15 +1,13 @@
 @extends("backend.adminlte.main")
+@section('title', 'Permissions')
 @section('administration', 'menu-open')
 @section('administration-permission', 'active')
 @section('content')
-<div class="block-title">
-    <center><h2><strong>Liste des Permissions</strong></h2></center>                    
-</div>
 <div class="card">                           
               <!-- /.card-header -->
               <div class="card-body">
                     @can('user.create', Auth::user()) 
-                        <a href="{{ route('permissions.create') }}" class="btn btn-block btn-success col-md-2 mt-2" type="button"><span><i class="fa fa-plus"></i></span>Permission</a>
+                        <a href="{{ route('permissions.create') }}" class="btn d-block w-100 btn-success col-md-2 mt-2" type="button"><span><i class="fa fa-plus"></i></span>Permission</a>
                     @endcan
                     <br>
 
@@ -35,8 +33,8 @@
                     <td class="text-center">
                        
                     <a href="#" class="btn btn-sm btn-success" style="background:#3393FF" title="Afficher les détais"> <i class="fa fa-eye"></i></a>
-                            <a href="{{ route('permissions.edit', $permission) }}" data-toggle="tooltip" title="Edit" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></a>                        
-                                <a href="#modal-confirm-delete" data-csp-click="delConfirm" data-csp-click-args="{{ json_encode([($permission->id)]) }}" style="background:#3393FF" data-toggle="modal" title="Supprimer" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
+                            <a href="{{ route('permissions.edit', $permission) }}" data-bs-toggle="tooltip" title="Edit" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></a>                        
+                                <a href="#modal-confirm-delete" data-csp-click="delConfirm" data-csp-click-args="{{ json_encode([($permission->id)]) }}" style="background:#3393FF" data-bs-toggle="modal" title="Supprimer" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
                         
                     </td>
                 </tr>
@@ -70,8 +68,8 @@
                         <input type="hidden" name="id_table" id="id_table">
                             <p>Voulez-vous vraiment Supprimer cette permission ??</p>
                         <div class="form-group form-actions">
-                            <div class="text-right">
-                                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Fermer</button>
+                            <div class="text-end">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Fermer</button>
                                 <button type="submit" class="btn btn-sm btn-primary" data-csp-click="supp_id">OUI</button>
                             </div>
                         </div>

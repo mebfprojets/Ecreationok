@@ -75,7 +75,6 @@ FACEBOOK: https://www.facebook.com/themefisher
   <!-- The main stylesheet of this template. All Bootstrap overwrites are defined in here -->
 
  
-  {{--<link rel="stylesheet" href="{{asset('adminlte/dist/css/adminlte.min.css')}}">--}}
   
 <!-- Pour test de formulaire demande -->
 <link href="{{asset('backend/libs/select2/css/select2.min.css')}}" rel="stylesheet" type="text/css">
@@ -96,7 +95,7 @@ FACEBOOK: https://www.facebook.com/themefisher
 <link rel="stylesheet" href="{{asset('/css/jquery.steps.css')}}">
 
   <!--  -->
-<link rel="stylesheet" href="{{asset('adminlte/plugins/fontawesome-free/css/all.min.css')}}"> 
+<link rel="stylesheet" href="{{asset('vendor/fontawesome-free-5.15.4/css/all.min.css')}}"> 
 
 
 <!-- Pour la signature -->
@@ -267,6 +266,15 @@ FACEBOOK: https://www.facebook.com/themefisher
                     <ul class="nav navbar-nav mr-auto">                     
                       <li class="nav-item"><a class="nav-link" href="{{ route('index') }}">Accueil</a></li>
                       @auth
+                        @if (Auth::user()->isadmin != null)
+                          {{-- Agents : accès direct à l'espace agents (tableau de bord, ou administration pour un compte sans accès aux demandes) --}}
+                          @php $lienEspaceAgents = Auth::user()->can('lister.demande') || !Auth::user()->can('user.create') ? route('dashboard') : route('user.index'); @endphp
+                          <li class="nav-item">
+                            <a class="nav-link fw-bold px-3" href="{{ $lienEspaceAgents }}" style="background:#0b9e44; border-radius:4px;" title="Espace agents">
+                              <i class="fas fa-tachometer-alt me-1" aria-hidden="true"></i>Tableau de bord
+                            </a>
+                          </li>
+                        @endif
                         <li class="nav-item"><a class="nav-link" href="{{ route('create.usager') }}">Créer une demande</a></li>
                         @if(nbr_demande()>0)
                         <li class="nav-item"><a class="nav-link" href="{{route('demande.liste')}}">Mes demandes</a></li>
@@ -318,7 +326,11 @@ FACEBOOK: https://www.facebook.com/themefisher
                 {{-- <li>
                     <a href="page_ready_lock_screen.html"><i class="fa fa-lock fa-fw pull-right"></i> Lock Account</a>
                 </li> --}}
-                
+                @if (Auth::user()->isadmin != null)
+                  <li>
+                    <a href="{{ $lienEspaceAgents }}"><i class="fas fa-tachometer-alt fa-fw pull-right" aria-hidden="true"></i> Tableau de bord</a>
+                  </li>
+                @endif
               <li>
                     <a href="{{ route('logout') }}"
                     data-csp-click="__deconnexion"><i class="fa fa-ban fa-fw pull-right"></i>

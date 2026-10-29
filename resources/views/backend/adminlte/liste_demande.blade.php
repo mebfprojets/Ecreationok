@@ -1,4 +1,5 @@
 @extends('backend.adminlte.main')
+@section('title', 'Demandes par statut de paiement')
 @section('demandes', 'menu-open')
 @section('dashboard', 'active')
 @section('content')
@@ -47,7 +48,7 @@
                     <td>{{$demande->primary_activity}}</td>
                     <td>{{$demande->objet_social}}</td>
                     <td>{{$demande->organisation_code}}</td>
-                    <td>{{format_date($demande->date_paiement)}}</td>
+                    <td>{{ $demande->date_paiement ? format_date($demande->date_paiement) : "—" }}</td>
                   </tr>
                   @endforeach
                   </tbody>

@@ -296,10 +296,77 @@ class UsagerController extends Controller
 
     public function promoteur()
     {
-        $usagers= Usager::where('id', '!=', null)->orderBy('updated_at', 'desc')
-        //->take(100)
-        ->get();
-        return view('usager.adminliste', compact('usagers'));
+        // Données personnelles des promoteurs : agents chargés des demandes uniquement
+        if (!Auth::user()->can('lister.demande')) {
+            return $this->refuserAcces();
+        }
+        // Le tableau est rempli page par page par promoteur_donnees() (plus de 14 000 promoteurs)
+        return view('usager.adminliste');
+    }
+
+    /** Liste des promoteurs au format DataTables (traitement côté serveur), limitée au CEFORE de l'agent. */
+    public function promoteur_donnees(Request $request)
+    {
+        if (!Auth::user()->can('lister.demande')) {
+            abort(403);
+        }
+        $p = $this->parametresTableau($request, [0 => 'usagers.NomRaisonSociale', 1 => 'usagers.DateNaissance', 2 => 'usagers.CIN',
+            3 => 'usagers.created_at', 4 => 'u.email'], 'usagers.created_at');
+        $siege = $this->estAgentSiege(Auth::user());
+        $organisation = Auth::user()->organisation;
+
+        $base = Usager::query()->leftJoin('users as u', 'u.id', '=', 'usagers.user_id')
+            ->when(!$siege, fn ($q) => $q->whereExists(fn ($e) => $e->select(DB::raw(1))->from('demandes as d')
+                ->whereColumn('d.usager_id', 'usagers.id')->where('d.organisation_code', $organisation)));
+        $total = (clone $base)->count();
+        if ($p['motif']) {
+            $base->where(function ($q) use ($p) {
+                $q->where(DB::raw("CONCAT(usagers.NomRaisonSociale, ' ', usagers.Prenom)"), 'like', $p['motif'])
+                  ->orWhere(DB::raw("CONCAT(usagers.Prenom, ' ', usagers.NomRaisonSociale)"), 'like', $p['motif'])
+                  ->orWhere('usagers.CIN', 'like', $p['motif'])
+                  ->orWhere('u.email', 'like', $p['motif']);
+            });
+        }
+        $filtre = (clone $base)->count();
+
+        $usagers = $base->orderBy($p['tri'], $p['sens'])->orderBy('usagers.id', 'desc')->skip($p['debut'])->take($p['longueur'])
+            ->get(['usagers.id', 'usagers.NomRaisonSociale', 'usagers.Prenom', 'usagers.DateNaissance', 'usagers.CIN', 'usagers.created_at', 'u.email as compte_email']);
+
+        // Demandes des promoteurs de la page : une seule requête pour toutes les lignes
+        $demandes = \App\Models\Demande::whereIn('usager_id', $usagers->pluck('id'))
+            ->when(!$siege, fn ($q) => $q->where('organisation_code', $organisation))
+            ->orderBy('created_at', 'desc')
+            ->get(['id', 'usager_id', 'commercial_name', 'denomination_social', 'etat', 'paye', 'created_at'])
+            ->groupBy('usager_id');
+
+        $date = function ($v, $format = 'd/m/Y') {
+            if (!$v) { return '—'; }
+            try { return \Carbon\Carbon::parse($v)->format($format); } catch (\Throwable $e) { return e($v); }
+        };
+        $lignes = $usagers->map(function ($u) use ($demandes, $date) {
+            $liste = $demandes->get($u->id, collect());
+            $derniere = $liste->first();
+            if ($derniere) {
+                [$libelle, $couleur] = (int) $derniere->paye !== 1 ? ['Non payée', 'secondary']
+                    : ([1 => ['Validée', 'success'], 2 => ['Rejetée', 'danger']][(int) $derniere->etat] ?? ['À valider', 'warning']);
+                $demandeHtml = '<a href="'.e(route('detail.demande', $derniere->id)).'" class="fw-semibold text-decoration-none">'
+                    .e($derniere->commercial_name ?: $derniere->denomination_social).'</a> <span class="badge text-bg-'.$couleur.'">'.$libelle.'</span>'
+                    .'<div class="small text-muted">du '.$date($derniere->created_at).'</div>';
+            } else {
+                $demandeHtml = '<span class="text-muted">Aucune demande</span>';
+            }
+            return [
+                e(trim($u->NomRaisonSociale.' '.$u->Prenom)),
+                $date($u->DateNaissance),
+                $u->CIN ? e($u->CIN) : '—',
+                $date($u->created_at),
+                $u->compte_email ? e($u->compte_email) : '<span class="text-muted">Aucun compte</span>',
+                $demandeHtml,
+                $liste->count(),
+            ];
+        });
+
+        return response()->json(['draw' => (int) $request->input('draw'), 'recordsTotal' => $total, 'recordsFiltered' => $filtre, 'data' => $lignes]);
     }
 
     public function rechercher(Request $request)

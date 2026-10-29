@@ -364,16 +364,14 @@
 
   <!-- Javascript Files
   ================================================== -->
-  {{-- <script src="{{asset('adminlte/plugins/jquery/jquery.min.js')}}"></script> --}}
-  {{-- <script src="{{asset('adminlte/dist/js/adminlte.min.js')}}"></script> --}}
   <!-- initialize jQuery Library -->
   {{-- <script src="{{asset('frontend/js/vendor/jquery.min.js')}}"></script> --}}
 
   {{-- <script src="{{asset('frontend/plugins/jQuery/jquery.min.js')}}"></script> --}}
   <!-- Gestionnaires data-csp-* (remplacent les onclick/onchange interdits par la CSP) -->
-  <script src="{{asset('js/csp-handlers.js')}}"></script>
+  <script src="{{asset_version('js/csp-handlers.js')}}"></script>
   <!-- Messages lisibles pour les erreurs des appels AJAX -->
-  <script src="{{asset('js/erreurs-ajax.js')}}"></script>
+  <script src="{{asset_version('js/erreurs-ajax.js')}}"></script>
   <!-- Slick Carousel -->
   <script src="{{asset('frontend/plugins/slick/slick.min.js')}}"></script>
   <script src="{{asset('frontend/plugins/slick/slick-animation.min.js')}}"></script>
@@ -420,7 +418,7 @@
   
   <!-- Pour la signature -->
   <!--  -->
-  <script src="{{asset('adminlte/plugins/jquery-ui/jquery-ui.min.js')}}"></script>
+  <script src="{{asset('vendor/jquery-ui-1.14.1/jquery-ui.min.js')}}"></script>
   <script src="{{asset('backend/js/signature.js')}}"></script>
   <script src="{{asset('frontend/js/front-personal.js')}}"></script>
   <script src="{{asset('backend/js/loaddata.js')}}"></script>

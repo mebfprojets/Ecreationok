@@ -1,4 +1,5 @@
 @extends("backend.adminlte.main")
+@section('title', 'Nouvelle valeur')
 @section('administration', 'menu-open')
 @section('administration-valeur', 'active')
 @section('content')
@@ -6,8 +7,8 @@
         <div class="block">
             <!-- Basic Form Elements Title -->
             <div class="block-title">
-                <div class="block-options pull-right">
-                    <a href="#" data-csp-click="__aucune" class="btn btn-alt btn-sm btn-default toggle-bordered enable-tooltip" data-toggle="button" title="Toggles .form-bordered class">No Borders</a>
+                <div class="block-options float-end">
+                    <a href="#" data-csp-click="__aucune" class="btn btn-alt btn-sm btn-outline-secondary toggle-bordered enable-tooltip" data-bs-toggle="button" title="Toggles .form-bordered class">No Borders</a>
                 </div>
                 <h2><strong>Creation</strong> de valeur</h2>
             </div>
@@ -95,7 +96,7 @@
                 </div>
             </div>
                 <div class="form-group form-actions">
-                    <div class="col-md-9 col-md-offset-3">
+                    <div class="col-md-9">
                         <button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-angle-right"></i> Enregistrers</button>
                         <a href="{{ route('valeurs.index') }}" class="btn btn-sm btn-warning"><i class="fa fa-repeat"></i>Annuler</a>
                     </div>

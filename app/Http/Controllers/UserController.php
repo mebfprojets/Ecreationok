@@ -29,28 +29,60 @@ class UserController extends Controller
     }
     public function index()
     {
-    //  if (Auth::user()->can('user.create')) {
+        // Comptes des agents : réservé aux administrateurs (même droit que le menu « Administration »)
+        if (!Auth::user()->can('user.create')) {
+            return $this->refuserAcces();
+        }
         $users= User::with("roles")->where('isadmin','!=',null)->orderBy('updated_at', 'desc')->get();
         return view('users.index', compact("users"));
-    //  }
-    //  else{
-    //      flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
-    //      return redirect()->back();
-    //  }
     }
     public function compte()
     {
-    //  if (Auth::user()->can('user.create')) {
-        $users= User::where('isadmin', '=', null)->orderBy('updated_at', 'desc')->get();
-        return view('users.compte', compact("users"));
-    //  }
-    //  else{
-    //      flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
-    //      return redirect()->back();
-    //  }
+        // Comptes des promoteurs (données personnelles) : agents chargés des demandes uniquement
+        if (!Auth::user()->can('lister.demande')) {
+            return $this->refuserAcces();
+        }
+        // Le tableau est rempli page par page par compte_donnees() (plus de 15 000 comptes)
+        return view('users.compte');
     }
-    public function store_user(){
-        dd('oko');
+
+    /** Comptes des promoteurs au format DataTables (traitement côté serveur), limités au CEFORE de l'agent. */
+    public function compte_donnees(Request $request)
+    {
+        if (!Auth::user()->can('lister.demande')) {
+            abort(403);
+        }
+        $p = $this->parametresTableau($request, [0 => 'users.name', 1 => 'users.email', 2 => 'users.created_at'], 'users.created_at');
+        $siege = $this->estAgentSiege(Auth::user());
+        $organisation = Auth::user()->organisation;
+
+        $base = User::query()->whereNull('users.isadmin')
+            ->leftJoin('usagers as us', 'us.user_id', '=', 'users.id')
+            ->when(!$siege, fn ($q) => $q->whereExists(fn ($e) => $e->select(DB::raw(1))->from('demandes as d')
+                ->whereColumn('d.usager_id', 'us.id')->where('d.organisation_code', $organisation)));
+        $total = (clone $base)->count();
+        if ($p['motif']) {
+            $base->where(function ($q) use ($p) {
+                $q->where('users.name', 'like', $p['motif'])->orWhere('users.prenom', 'like', $p['motif'])
+                  ->orWhere('users.email', 'like', $p['motif'])
+                  ->orWhere(DB::raw("CONCAT(us.NomRaisonSociale, ' ', us.Prenom)"), 'like', $p['motif']);
+            });
+        }
+        $filtre = (clone $base)->count();
+
+        $lignes = $base->orderBy($p['tri'], $p['sens'])->orderBy('users.id', 'desc')->skip($p['debut'])->take($p['longueur'])
+            ->get(['users.id', 'users.name', 'users.prenom', 'users.email', 'users.created_at', 'users.email_verified_at',
+                'us.NomRaisonSociale', 'us.Prenom as us_prenom',
+                DB::raw('(SELECT COUNT(*) FROM demandes d2 WHERE d2.usager_id = us.id) AS nb_demandes')])
+            ->map(fn ($u) => [
+                e(trim($u->prenom.' '.$u->name)),
+                e($u->email).($u->email_verified_at ? ' <i class="fas fa-check-circle text-success" title="Adresse vérifiée" aria-hidden="true"></i>' : ''),
+                $u->created_at ? $u->created_at->format('d/m/Y') : '—',
+                $u->NomRaisonSociale ? e(trim($u->NomRaisonSociale.' '.$u->us_prenom)) : '<span class="text-muted">Aucun</span>',
+                (int) $u->nb_demandes,
+            ]);
+
+        return response()->json(['draw' => (int) $request->input('draw'), 'recordsTotal' => $total, 'recordsFiltered' => $filtre, 'data' => $lignes]);
     }
 
     /**
@@ -180,31 +212,6 @@ class UserController extends Controller
     {
         //
     }
-public function updateuser(Request $request, User $user)
-        {
-        if (Auth::user()->can('user.create')) {
-            dd("ok");
-            $user->update([
-                    'name' => $request ['nom'],
-                    'prenom'=> $request ['prenom'],
-                    'telephone'=> $request ['telephone'],
-                    'email' => $request['email']
-                ]);
-
-            if(!empty($request['password']))
-            {
-                $user->update([
-                    'password' => bcrypt($request['password'])
-                ]);
-            }
-            flash("Utilisateur modifié avec succès!!!")->error();
-            return redirect()->back();
-        }
-        else{
-            flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
-            return redirect()->back();
-        }
-}
 public function verifier_conformite_cpt(Request $request){ 
     $entreprises=Entreprise::where('code_promoteur',$request->code_promoteur)->where("participer_a_la_formation",1)->where("decision_du_comite_phase1","selectionnee")->get();
     $user=User::where("code_promoteur",$request->code_promoteur)->first();

@@ -1,16 +1,14 @@
 @extends("backend.adminlte.main")
+@section('title', 'Agents')
 @section('administration', 'menu-open')
 @section('administration-user', 'active') 
 
 @section('content')
-<div class="block-title">
-    <center><h2><strong>Liste des Utilisateurs</strong></h2></center>                    
-</div>
 <div class="card">                           
               <!-- /.card-header -->
               <div class="card-body">
               @can('user.create', Auth::user())
-            <a href="{{ route('user.create') }}" class="btn btn-success col-md-2 pull-right mt-2"><span><i class="fa fa-plus"></i></span>User</a>
+            <a href="{{ route('user.create') }}" class="btn btn-success col-md-2 float-end mt-2"><span><i class="fa fa-plus"></i></span>User</a>
             @endcan<br><br>
                 <table id="example1" class="table table-bordered table-striped">
                   <thead>
@@ -43,7 +41,7 @@
                          @can('user.update',Auth::user())
 
                             <a href="#" class="btn btn-sm btn-success" style="background:#3393FF" title="Afficher les détais"> <i class="fa fa-eye"></i></a>
-                            <a href="{{ route('user.edit',$user) }}" data-toggle="tooltip" title="Edit" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></a>
+                            <a href="{{ route('user.edit',$user) }}" data-bs-toggle="tooltip" title="Edit" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></a>
 
                          @endcan 
                     </td>                
@@ -85,8 +83,8 @@
                                 <p>Voulez-vous vraiment Reinitialiser?</p>
                             </div>
                             <input type="hidden" name="id_table" id="id_table">
-                            <div class="text-right">
-                                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
+                            <div class="text-end">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
                                 <button type="button" class="btn btn-sm btn-primary" data-csp-click="recu_id">OUI</button>
                             </div>
 
@@ -107,26 +105,26 @@
 
                 <!-- Modal Body -->
                 <div class="modal-body form-bordered">
-                        <div class="row col-md-offset-2">
+                        <div class="row">
                             <label class="col-md-3 control-label">NOM</label> <div class="col-md-8"><span id="nom_user"></span></div>
                         </div>
 
-                        <div class="row col-md-offset-2">
+                        <div class="row">
                             <label class="col-md-3 control-label">PRENOM</label> <div class="col-md-8"> <span  id="prenom_user"></span></div>
                         </div>
 
-                        <div class="row col-md-offset-2">
+                        <div class="row">
                                 <label class="col-md-3 control-label">EMAIL</label> <div class="col-md-8"> <span  id="email_user"></span></div>
                         </div>
-                        <div class="row col-md-offset-2">
+                        <div class="row">
                                 <label class="col-md-3 control-label">TELEPHONE</label> <div class="col-md-8"> <span  id="telephone_user"></span></div>
                         </div>
 
-                        <div class="row col-md-offset-2">
+                        <div class="row">
                                 <label class="col-md-3 control-label">Login</label> <div class="col-md-8"> <span  id="login_user"></span></div>
                         </div>
-                            <div class="text-right">
-                                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
+                            <div class="text-end">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
                             </div>
 
                 </div>
@@ -149,8 +147,8 @@
                            <input type="hidden" name="id_table" id="id_table">
                             <p>Voulez-vous vraiment Supprimer l'utilisateur</p>
                         <div class="form-group form-actions">
-                            <div class="text-right">
-                                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Fermer</button>
+                            <div class="text-end">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Fermer</button>
                                 <button type="submit" class="btn btn-sm btn-primary" data-csp-click="supp_id">OUI</button>
                             </div>
                         </div>
@@ -177,8 +175,8 @@
                             </div>
                             <p>Voulez-vous vraiment Supprimer l'utilisateur ???</p>
                         <div class="form-group form-actions">
-                            <div class="col-xs-12 text-right">
-                                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Fermer</button>
+                            <div class="col-12 text-end">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Fermer</button>
                                 <button type="submit" class="btn btn-sm btn-primary">OUI</button>
                             </div>
                         </div>

@@ -1,11 +1,12 @@
 @extends("backend.adminlte.main")
+@section('title', 'Modifier un rôle')
 @section('administration', 'menu-open')
 @section('administration-role', 'active')
    
     @section('content')
     <div class="container">
         <div class="row">
-            <div class="card card-success col-md-12 col-md-offset-2">
+            <div class="card card-success col-md-12">
                 <div class="card-header">
                   <h3 class="card-title">Modifier un rôle</h3>
                 </div>
@@ -27,7 +28,7 @@
                                     @endif
                                 </div>
                             </div>
-                            <div class="row col-lg-offset-1">
+                            <div class="row">
                                 <div class="col-lg-5">
                                     <label>Permissions Système</label>
                                     @foreach ($permissions as $permission )
@@ -60,7 +61,7 @@
                                         
                             </div>
                         <div class="form-group form-actions">
-                            <div class="col-md-8 col-md-offset-4 row">
+                            <div class="col-md-8 row">
                                 <button type="submit" class="btn btn-sm btn-success"><i class="fa fa-arrow-right"></i> Valider</button>
                                 <a href="{{ route('role.index') }}" class="btn btn-sm btn-warning"><i class="fa fa-repeat"></i> Annuler</a>
                             </div>

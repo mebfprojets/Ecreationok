@@ -21,15 +21,11 @@ class RoleController extends Controller
      */
     public function index()
     {
-            //  if (Auth::user()->can('role.view')) {
-                $roles=Role::orderBy('updated_at', 'desc')->get();
-                return view('roles.index',compact('roles'));
-            //  }
-            //  else{
-            //      flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
-            //      return redirect()->back();
-            //  }
-       
+        if (!Auth::user()->can('role.view') && !Auth::user()->can('user.create')) {
+            return $this->refuserAcces();
+        }
+        $roles=Role::orderBy('updated_at', 'desc')->get();
+        return view('roles.index',compact('roles'));
     }
 
     /**

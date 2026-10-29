@@ -15,7 +15,9 @@ class JetstreamServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        // Pages Jetstream (/user/profile, /user/api-tokens...) inutilisées : elles permettaient de supprimer son compte
+        // ou de changer d'adresse e-mail sans code de vérification, et imposaient 'unsafe-eval' dans la CSP.
+        Jetstream::ignoreRoutes();
     }
 
     /**

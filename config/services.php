@@ -30,4 +30,14 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    // API du Fichier national RCCM (vérification de la disponibilité des noms commerciaux).
+    // Les identifiants se renseignent uniquement dans le fichier .env, jamais dans le code.
+    'fnrccm' => [
+        'url' => env('FNRCCM_URL', 'https://fichiernationalrccm.com'),
+        'utilisateur' => env('FNRCCM_UTILISATEUR'),
+        'mot_de_passe' => env('FNRCCM_MOT_DE_PASSE'),
+        // Vérification du certificat HTTPS : ne la désactiver qu'en dépannage (voir curl.cainfo dans php.ini)
+        'verifier_ssl' => env('FNRCCM_VERIFIER_SSL', true),
+    ],
+
 ];

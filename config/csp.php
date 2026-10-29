@@ -25,8 +25,9 @@ return [
      */
     'mode' => env('CSP_MODE', 'report'),
 
-    // Pages Jetstream (Alpine.js) qui ont besoin de 'unsafe-eval'. Réservées aux comptes connectés.
-    'unsafe_eval_paths' => ['user/profile', 'user/api-tokens', 'dashboard'],
+    // Pages ayant besoin de 'unsafe-eval' : aucune depuis le retrait des pages Jetstream (Alpine.js).
+    // Ne rien ajouter ici sans nécessité absolue : l'ANSSI demande une CSP sans 'unsafe-eval'.
+    'unsafe_eval_paths' => [],
 
     'directives' => [
         'default-src' => ["'self'"],
@@ -42,14 +43,12 @@ return [
             'https://cdn.jsdelivr.net',
             'https://cdnjs.cloudflare.com',
             'https://fonts.googleapis.com',
-            'https://code.ionicframework.com',
         ],
         'font-src' => [
             "'self'",
             'data:',
             'https://fonts.gstatic.com',
             'https://cdnjs.cloudflare.com',
-            'https://code.ionicframework.com',
             'https://cdn.jsdelivr.net',
         ],
         'img-src' => ["'self'", 'data:', 'blob:'],

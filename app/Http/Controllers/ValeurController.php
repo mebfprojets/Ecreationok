@@ -141,7 +141,12 @@ class ValeurController extends Controller
      */
     public function destroy($id)
     {
+       // Même droit que pour modifier une valeur
+       if (!Auth::user()->can('valeur.create')) {
+           return $this->refuserAcces();
+       }
        Valeur::destroy($id);
+       flash('La valeur a été supprimée.')->success();
        return redirect()->route("valeurs.index");
     }
     public function selection(Request $request)

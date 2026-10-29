@@ -207,4 +207,13 @@ if (!function_exists('returnpieceinfos')) {
                     }
                 }
     
+
+    if(!function_exists('asset_version')){
+        /** URL d'un fichier de public/ suivie de sa date de modification : le navigateur recharge le fichier dès qu'il change. */
+        function asset_version($chemin){
+            $date = @filemtime(public_path($chemin));
+            return asset($chemin).($date ? '?v='.$date : '');
+        }
+    }
+
 ?>

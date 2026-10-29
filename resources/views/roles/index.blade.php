@@ -1,16 +1,14 @@
 @extends("backend.adminlte.main")
+@section('title', 'Rôles')
  @section('administration', 'menu-open')
 @section('administration-role', 'active')
 
 @section('content')
-<div class="block-title">
-    <center><h2><strong>Liste des Rôles</strong></h2></center>                    
-</div>
 <div class="card"> 
  <!-- /.card-header -->
 <div class="card-body">
     @can('user.create', Auth::user()) 
-     <a href="{{ route('role.create') }}" class="btn btn-success col-md-2 pull-right mt-2"><span><i class="fa fa-plus"></i></span> Rôle</a>
+     <a href="{{ route('role.create') }}" class="btn btn-success col-md-2 float-end mt-2"><span><i class="fa fa-plus"></i></span> Rôle</a>
    @endcan
    <br><br>
 <table id="example1" class="table table-bordered table-striped">
@@ -36,10 +34,10 @@
                     <td class="text-center">
                              {{-- @can('role.update', Auth::user()) --}}
                             <a href="#" class="btn btn-sm btn-success" style="background:#3393FF" title="Afficher les détais"> <i class="fa fa-eye"></i></a>
-                                <a href="{{ route('role.edit',$role) }}" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-warning"><i class="fa fa-edit"></i></a>
+                                <a href="{{ route('role.edit',$role) }}" data-bs-toggle="tooltip" title="Edit" class="btn btn-xs btn-warning"><i class="fa fa-edit"></i></a>
                             {{-- @endcan --}}
                             @can('role.delete',Auth::user())
-                                <a href="#modal-confirm-delete" data-csp-click="delConfirm" data-csp-click-args="{{ json_encode([($role->id)]) }}" data-toggle="modal" title="Supprimer" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
+                                <a href="#modal-confirm-delete" data-csp-click="delConfirm" data-csp-click-args="{{ json_encode([($role->id)]) }}" data-bs-toggle="modal" title="Supprimer" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
                             @endcan
                             </div>
                     </td>
@@ -72,8 +70,8 @@
                             <input type="hidden" name="id_table" id="id_table">
                                 <p>Voulez-vous vraiment Supprimer ce role ??</p>
                             <div class="form-group form-actions">
-                                <div class="text-right">
-                                    <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Fermer</button>
+                                <div class="text-end">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Fermer</button>
                                     <button type="submit" class="btn btn-sm btn-primary" data-csp-click="supp_id">OUI</button>
                                 </div>
                             </div>

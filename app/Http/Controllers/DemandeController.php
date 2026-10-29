@@ -14,6 +14,7 @@ use App\Models\Prestation;
 use App\Models\PieceJointe;
 use App\Models\Valeur;
 use App\Models\Formalite;
+use App\Models\JournalAction;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -300,11 +301,17 @@ class DemandeController extends Controller
          //$request->signed->store('public','upload');
         // $path = Storage::putFile('photos', new File('public/upload/'));
         // $path = $request->file('signed')->store('upload', 'public');
-         $image_parts = explode(';base64,',$request->signed);
-         $image_type_aux = explode('image/',$image_parts[0]);
-         //dd($image_type_aux);
-         $image_type = $image_type_aux[1];
-         $image_base64 = base64_decode($image_parts[1]);
+         // La signature doit être une vraie image PNG ou JPEG : l'extension du fichier ne doit jamais venir du navigateur
+         // (sinon « data:image/php;base64,... » créerait un fichier signature.php).
+         if (!preg_match('#^data:image/(png|jpe?g);base64,([A-Za-z0-9+/=\s]+)$#', (string) $request->signed, $signature)) {
+             throw new DemandeRefuseeException('La signature n’a pas été reçue correctement. Signez à nouveau dans le cadre prévu, puis réessayez.');
+         }
+         $image_base64 = base64_decode($signature[2], true);
+         $infosImage = $image_base64 === false ? false : @getimagesizefromstring($image_base64);
+         if (!$infosImage || !in_array($infosImage[2], [IMAGETYPE_PNG, IMAGETYPE_JPEG], true)) {
+             throw new DemandeRefuseeException('La signature n’a pas été reçue correctement. Signez à nouveau dans le cadre prévu, puis réessayez.');
+         }
+         $image_type = $infosImage[2] === IMAGETYPE_PNG ? 'png' : 'jpeg';
          //$file =$path.$usager->id.'.'.$image_type;
          $file =$path.'signature'.'.'.$image_type;
 
@@ -673,65 +680,54 @@ public function updatepj_correct(Request $request){
         .'Une fois toutes les corrections faites, renvoyez la demande pour traitement.');
 }
 
- public function verifier_nom_commercial(Request $request){
-    if (isset($request['nom_commercial'])) {
-        $nom_commercial = $request['nom_commercial'];
+    /**
+     * Disponibilité d'un nom commercial auprès du Fichier national RCCM.
+     * Les identifiants de l'API sont dans le fichier .env (config/services.php, clé « fnrccm »), jamais dans le code.
+     */
+    public function verifier_nom_commercial(Request $request){
+        $request->validate(['nom_commercial' => 'required|string|max:255'], [
+            'nom_commercial.required' => 'Saisissez le nom commercial à vérifier.',
+            'nom_commercial.max' => 'Le nom commercial est trop long.',
+        ]);
+        $indisponible = response()->json([
+            'message' => 'La vérification du nom commercial est momentanément indisponible. Réessayez dans quelques instants.',
+        ], 503);
+
+        $fnrccm = config('services.fnrccm');
+        if (empty($fnrccm['utilisateur']) || empty($fnrccm['mot_de_passe'])) {
+            report(new \RuntimeException('Identifiants de l’API FNRCCM absents : renseigner FNRCCM_UTILISATEUR et FNRCCM_MOT_DE_PASSE dans le fichier .env.'));
+            return $indisponible;
+        }
+
+        try {
+            $client = new \GuzzleHttp\Client([
+                'base_uri' => rtrim($fnrccm['url'], '/').'/',
+                'verify' => $fnrccm['verifier_ssl'],
+                'timeout' => 20,
+                'headers' => ['Accept' => 'application/json'],
+            ]);
+            $authentification = json_decode($client->post('api/auth/token', [
+                'auth' => [$fnrccm['utilisateur'], $fnrccm['mot_de_passe']],
+            ])->getBody()->getContents(), true);
+            $jeton = $authentification['response'] ?? null;
+            if (!$jeton) {
+                throw new \RuntimeException('API FNRCCM : jeton d’accès non reçu.');
+            }
+
+            $resultat = json_decode($client->post('api/registres/verifync', [
+                'headers' => ['Authorization' => 'Bearer '.$jeton],
+                'form_params' => ['keywords' => $request->nom_commercial],
+            ])->getBody()->getContents(), true);
+        } catch (\Throwable $e) {
+            report($e);
+            return $indisponible;
+        }
+
+        return response()->json([
+            'data' => $resultat['response'] ?? null,
+            'status' => $resultat['status'] ?? null,
+        ]);
     }
-    $client = new \GuzzleHttp\Client([
-        'verify' => false
-    ]);
-    //$token='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpcCI6IiIsInVpZCI6IjEwMDAiLCJ1c2VybmFtZSI6Im1lYmYuZWNyZWF0aW9uIiwiZW1haWwiOiJtZWJmLmVjcmVhdGlvbkBtZS5iZiIsImV4cCI6MTY4MDg3ODM5OH0.BUkk2_9bq1uFyASMdDGBQMdAdd79TjiN1_4Vi18phRE';
-    //$token='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpcCI6IiIsInVpZCI6IjEwMDAiLCJ1c2VybmFtZSI6Im1lYmYuZWNyZWF0aW9uIiwiZW1haWwiOiJtZWJmLmVjcmVhdGlvbkBtZS5iZiIsImV4cCI6MTY4MjI2NTQ2OX0.imp8JNP8GwYTaU1ROB5a2L_XePyvudeMMMteQaNPaaM';
-    //$token='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpcCI6IiIsInVpZCI6IjEwMDAiLCJ1c2VybmFtZSI6Im1lYmYuZWNyZWF0aW9uIiwiZW1haWwiOiJtZWJmLmVjcmVhdGlvbkBtZS5iZiIsImV4cCI6MTY4NjQyNzIzMH0.6WOx9JkPH6z0QNE7Q8nhzEDfcWFbU1Ke98XHzkDB9cI';
-    //$token='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpcCI6IiIsInVpZCI6IjEwMDAiLCJ1c2VybmFtZSI6Im1lYmYuZWNyZWF0aW9uIiwiZW1haWwiOiJtZWJmLmVjcmVhdGlvbkBtZS5iZiIsImV4cCI6MTcwMTMwNzQ3OX0.BPZZ7dJwiy7c7-xU8hMqqrsroxqPWVOSp6UtwZMRAEo';
-    // $res = $client->request (
-    //     'POST',
-    //     'http://fichiernationalrccm.com/api/auth/token', [
-    //         'headers' => [
-    //             'Authorization' => 'Basic mebf.ecreation:mebfERP@Ecrat1',
-    //             'Accept' => 'application/json',
-    //         ],
-    // ]);
-    // dd($res);
-
-    $acces= base64_encode("mebf.ecreation:mebfERP@Ecrat1");
-       // dd($acces);
-    $res = $client->request (
-        'POST',
-        'http://fichiernationalrccm.com/api/auth/token', [           
-          
-            'headers' => [
-                'Authorization' => 'Basic '.$acces,
-                'Accept' => 'application/json',
-            ],
-    ]);
-    $Body=$res->getBody()->getContents();
-    $json_decoded=json_decode($Body, true);
-    if($json_decoded['status']=200){
-    $token=$json_decoded['response'];
-    //dd($token);
-    }
-
-    $response = $client->request (
-        'POST',
-        'https://fichiernationalrccm.com/api/registres/verifync', [
-            'headers' => [
-                'Authorization' => 'Bearer '.$token,
-                'Accept' => 'application/json',
-            ],
-        'form_params' => [
-            'keywords' => $nom_commercial,
-        ]
-    ]);
-        //  $responses = json_decode ($response->getBody ());
-        //     return  $responses;
-        $Body=$response->getBody()->getContents();
-         $json_decoded=json_decode($Body, true);
-         $data= array('data'=>$json_decoded['response'], 'status'=>$json_decoded['status']);
-
-         //   return  $responses;
-         return json_encode($data);
- }
 
 public function laodpiecejointe(Request $request){
     $request->validate(['piece_jointe_1' => 'nullable|'.self::REGLE_FICHIER], $this->messagesFichier('piece_jointe_1'));
@@ -1090,6 +1086,7 @@ public function laodpiecejointe(Request $request){
             }
 
             $demande->update();
+            JournalAction::noter('demande_corrigee', $demande);
             return redirect()->back()->with('success', $demande->estRejetee()
                 ? 'Les informations de l’entreprise ont été corrigées. Une fois toutes les corrections faites, renvoyez la demande pour traitement.'
                 : 'Les informations de l’entreprise ont été mises à jour.');
@@ -1119,89 +1116,122 @@ public function laodpiecejointe(Request $request){
                 // 'Region_Code'=>$request->region_usager,
                 // 'Province_Code'=>$request->province_usager
                ]);
+            // La page détail côté agents indique la demande consultée
+            $demandeConcernee = Demande::where('id', (int) $request->demande)->where('usager_id', $usager->id)->first();
+            JournalAction::noter('dirigeant_corrige', $demandeConcernee);
             return redirect()->back()->with('success', 'Les informations du dirigeant ont été mises à jour.');
         }
 
+        /** Demandes visibles par l'agent connecté : celles de son CEFORE (le siège voit tout). */
+        private function demandesVisibles()
+        {
+            $requete = Demande::query();
+            if (!$this->estAgentSiege(Auth::user())) {
+                $requete->where('organisation_code', Auth::user()->organisation);
+            }
+            return $requete;
+        }
+
+        /** Compteurs des cases du tableau de bord, calculés en base (COUNT) et non en chargeant les demandes. */
+        private function compteursDemandes(): array
+        {
+            return [
+                'nbr' => $this->demandesVisibles()->whereNotNull('etat')->count(),
+                'nbr_paye' => $this->demandesVisibles()->where('paye', 1)->count(),
+                'nbr_nonpaye' => $this->demandesVisibles()->where('paye', 0)->count(),
+                'nbr_rejet' => $this->demandesVisibles()->where('etat', 2)->count(),
+                'nbr_a_valider' => $this->demandesVisibles()->where('paye', 1)->where('etat', 0)->count(),
+                'nbr_validees' => $this->demandesVisibles()->where('etat', 1)->count(),
+            ];
+        }
+
         public function index_admin(){
-            if (Auth::user()->can('lister.demande'))
-            {
-            if(Auth::user()->organisation!="001000"){
-                $demandes=Demande::where('organisation_code',Auth::user()->organisation)->where('etat', '!=', null)->orderby('created_at','desc')
-                ->take(300)
-                ->get();
-                $demande_count=Demande::where('etat', '!=', null)->orderby('created_at','desc')
-                ->get();
-                $paye=Demande::where('paye', 1)->where('organisation_code',Auth::user()->organisation)->get();
-                $nbr_paye=count($paye);
-                $nonpaye=Demande::where('paye', 0)->where('organisation_code',Auth::user()->organisation)->get();
-                $rejet=Demande::where('etat', 2)->where('organisation_code',Auth::user()->organisation)->get();
-                $valider=Demande::where('etat', 1)->where('paye', 1)->where('organisation_code',Auth::user()->organisation)->get();
-                $non_valider=Demande::where('etat', 0)->where('paye', 1)->where('organisation_code',Auth::user()->organisation)->get();
-                $nbr_rejet=count($rejet);
-                $nbr_nonpaye=count($nonpaye);
-                $nbr=count($demande_count);
+            if (!Auth::user()->can('lister.demande')) {
+                return $this->refuserAcces();
             }
-            else{
-                $demandes=Demande::where('etat', '!=', null)->orderby('created_at','desc')
-                ->take(300)
+            // Les 50 dernières actions des agents (validations, rejets, corrections...), limitées au CEFORE de l'agent
+            $actions = JournalAction::with([
+                    'agent:id,name,prenom,organisation',
+                    'demande:id,numero_demande,commercial_name,denomination_social,organisation_code',
+                ])
+                ->when(!$this->estAgentSiege(Auth::user()), function ($q) {
+                    $organisation = Auth::user()->organisation;
+                    $q->where(function ($w) use ($organisation) {
+                        $w->whereHas('demande', fn ($d) => $d->where('organisation_code', $organisation))
+                          ->orWhere(fn ($x) => $x->whereNull('demande_id')->where('organisation', $organisation));
+                    });
+                })
+                ->orderBy('created_at', 'desc')->orderBy('id', 'desc')
+                ->take(50)
                 ->get();
-                $demande_count=Demande::where('etat', '!=', null)->orderby('created_at','desc')
-                ->get();
-                $paye=Demande::where('paye', 1)->get();
-                $nbr_paye=count($paye);
-                $nonpaye=Demande::where('paye', 0)->get();
-                $rejet=Demande::where('etat', 2)->get();
-                $valider=Demande::where('etat', 1)->where('paye',1)->get();
-                $non_valider=Demande::where('etat', 0)->where('paye',1)->get();
-                $nbr_rejet=count($rejet);
-                $nbr_nonpaye=count($nonpaye);
-                $nbr=count($demande_count);
-            }
-            return view('backend.adminlte.dashboard', compact('demandes','nbr','nbr_paye','nbr_nonpaye','nbr_rejet','valider','non_valider'));
-        }
-        else{
-            flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
-            return redirect()->back();
-        }
+            $siege = $this->estAgentSiege(Auth::user());
+
+            return view('backend.adminlte.dashboard', array_merge($this->compteursDemandes(), compact('actions', 'siege')));
         }
 
         public function all(){
-            if (Auth::user()->can('lister.demande'))
-            {
-            if(Auth::user()->organisation!="001000"){
-                $demandes=Demande::where('organisation_code',Auth::user()->organisation)->where('etat', '!=', null)->orderby('created_at','desc')
-                //->take(1000)
-                ->get();
-                $demande_count=Demande::where('etat', '!=', null)->orderby('created_at','desc')
-                ->get();
-                $paye=Demande::where('paye', 1)->where('organisation_code',Auth::user()->organisation)->get();
-                $nbr_paye=count($paye);
-                $nonpaye=Demande::where('paye', 0)->where('organisation_code',Auth::user()->organisation)->get();
-                $rejet=Demande::where('etat', 2)->where('organisation_code',Auth::user()->organisation)->get();
-                $nbr_rejet=count($rejet);
-                $nbr_nonpaye=count($nonpaye);
-                $nbr=count($demande_count);
+            if (!Auth::user()->can('lister.demande')) {
+                return $this->refuserAcces();
             }
-            else{
-                $demandes=Demande::where('etat', '!=', null)->orderby('created_at','desc')
-                //->take(1000)
-                ->get();
-                $demande_count=Demande::where('etat', '!=', null)->orderby('created_at','desc')
-                ->get();
-                $paye=Demande::where('paye', 1)->get();
-                $nbr_paye=count($paye);
-                $nonpaye=Demande::where('paye', 0)->get();
-                $rejet=Demande::where('etat', 2)->get();
-                $nbr_rejet=count($rejet);
-                $nbr_nonpaye=count($nonpaye);
-                $nbr=count($demande_count);
+            // Le tableau est rempli page par page par all_donnees() : plus de chargement de toutes les demandes d'un coup
+            return view('backend.adminlte.all', $this->compteursDemandes());
+        }
+
+        /** Données de « Toutes les demandes » au format attendu par DataTables (traitement côté serveur). */
+        public function all_donnees(Request $request)
+        {
+            if (!Auth::user()->can('lister.demande')) {
+                abort(403);
             }
-            return view('backend.adminlte.all', compact('demandes','nbr','nbr_paye','nbr_nonpaye','nbr_rejet'));
-        }
-        else{
-            flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
-            return redirect()->back();
-        }
+            $colonnes = [0 => 'numero_demande', 1 => 'legal_rep_name', 2 => 'paye', 3 => 'commercial_name', 4 => 'denomination_social',
+                5 => 'sigle', 7 => 'created_at', 8 => 'primary_activity', 10 => 'organisation_code', 11 => 'date_paiement'];
+
+            $base = $this->demandesVisibles()->whereNotNull('etat');
+            $total = (clone $base)->count();
+
+            $recherche = trim((string) data_get($request->input('search'), 'value', ''));
+            if ($recherche !== '') {
+                $motif = '%'.str_replace(['[', '%', '_'], ['[[]', '[%]', '[_]'], $recherche).'%';
+                $base->where(function ($q) use ($motif) {
+                    foreach (['numero_demande', 'legal_rep_name', 'commercial_name', 'denomination_social', 'sigle', 'primary_activity', 'organisation_code'] as $champ) {
+                        $q->orWhere($champ, 'like', $motif);
+                    }
+                });
+            }
+            $filtre = (clone $base)->count();
+
+            $tri = $colonnes[(int) data_get($request->input('order'), '0.column', 7)] ?? 'created_at';
+            $sens = data_get($request->input('order'), '0.dir') === 'asc' ? 'asc' : 'desc';
+            $longueur = max(1, min(100, (int) $request->input('length', 25)));
+            $debut = max(0, (int) $request->input('start', 0));
+
+            $lignes = $base->orderBy($tri, $sens)->orderBy('id', 'desc')->skip($debut)->take($longueur)
+                ->get(['id', 'numero_demande', 'legal_rep_name', 'paye', 'commercial_name', 'denomination_social', 'sigle',
+                    'created_at', 'primary_activity', 'objet_social', 'organisation_code', 'date_paiement'])
+                ->map(function ($d) {
+                    $date = fn ($v) => $v ? date('d-m-Y', strtotime($v)) : '—';
+                    return [
+                        e($d->numero_demande),
+                        e($d->legal_rep_name),
+                        $d->paye == 1 ? 'Payé' : ($d->paye == 2 ? 'Paiement à confirmer' : 'Non payé'),
+                        e($d->commercial_name),
+                        e($d->denomination_social),
+                        e($d->sigle),
+                        '<a href="'.e(route('detail.demande', $d->id)).'" class="btn btn-sm btn-primary" title="Afficher le détail"><i class="fa fa-eye" aria-hidden="true"></i><span class="visually-hidden">Détail</span></a>',
+                        $date($d->created_at),
+                        e($d->primary_activity),
+                        e(\Illuminate\Support\Str::limit((string) $d->objet_social, 80)),
+                        e($d->organisation_code),
+                        $date($d->date_paiement),
+                    ];
+                });
+
+            return response()->json([
+                'draw' => (int) $request->input('draw'),
+                'recordsTotal' => $total,
+                'recordsFiltered' => $filtre,
+                'data' => $lignes,
+            ]);
         }
 
         public function liste_demande(Request $request){
@@ -1245,20 +1275,12 @@ public function laodpiecejointe(Request $request){
         public function liste_en_attente_de_partenaire(){
             if (Auth::user()->can('lister.demande'))
             {
-            if(Auth::user()->organisation=="001000"){
-            $demandes=Demande::where('RCCM','!=',null)->get();
-            $rccm =count(Demande::where('RCCM','=',null)->where('etat', 1)->get());
-            $ifu=count(Demande::where('IFU','=',null)->where('etat', 1)->get());
-            $cnss=count(Demande::where('CNSS','=',null)->where('etat', 1)->get());
-            $cpc=count(Demande::where('CPC','=',null)->where('etat', 1)->get());
-            }
-            else{
-            $demandes=Demande::where('RCCM','!=',null)->where('organisation_code',Auth::user()->organisation)->orderby('created_at','desc')->get();
-            $rccm =count(Demande::where('RCCM','=',null)->where('etat', 1)->get());
-            $ifu=count(Demande::where('IFU','=',null)->where('etat', 1)->get());
-            $cnss=count(Demande::where('CNSS','=',null)->where('etat', 1)->get());
-            $cpc=count(Demande::where('CPC','=',null)->where('etat', 1)->get());    
-            }
+            // Compteurs calculés en base et limités au CEFORE de l'agent (le siège voit tout)
+            $demandes=$this->demandesVisibles()->whereNotNull('RCCM')->orderBy('created_at','desc')->get();
+            $rccm=$this->demandesVisibles()->whereNull('RCCM')->where('etat', 1)->count();
+            $ifu=$this->demandesVisibles()->whereNull('IFU')->where('etat', 1)->count();
+            $cnss=$this->demandesVisibles()->whereNull('CNSS')->where('etat', 1)->count();
+            $cpc=$this->demandesVisibles()->whereNull('CPC')->where('etat', 1)->count();
             $dem="demande_en_attente_partenaire";
             return view('backend.adminlte.enattentedepartenaire', compact('demandes','dem','rccm','ifu','cnss','cpc'));
             
@@ -1287,166 +1309,276 @@ public function laodpiecejointe(Request $request){
             }
         }
 
+        /** Page de traitement d'une demande par un agent (informations, pièces, historique, décision). */
         public function detail_backend($id)
         {
-            if (Auth::user()->can('lister.demande'))
-            {
-            $demandes=Demande::where('id', $id)->first();
-            $usager=Usager::where('id', $demandes->usager_id)->first();
-           $activites= DB::table('activites')->where('Code', $demandes->primary_activity)->first();
-           $regions_all=DB::table('regions')->get();
-           $nationalites= DB::table('valeurs')->where('parametre_id',6)->orderby('libelle','asc')->get();
-           $civilites=DB::table('valeurs')->where('parametre_id',15)->get();
-           $pays= DB::table('valeurs')->where('parametre_id',5)->orderby('libelle','asc')->get();
-           $forme_juridiques= DB::table('forme_juridiques')->where('code', $demandes->forme_juridique)->first();
-           $professions= Valeur::where('code', $usager->IdFonction)->first();
-           $regions=DB::table('regions')->where('id', $demandes->region_code)->first();
-           $provinces=DB::table('provinces')->where('id', $demandes->province_code)->first();
-           $communes=DB::table('commune_departements')->where('id', $demandes->commune_departement_code)->first();
-           $arrondissements=DB::table('arrondissements')->where('id', $demandes->arrondissement_code)->first();
-           $secteurs=DB::table('secteur_villages')->where('code', $demandes->code_secteur_village)->first();
-           $terrains=DB::table('terrains')->where('id', $demandes->id_terrain)->first();
-           $piecejointes= PieceJointe::where('usager_id',$usager->id)->where('demande_id', $demandes->id)->get();
-            $secteur_usager=DB::table('secteur_villages')->where('code', $usager->Code_Secteur_Village)->first();
-            $province_usager=DB::table('provinces')->where('id', $usager->Province_Code)->first();
-            $region_usager=DB::table('regions')->where('id', $usager->Region_Code)->first();
-            $FJ_EI= DB::table('forme_juridiques')->where('company_type','EI')->get();
-            $FJ_ES= DB::table('forme_juridiques')->where('company_type','ES')->get();
-            $FJ_GIE= DB::table('forme_juridiques')->where('company_type','GIE')->get();
-           $activites_all= DB::select('select secteur_activite from activites group by secteur_activite');
-           $professions= DB::table('valeurs')->where('parametre_id',8)->orderby('libelle','asc')->get();
-           $usage_terrains= DB::table('usage_terrains')->get();
-           $demande=Demande::where('usager_id', $usager->id)->orderby('created_at','desc')->get();
-           $c=count($demande);
-           $cefore=DB::table('organisations')->where('CodeOrganisation',$demandes->organisation_code)->first();
-            $cefore_code=$cefore->Ville;
-            $typepieceformaliteretours= Valeur::where('parametre_id',18)->get();
-            return view('backend.adminlte.detail', compact('demandes','usager','activites','forme_juridiques',
-            'professions','regions','provinces','communes','arrondissements','secteurs','terrains','piecejointes',
-        'secteur_usager','province_usager','region_usager','c','cefore_code','FJ_EI','FJ_ES','FJ_GIE','activites_all',
-    'usage_terrains','civilites','professions','pays','nationalites','regions_all','typepieceformaliteretours'));  
-}
-    else{
-        flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
-        return redirect()->back();
-    }
-    }
+            if (!Auth::user()->can('lister.demande')) {
+                return $this->refuserAcces();
+            }
+            $demandes = Demande::where('id', $id)->first();
+            $this->autoriserAgentDemande($demandes);
+            $usager = Usager::where('id', $demandes->usager_id)->first();
+            $compte = $usager ? User::find($usager->user_id, ['id', 'name', 'prenom', 'email']) : null;
 
+            // Référentiels (affichage et formulaires de correction)
+            $activites = DB::table('activites')->where('Code', $demandes->primary_activity)->first();
+            $forme_juridiques = DB::table('forme_juridiques')->where('code', $demandes->forme_juridique)->first();
+            $regions = DB::table('regions')->where('id', $demandes->region_code)->first();
+            $provinces = DB::table('provinces')->where('id', $demandes->province_code)->first();
+            $communes = DB::table('commune_departements')->where('id', $demandes->commune_departement_code)->first();
+            $arrondissements = DB::table('arrondissements')->where('id', $demandes->arrondissement_code)->first();
+            $secteurs = DB::table('secteur_villages')->where('code', $demandes->code_secteur_village)->first();
+            $terrains = DB::table('terrains')->where('id', $demandes->id_terrain)->first();
+            $region_usager = DB::table('regions')->where('id', $usager->Region_Code)->first();
+            $province_usager = DB::table('provinces')->where('id', $usager->Province_Code)->first();
+            $commune_usager = DB::table('commune_departements')->where('id', $usager->Commun_Departement_Code)->first();
+            $arrondissement_usager = DB::table('arrondissements')->where('id', $usager->Arrondissement_Code)->first();
+            $secteur_usager = DB::table('secteur_villages')->where('code', $usager->Code_Secteur_Village)->first();
+            $nationalites = DB::table('valeurs')->where('parametre_id', 6)->orderBy('libelle', 'asc')->get();
+            $civilites = DB::table('valeurs')->where('parametre_id', 15)->get();
+            $pays = DB::table('valeurs')->where('parametre_id', 5)->orderBy('libelle', 'asc')->get();
+            $professions = DB::table('valeurs')->where('parametre_id', 8)->orderBy('libelle', 'asc')->get();
+            $FJ_EI = DB::table('forme_juridiques')->where('company_type', 'EI')->get();
+            $FJ_ES = DB::table('forme_juridiques')->where('company_type', 'ES')->get();
+            $FJ_GIE = DB::table('forme_juridiques')->where('company_type', 'GIE')->get();
+            $activites_all = DB::select('select secteur_activite from activites group by secteur_activite');
+            $usage_terrains = DB::table('usage_terrains')->get();
+            $typepieceformaliteretours = Valeur::where('parametre_id', 18)->get();
+            $cefore = DB::table('organisations')->where('CodeOrganisation', $demandes->organisation_code)->first();
+            $cefore_code = $cefore->Ville ?? $demandes->organisation_code;
+
+            $piecejointes = PieceJointe::where('demande_id', $demandes->id)->orderBy('id')->get()
+                ->each(fn ($piece) => $piece->fichier_present = $this->localiserFichier($piece->url) !== null);
+            $premierePiece = $piecejointes->firstWhere('fichier_present', true);
+            $autresDemandes = Demande::where('usager_id', $usager->id)->where('id', '!=', $demandes->id)
+                ->orderBy('created_at', 'desc')->get(['id', 'numero_demande', 'commercial_name', 'denomination_social', 'etat', 'paye', 'created_at']);
+            $validateur = $demandes->User_ayant_valide ? User::find($demandes->User_ayant_valide, ['id', 'name', 'prenom']) : null;
+
+            // Historique du dossier : création, paiement, actions des agents (journal), renvois du promoteur
+            $historique = collect([['date' => $demandes->created_at, 'type' => 'creation', 'titre' => 'Demande créée par le promoteur', 'detail' => null, 'auteur' => null]]);
+            if ($demandes->paye == 1 && $demandes->date_paiement) {
+                $historique->push(['date' => \Carbon\Carbon::parse($demandes->date_paiement), 'type' => 'paiement',
+                    'titre' => 'Paiement reçu'.($demandes->montant_total ? ' ('.number_format((float) $demandes->montant_total, 0, ',', ' ').' FCFA)' : ''), 'detail' => null, 'auteur' => null]);
+            }
+            foreach (JournalAction::with('agent:id,name,prenom')->where('demande_id', $demandes->id)->get() as $action) {
+                $historique->push(['date' => $action->created_at, 'type' => $action->action, 'titre' => $action->libelle(),
+                    'detail' => $action->detail, 'auteur' => $action->agent ? trim($action->agent->prenom.' '.$action->agent->name) : null]);
+            }
+            foreach (Historique::where('id_demande', $demandes->id)->where('motif', 'Envoyer Pour Traitement')->get() as $renvoi) {
+                $historique->push(['date' => $renvoi->created_at, 'type' => 'renvoi', 'titre' => 'Corrigée et renvoyée par le promoteur', 'detail' => null, 'auteur' => null]);
+            }
+            $historique = $historique->filter(fn ($e) => $e['date'])->sortByDesc(fn ($e) => $e['date']->timestamp)->values();
+
+            // Statut lisible et possibilité de décider
+            $renvoyee = $historique->first(fn ($e) => in_array($e['type'], ['rejet', 'renvoi'], true));
+            $statut = match (true) {
+                (int) $demandes->paye === 0 => ['En attente de paiement', 'secondary', 'fa-credit-card'],
+                (int) $demandes->paye === 2 => ['Paiement à confirmer', 'info', 'fa-hourglass-start'],
+                (string) $demandes->etat === '1' => ['Validée', 'success', 'fa-check-circle'],
+                (string) $demandes->etat === '2' => ['Rejetée — en attente de correction', 'danger', 'fa-undo-alt'],
+                ($renvoyee['type'] ?? null) === 'renvoi' => ['À valider — corrigée par le promoteur', 'warning', 'fa-redo-alt'],
+                default => ['À valider', 'warning', 'fa-hourglass-half'],
+            };
+            $peutTraiter = Auth::user()->can('valider.demande') && (int) $demandes->paye === 1 && (string) $demandes->etat === '0';
+            $peutCorriger = Auth::user()->can('valider.demande') && (int) $demandes->paye === 1 && (string) $demandes->etat === '2';
+
+            return view('backend.adminlte.detail', compact(
+                'demandes', 'usager', 'compte', 'activites', 'forme_juridiques', 'regions', 'provinces', 'communes', 'arrondissements',
+                'secteurs', 'terrains', 'region_usager', 'province_usager', 'commune_usager', 'arrondissement_usager', 'secteur_usager',
+                'nationalites', 'civilites', 'pays', 'professions', 'FJ_EI', 'FJ_ES', 'FJ_GIE', 'activites_all', 'usage_terrains',
+                'typepieceformaliteretours', 'cefore_code', 'piecejointes', 'premierePiece', 'autresDemandes', 'validateur', 'historique', 'statut',
+                'peutTraiter', 'peutCorriger'
+            ));
+        }
 
     public function add_formalite_retour(Request $request){
-        $request->validate(['copie_de_la_formalite' => 'nullable|'.self::REGLE_FICHIER], $this->messagesFichier('copie_de_la_formalite'));
-    if (Auth::user()->can('save_formalite_retour'))
-        {
-        if ($request->hasFile('copie_de_la_formalite')) {
-            $file = $request->file('copie_de_la_formalite');
-            $extension=$file->getClientOriginalExtension();
-            $fileName = getlibelle($request->typepiece).'.'.$extension;
-            $emplacement='public/files/formalite_retours/'.$request->demande;
-            $file_url= $request['copie_de_la_formalite']->storeAs($emplacement, $fileName);
-                Formalite::create([
-                    'typepiece'=>$request->typepiece,
-                    'demande_id'=>$request->demande,
-                    'url'=> $file_url,
-                   ]);
-                   flash("La formalité a été enregistré avec success!!!")->error();
+        return $this->enregistrerFormaliteRetour($request);
     }
-    return redirect()->back();
-}
-else{
-    flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
-    return redirect()->back();
-}
-}
 
+    public function update_formalite_retour(Request $request){
+        return $this->enregistrerFormaliteRetour($request);
+    }
 
-public function update_formalite_retour(Request $request){
-    $request->validate(['copie_de_la_formalite' => 'nullable|'.self::REGLE_FICHIER], $this->messagesFichier('copie_de_la_formalite'));
-    if (Auth::user()->can('save_formalite_retour'))
-     {
-        if ($request->hasFile('copie_de_la_formalite'))
-            {
-                    $file = $request->file('copie_de_la_formalite');
-                    $extension=$file->getClientOriginalExtension();
-                    $fileName = getlibelle($request->typepiece).'.'.$extension;
-                    $emplacement='public/files/formalite_retours/'.$request->demande;
-                    $file_url= $request['copie_de_la_formalite']->storeAs($emplacement, $fileName);
-                    $formalite= Formalite::where('demande_id' ,$request->demande)->where('typepiece' ,$request->typepiece)->first();
-                    $formalite->update([
-                            'url'=> $file_url,
-                    ]);
-            }
-            return redirect()->back();
+    /** Ajout ou remplacement de la copie d'une formalité de retour (RCCM, IFU...) par un agent du CEFORE de la demande. */
+    private function enregistrerFormaliteRetour(Request $request)
+    {
+        if (!Auth::user()->can('save_formalite_retour')) {
+            return $this->refuserAcces();
         }
-            else{
-                flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
-                return redirect()->back();
-            }
-}
+        $request->validate([
+            'demande' => 'required|integer',
+            'typepiece' => 'required|integer',
+            'copie_de_la_formalite' => 'required|'.self::REGLE_FICHIER,
+        ], array_merge($this->messagesFichier('copie_de_la_formalite'), [
+            'demande.*' => 'La demande n’a pas été identifiée. Rechargez la page puis réessayez.',
+            'typepiece.*' => 'Le type de formalité n’a pas été identifié. Fermez la fenêtre puis réessayez.',
+        ]));
+
+        $demande = Demande::find($request->demande);
+        $this->autoriserAgentDemande($demande);
+
+        $file = $request->file('copie_de_la_formalite');
+        $fileName = getlibelle($request->typepiece).'.'.strtolower($file->extension());
+        $file_url = $file->storeAs('public/files/formalite_retours/'.$demande->id, $fileName);
+
+        Formalite::updateOrCreate(
+            ['demande_id' => $demande->id, 'typepiece' => $request->typepiece],
+            ['url' => $file_url]
+        );
+        flash('La copie de la formalité a été enregistrée.')->success();
+
+        return redirect()->back();
+    }
 
 public function show_formalite_retour(Formalite $formalite){
-    if (Auth::user()->can('lister.demande'))
-     {
+    if (!Auth::user()->can('lister.demande')) {
+        return $this->refuserAcces();
+    }
+    $this->autoriserAgentDemande(Demande::find($formalite->demande_id));
+
     return view("demande.detailformalite", compact('formalite'));
 }
-else{
-    flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
-    return redirect()->back();
-}
-}
+
+    /** Affichage d'une pièce jointe (dans la page) : promoteur propriétaire ou agent du CEFORE de la demande. */
+    public function voirPiece($id)
+    {
+        $piecejointe = PieceJointe::find($id);
+        if (!$piecejointe) {
+            abort(404);
+        }
+        if ($piecejointe->demande_id) {
+            $this->autoriserDemande(Demande::find($piecejointe->demande_id));
+        } else {
+            $this->autoriserUsager($piecejointe->usager_id);
+        }
+
+        return $this->afficherFichier($piecejointe->url);
+    }
+
+    /** Affichage de la copie d'une formalité de retour : promoteur propriétaire ou agent du CEFORE de la demande. */
+    public function voirFormalite($id)
+    {
+        $formalite = Formalite::find($id);
+        if (!$formalite) {
+            abort(404);
+        }
+        $this->autoriserDemande(Demande::find($formalite->demande_id));
+
+        return $this->afficherFichier($formalite->url);
+    }
+
+    private function afficherFichier(?string $chemin)
+    {
+        $entetes = ['Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff'];
+        $fichier = $this->localiserFichier($chemin);
+        if ($fichier === null) {
+            abort(404, 'Le fichier est introuvable.');
+        }
+        if ($fichier['absolu']) {
+            return response()->file($fichier['chemin'], $entetes)->setPrivate();
+        }
+
+        return Storage::response($fichier['chemin'], basename($fichier['chemin']), $entetes);
+    }
+
+    /**
+     * Retrouve le fichier d'une pièce : chemin relatif au disque local (cas général) ou chemin complet
+     * (signatures), accepté seulement s'il se trouve dans storage/app. Renvoie null si le fichier n'existe pas.
+     */
+    private function localiserFichier(?string $chemin): ?array
+    {
+        if (!$chemin) {
+            return null;
+        }
+        $complet = realpath($chemin);
+        $racine = realpath(storage_path('app'));
+        if ($complet && $racine && str_starts_with($complet, $racine.DIRECTORY_SEPARATOR) && is_file($complet)) {
+            return ['chemin' => $complet, 'absolu' => true];
+        }
+
+        return Storage::exists($chemin) ? ['chemin' => $chemin, 'absolu' => false] : null;
+    }
 
     public function valider_demande(Request $request , $id){
         if (Auth::user()->can('valider.demande'))
             {
+            $request->validate([
+                'etat' => 'required|in:oui,non',
+                'motif' => 'nullable|required_if:etat,non|string|max:2000',
+            ], [
+                'etat.*' => 'La décision (validation ou rejet) n’a pas été reçue. Rechargez la page puis réessayez.',
+                'motif.required_if' => 'Saisissez le motif du rejet : il sera communiqué au promoteur.',
+                'motif.max' => 'Le motif du rejet ne doit pas dépasser 2000 caractères.',
+            ]);
             $demandes=Demande::find($id);
-            $organisation=$demandes->organisation_code;
-            $cefore=DB::table('organisations')->where('CodeOrganisation', $organisation)->first();
-            $etat=$request->etat;
+            $this->autoriserAgentDemande($demandes);
+            // Seule une demande payée et en attente de validation peut être validée ou rejetée
+            if ((int) $demandes->paye !== 1 || (string) $demandes->etat !== '0') {
+                flash('Cette demande n’est pas en attente de validation : elle n’est pas payée ou a déjà été traitée.')->error();
+                return redirect()->route('detail.demande', $demandes->id);
+            }
             $motif=$request->motif;
-            $usager_id=$demandes->usager_id;
-            $usager=Usager::where('id', $usager_id)->first();
-            $user_id=$usager['user_id'];
-            $user=User::where('id', $user_id)->first();
-            $email=$user->email;
-            $details['email'] = $email;
-            $details['cefore'] = $cefore->Ville;
-            $details['nom'] = $usager->NomRaisonSociale;
-            $details['prenom'] =$usager->Prenom;
-            $details['nom_commercial'] =$demandes->commercial_name;
-            $details['motif'] =$motif;
-            $date=new \DateTime();
-            $date_validation= $date->format("d-m-Y H:i:s");
-            if($etat=="oui"){                
+            $usager=Usager::find($demandes->usager_id);
+            $date_validation=(new \DateTime())->format("d-m-Y H:i:s");
+
+            if($request->etat=="oui"){
                 $demandes->update([
                     'etat'=>1,
                     'Date_etat_validation'=>$date_validation,
                     'User_ayant_valide'=>Auth::user()->id
                    ]);
-                  //Mail::to($email)->send(new NotifyValider($details));
-                   return redirect()->route('list');
+                JournalAction::noter('validation', $demandes);
+                $envoye = $this->prevenirPromoteur(new NotifyValider($demandes, $usager), $usager);
+                flash('La demande « '.$demandes->commercial_name.' » a été validée.'
+                    .($envoye ? ' Le promoteur a été prévenu par e-mail.' : ''))->success();
             }
             else{
-            
-            $demandes->update([
+                $demandes->update([
                     'etat'=>2,
                     'motif'=>$motif,
                     'Date_etat_validation'=>$date_validation,
                     'User_ayant_valide'=>Auth::user()->id
                    ]);
-            $historique=Historique::create([
-                'id_demande'=>$demandes->id,
-                'id_user'=>Auth::user()->id,
-                'motif'=>$motif
-                ]);
-//dd($details);
-            //Mail::to($email)->send(new NotifyRejet($details));
-                   return redirect()->route('list');
+                Historique::create([
+                    'id_demande'=>$demandes->id,
+                    'id_user'=>Auth::user()->id,
+                    'motif'=>$motif
+                    ]);
+                JournalAction::noter('rejet', $demandes, $motif);
+                $envoye = $this->prevenirPromoteur(new NotifyRejet($demandes, $usager), $usager);
+                flash('La demande « '.$demandes->commercial_name.' » a été rejetée et renvoyée au promoteur pour correction.'
+                    .($envoye ? ' Le promoteur a été prévenu par e-mail.' : ''))->success();
             }
+            if (!$envoye) {
+                flash('Le promoteur n’a pas pu être prévenu par e-mail (adresse absente ou service d’envoi indisponible). '
+                    .'Il verra la décision dans son espace « Mes demandes » ; vous pouvez aussi le contacter directement.')->warning()->important();
+            }
+            return redirect()->route('list', ['etat' => 0]);
         }
         else{
             flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
             return redirect()->back();
         }
         }
+    /**
+     * Envoie au promoteur l'e-mail de décision. La décision est déjà enregistrée : un échec d'envoi
+     * ne doit pas l'annuler, il est seulement signalé à l'agent (et écrit dans le journal).
+     */
+    private function prevenirPromoteur(\Illuminate\Mail\Mailable $mail, ?Usager $usager): bool
+    {
+        $email = $usager ? User::where('id', $usager->user_id)->value('email') : null;
+        if (!$email) {
+            return false;
+        }
+        try {
+            Mail::to($email)->send($mail);
+            return true;
+        } catch (\Throwable $e) {
+            report($e);
+            return false;
+        }
+    }
+
         public function liste_filtre(Request $request){
             if (Auth::user()->can('lister.demande'))
             {
@@ -1488,66 +1620,103 @@ else{
                   
         }
         public function showpj(Piecejointe $piecejointe){
-            //dd($piecejointe);
+            if (!Auth::user()->can('lister.demande')) {
+                return $this->refuserAcces();
+            }
+            $this->autoriserAgentDemande($piecejointe->demande);
             return view("demande.showPj", compact('piecejointe'));
         }
         public function editpj(Piecejointe $piecejointe){
+            if (!Auth::user()->can('valider.demande')) {
+                return $this->refuserAcces();
+            }
+            $this->autoriserAgentDemande($piecejointe->demande);
             return view("demande.editPj", compact('piecejointe'));
         }
         public function updatepj(Piecejointe $piecejointe, Request $request){
-            $request->validate(['piece_jointe_u' => 'nullable|'.self::REGLE_FICHIER], $this->messagesFichier('piece_jointe_u'));
-            $type_doc=$piecejointe->type_piece;
-            $usager= $piecejointe->demande->usager;
-            $file = $request->file('piece_jointe_u');
-            $extension=$file->getClientOriginalExtension();
-            $fileName = $type_doc.'.'.$extension;
-            $emplacement='public/files/'.$usager->id;
-            $file_url= $request['piece_jointe_u']->storeAs($emplacement, $fileName);
-            $url_local=$usager->id.'/'.$fileName;           
-            $pj= $piecejointe->update([
-                'url'=> $file_url,
+            if (!Auth::user()->can('valider.demande')) {
+                return $this->refuserAcces();
+            }
+            $this->autoriserAgentDemande($piecejointe->demande);
+            $request->validate([
+                'piece_jointe_u' => 'nullable|'.self::REGLE_FICHIER,
+                'numero_ref' => 'nullable|string|max:255',
+            ], array_merge($this->messagesFichier('piece_jointe_u'), [
+                'numero_ref.max' => 'Le numéro de référence est trop long.',
+            ]));
+            $donnees = [
                 'numero'=> $request->numero_ref,
                 'date_etablissement'=> $request->date_detablissment,
                 'lieu_etablissement' => $request->lieu_etablissment,
-                'url_local'=>$url_local
-            ]);
+            ];
+            // Le fichier n'est remplacé que si un nouveau fichier a été choisi
+            if ($request->hasFile('piece_jointe_u')) {
+                $usager = $piecejointe->demande->usager;
+                $fileName = $piecejointe->type_piece.'.'.strtolower($request->file('piece_jointe_u')->extension());
+                $donnees['url'] = $request->file('piece_jointe_u')->storeAs('public/files/'.$usager->id, $fileName);
+                $donnees['url_local'] = $usager->id.'/'.$fileName;
+            }
+            $piecejointe->update($donnees);
+            JournalAction::noter('piece_modifiee', $piecejointe->demande, str_replace('_', ' ', $piecejointe->type_piece));
+            flash('La pièce « '.str_replace('_', ' ', $piecejointe->type_piece).' » a été mise à jour.')->success();
             return redirect()->route("detail.demande", ['id'=>$piecejointe->demande->id]);
         }
 
+        /**
+         * Statistiques par CEFORE sur une période (date de création des demandes).
+         * Tout est compté en base ; un agent ne voit que son CEFORE, le siège peut choisir un CEFORE ou tous.
+         */
         public function statistique(Request $request)
         {
-            
-            $cefores=DB::table('organisations')->get();
-            if($request->datedebut!="")
-            {
-                //dd($request->datedebut);
-                $date_debut=format_date($request->datedebut);
-               $demandes=Demande::where('id', 1)->first();
-               dd($demandes->created_at);
-               
-               for($i=0; $i<count($demandes); $i++){           
-                    $dates=format_date($demandes[$i]->created_at); 
-                    $date=date("Y-m-d", strtotime($dates));
-                    dd($date);                    
-                }
-            
-            //dd($date);
-               //dd($request->datedebut); 
-                           
+            if (!Auth::user()->can('lister.demande')) {
+                return $this->refuserAcces();
             }
-            if($request->cefore!=""){
-                               
-                $result=Demande::where('organisation_code',$request->cefore)->get();
-                $demandes=$result;
+            $request->validate([
+                'du' => 'nullable|date_format:Y-m-d',
+                'au' => 'nullable|date_format:Y-m-d|after_or_equal:du',
+                'cefore' => 'nullable|string|max:50',
+            ], [
+                'du.date_format' => 'La date de début n’est pas valide.',
+                'au.date_format' => 'La date de fin n’est pas valide.',
+                'au.after_or_equal' => 'La date de fin doit être postérieure à la date de début.',
+            ]);
+
+            $siege = $this->estAgentSiege(Auth::user());
+            $du = $request->input('du', now()->startOfYear()->format('Y-m-d'));
+            $au = $request->input('au', now()->format('Y-m-d'));
+            $ceforeChoisi = $siege ? $request->input('cefore') : Auth::user()->organisation;
+
+            $requete = Demande::query()->whereNotNull('etat')
+                // Format ISO (avec « T ») : interprété de la même façon quelle que soit la langue de SQL Server
+                ->where('created_at', '>=', $du.'T00:00:00')
+                ->where('created_at', '<', \Carbon\Carbon::parse($au)->addDay()->format('Y-m-d').'T00:00:00');
+            if ($ceforeChoisi) {
+                $requete->where('organisation_code', $ceforeChoisi);
+            }
+
+            $parCefore = $requete->groupBy('organisation_code')->orderBy('organisation_code')->get([
+                'organisation_code',
+                DB::raw('COUNT(*) AS total'),
+                DB::raw('SUM(CASE WHEN paye = 1 THEN 1 ELSE 0 END) AS payees'),
+                DB::raw('SUM(CASE WHEN paye = 0 THEN 1 ELSE 0 END) AS non_payees'),
+                DB::raw('SUM(CASE WHEN paye = 1 AND etat = 0 THEN 1 ELSE 0 END) AS a_valider'),
+                DB::raw('SUM(CASE WHEN etat = 1 THEN 1 ELSE 0 END) AS validees'),
+                DB::raw('SUM(CASE WHEN etat = 2 THEN 1 ELSE 0 END) AS rejetees'),
+                DB::raw('SUM(CASE WHEN paye = 1 THEN CAST(montant_total AS DECIMAL(18,0)) ELSE 0 END) AS montant'),
+            ]);
+
+            $totaux = ['total' => 0, 'payees' => 0, 'non_payees' => 0, 'a_valider' => 0, 'validees' => 0, 'rejetees' => 0, 'montant' => 0];
+            foreach ($parCefore as $ligne) {
+                foreach ($totaux as $cle => $valeur) {
+                    $totaux[$cle] += (float) $ligne->$cle;
                 }
-            else{
-                if($request->reset=1){
-                    $demandes=Demande::all();
-                    }
-                }
-            return view('backend.adminlte.statistique', compact('demandes','cefores'));
+            }
+            $nomsCefore = DB::table('organisations')->pluck('Ville', 'CodeOrganisation');
+            $cefores = $siege ? DB::table('organisations')->orderBy('Ville')->get(['CodeOrganisation', 'Ville']) : collect();
+
+            return view('backend.adminlte.statistique', compact('parCefore', 'totaux', 'nomsCefore', 'cefores', 'siege', 'du', 'au', 'ceforeChoisi'));
         }
-        
+
         public function reponse_paiement(Request $request){
             //dd($request->all());
                 $numero_demande=$request->command_number;

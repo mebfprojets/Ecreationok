@@ -1,37 +1,31 @@
 @extends('backend.adminlte.main')
+@section('title', 'En attente des partenaires')
 @section('demandes', 'menu-open')
 @section('liste_partenaire', 'active')
 @section('content')
-<div class="block-title" style="margin-top:-50px;">
-    <center><h3><strong>Attente Partenaire</strong></h3></center>                    
-</div>
 <div class="card">
 
 <div class="row">
           <div class="col-lg-3 col-6">
             <!-- small box -->
-            <div class="small-box bg-info">
+            <div class="small-box text-bg-info">
               <div class="inner">
                 <h3>{{$rccm}}</h3>
                 <p>Attente RCCM</p>
               </div>
-              <div class="icon">
-                <i class="ion ion-bag"></i>
-              </div>
+              <i class="small-box-icon fas fa-folder-open" aria-hidden="true"></i>
               <a href="#" class="small-box-footer">Consulter <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
           <!-- ./col -->
           <div class="col-lg-3 col-6">
             <!-- small box -->
-            <div class="small-box bg-success">
+            <div class="small-box text-bg-success">
               <div class="inner">
                 <h3>{{$ifu}}</h3>
                 <p>Attente IFU</p>
               </div>
-              <div class="icon">
-                <i class="ion ion-stats-bars"></i>
-              </div>
+              <i class="small-box-icon fas fa-check-circle" aria-hidden="true"></i>
               <a href="#" class="small-box-footer">Consulter <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
@@ -39,29 +33,25 @@
           <!-- ./col -->
           <div class="col-lg-3 col-6">
             <!-- small box -->
-            <div class="small-box bg-warning">
+            <div class="small-box text-bg-warning">
               <div class="inner">
                 <h3>{{$cnss}}</h3>
 
                 <p>Attente CNSS</p>
               </div>
-              <div class="icon">
-                <i class="ion ion-pie-graph"></i>
-              </div>
+              <i class="small-box-icon fas fa-hourglass-half" aria-hidden="true"></i>
               <a href="#" class="small-box-footer">Consulter <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
           <div class="col-lg-3 col-6">
             <!-- small box -->
-            <div class="small-box bg-danger">
+            <div class="small-box text-bg-danger">
               <div class="inner">
                 <h3>{{$cpc}}</h3>
 
                 <p>Attente CPC</p>
               </div>
-              <div class="icon">
-                <i class="ion ion-person-add"></i>
-              </div>
+              <i class="small-box-icon fas fa-times-circle" aria-hidden="true"></i>
               <a href="#" class="small-box-footer">Consulter <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>          
@@ -111,7 +101,7 @@
                     <td>{{$demande->sigle}}</td>
                     <td>{{$demande->objet_social}}</td>
                     <td>{{$demande->organisation_code}}</td>
-                    <td>{{format_date($demande->date_paiement)}}</td>
+                    <td>{{ $demande->date_paiement ? format_date($demande->date_paiement) : "—" }}</td>
                     
                   </tr>
                   @endforeach

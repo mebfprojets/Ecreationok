@@ -23,21 +23,8 @@
         ?? ['M.' => 'Monsieur', 'MME' => 'Madame', 'MLLE' => 'Mademoiselle'][$usager->Civility] ?? $usager->Civility;
     $situation = [1 => 'Célibataire', 2 => 'Marié(e)', 3 => 'Divorcé(e)'][$usager->SituationMatrimoniale] ?? null;
     $nbRejets = $historiques->filter(function ($h) { return $h->motif !== 'Envoyer Pour Traitement'; })->count();
-    // Libellés lisibles des pièces jointes (type_piece enregistré en base -> libellé affiché)
-    $libellesPieces = [
-        'declaration' => 'Déclaration sur l’honneur / casier judiciaire', 'casier_judiciaire' => 'Casier judiciaire',
-        'cnib' => 'CNIB', 'passport' => 'Passeport', 'piece_didentite' => 'Pièce d’identité',
-        'titre_propriete' => 'Titre de propriété / bail', 'titre_de_propriete' => 'Titre de propriété / bail',
-        'formulaire_dem_cpc' => 'Formulaire de demande de CPC', 'formulaire_cpc_es' => 'Formulaire CPC',
-        'certificat_residence' => 'Certificat de résidence', 'certificat_de_residence' => 'Certificat de résidence',
-        'photo_didentite' => 'Photo d’identité', 'signature' => 'Signature', 'statut' => 'Statuts',
-        'formulaire_rccm' => 'Formulaire RCCM', 'acte_de_depot' => 'Acte de dépôt',
-        'acte_mariage' => 'Acte de mariage', 'autorisation_de_commerce' => 'Autorisation d’exercer le commerce',
-    ];
-    $libellePiece = function ($type) use ($libellesPieces) {
-        $cle = mb_strtolower(trim((string) $type));
-        return $libellesPieces[$cle] ?? ucfirst(str_replace('_', ' ', $cle));
-    };
+    // Libellés lisibles des pièces jointes (communs avec l'espace agents)
+    $libellePiece = fn ($type) => \App\Models\PieceJointe::libelleType($type);
 @endphp
 
 <div class="ed-page">

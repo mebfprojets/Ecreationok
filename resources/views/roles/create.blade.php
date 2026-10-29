@@ -1,4 +1,5 @@
 @extends("backend.adminlte.main")
+@section('title', 'Nouveau rôle')
 @section('administration', 'menu-open')
 @section('administration-role', 'active') 
 {{-- @section('blank')
@@ -9,7 +10,7 @@
     @section('content')
     <div class="container">
         <div class="row">
-            <div class="card card-success col-md-8 col-md-offset-2">
+            <div class="card card-success col-md-8">
                 <div class="card-header">
                   <h3 class="card-title">Créer un rôle</h3>
                 </div>
@@ -38,7 +39,7 @@
                             </div>
                         </div>
                     </div> --}}
-                        <div class="row col-lg-offset-1">
+                        <div class="row">
                                 <div class="col-lg-6">
                                     <label><u>Permissions demande</u></label>
                                     @foreach ($permissions as $permission )
@@ -48,7 +49,7 @@
                                     @endforeach
                                 </div>
                            
-                                <div class="col-lg-6 ">
+                                <div class="col-lg-6">
                                     <label> <u>Permissions Administration</u></label>
                                     @foreach ($permissions as $permission )
                                         @if($permission->for== 'administration')
@@ -58,7 +59,7 @@
                             </div>
                         </div>
                     <div class="form-group form-actions">
-                    <div class="col-md-8 col-md-offset-4">
+                    <div class="col-md-8">
                         <button type="submit" class="btn btn-sm btn-sucess"><i class="fa fa-arrow-right"></i> Valider</button>
                         <a href="{{ route('role.index') }}" class="btn btn-sm btn-warning"><i class="fa fa-repeat"></i> Annuler</a>
                     </div>

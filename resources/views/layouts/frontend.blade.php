@@ -83,40 +83,33 @@
       </div>
     </div>
   </div>
-  <div class="modal fade" id="modal-forget-password" tabindex="-1" role="dialog" aria-labelledby="modal-login-label" aria-hidden="true">
-    <div class="modal-dialog modal-md">
-      <div class="modal-content">
-        <div class="modal-header">
- 
-        <center><h3 class="modal-title text-center" id="modal-login-label">  Récupérer le mot de passe <i class="fa fa-key"></i></h3></center>
-
-          <button type="button" class="close" data-bs-dismiss="modal">
-            <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
-          </button>
-        </div>
-        
-        <div class="modal-body">
-          <div class="row">
-              <div class="col-md-12">
-          
-                <form role="form"  method="POST" action="{{ url('/reset_password_without_token') }}" method="post" class="login-form">
-                  @csrf
-                  <div class="form-group">
-                  <label class="control-label login-label" for="val_username">Email:HJ <span class="text-danger">*</span></label>
-                      <div class="input-group">
-                        <input id="email" placeholder="Entrez email" class="form-control input-lg" type="email" name="email" required autocomplete="current-password" />
-                      </div>
-                  </div>
-                    
-                    <button type="submit" class="btn btn-success">Valider <i class="fa fa-unlock"></i></button>
-                    </a>
-                </form>   
-              </div>
+  <div class="modal fade" id="modal-forget-password" tabindex="-1" role="dialog" aria-labelledby="modal-forget-password-titre" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+      <div class="modal-content fenetre-compte">
+        <form action="{{ route('password.oubli') }}" method="post">
+          @csrf
+          <div class="modal-header">
+            <div>
+              <h3 class="modal-title" id="modal-forget-password-titre"><i class="fas fa-key me-2" aria-hidden="true"></i>Mot de passe oublié</h3>
+              <div class="small text-muted">Nous vous enverrons un lien pour choisir un nouveau mot de passe.</div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
           </div>
-          
-                
-        </div>
-        
+
+          <div class="modal-body">
+            <div class="champ">
+              <label class="form-label" for="oubli_email">Adresse e-mail de votre compte</label>
+              <input id="oubli_email" class="form-control" type="email" name="email" placeholder="Exemple : nom@gmail.com" required autocomplete="email">
+              <div class="aide">Le lien est valable 60 minutes. Pensez à regarder dans les courriers indésirables.</div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <a href="#modal-login" class="lien-vert small me-auto" data-bs-toggle="modal" data-bs-dismiss="modal"><i class="fas fa-arrow-left me-1" aria-hidden="true"></i>Retour à la connexion</a>
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-success fw-semibold"><i class="fas fa-paper-plane me-1" aria-hidden="true"></i>Envoyer le lien</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
