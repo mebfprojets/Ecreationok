@@ -48,14 +48,14 @@ FACEBOOK: https://www.facebook.com/themefisher
 <!-- Styles -->
 
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" integrity="sha384-KZO2FRYNmIHerhfYMjCIUaJeGBRXP7CN24SiNSG+wdDzgwvxWbl16wMVtWiJTcMt" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" integrity="sha384-IrMr0LFnIMa9H6HhC5VVqVuWNEIwspnRLKQc0SUyPj4Cy4s02DiWDZEoJOo5WNK6" crossorigin="anonymous" />
 <!-- Or for RTL support -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" integrity="sha384-dHmYdBULIlN1UT/7MFm1UJxGu3C9ZSlZsdfWUpvgCU1wIvwTX2vzDO45ndkHLFgS" crossorigin="anonymous" />
 <!-- Scripts -->
 <script src="{{ asset('frontend/plugins/jQuery/jquery.min.js') }}"></script>
 {{-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.slim.min.js"></script> --}}
-<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.full.min.js" integrity="sha384-HCjW0//bc6Gu9bS3OISjenLhzVqjRipLVVj9LZtzKu+FYXXOZVCN7WDv2TYxCfmo" crossorigin="anonymous"></script>
 
   <!-- Bootstrap : feuille unique backend/css/bootstrap.min.css (v5, thème) chargée plus bas -->
   <!-- FontAwesome -->
@@ -321,8 +321,7 @@ FACEBOOK: https://www.facebook.com/themefisher
                 
               <li>
                     <a href="{{ route('logout') }}"
-                    onclick="event.preventDefault();
-                             document.getElementById('logout-form').submit();"><i class="fa fa-ban fa-fw pull-right"></i>
+                    data-csp-click="__deconnexion"><i class="fa fa-ban fa-fw pull-right"></i>
                     Se Deconnecter
                 </a>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

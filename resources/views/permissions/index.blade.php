@@ -36,7 +36,7 @@
                        
                     <a href="#" class="btn btn-sm btn-success" style="background:#3393FF" title="Afficher les détais"> <i class="fa fa-eye"></i></a>
                             <a href="{{ route('permissions.edit', $permission) }}" data-toggle="tooltip" title="Edit" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></a>                        
-                                <a href="#modal-confirm-delete" onclick="delConfirm({{ $permission->id }});" style="background:#3393FF" data-toggle="modal" title="Supprimer" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
+                                <a href="#modal-confirm-delete" data-csp-click="delConfirm" data-csp-click-args="{{ json_encode([($permission->id)]) }}" style="background:#3393FF" data-toggle="modal" title="Supprimer" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
                         
                     </td>
                 </tr>
@@ -72,7 +72,7 @@
                         <div class="form-group form-actions">
                             <div class="text-right">
                                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Fermer</button>
-                                <button type="submit" class="btn btn-sm btn-primary" onclick="supp_id();">OUI</button>
+                                <button type="submit" class="btn btn-sm btn-primary" data-csp-click="supp_id">OUI</button>
                             </div>
                         </div>
 
@@ -82,7 +82,7 @@
         </div>
 </div>
     {{-- cette fonction javascript permet de definir l'action du formulaire dynamiquement. l'action route user reinitialise dans le formulaire dont id est reini_user --}}
-    <script>
+    <script nonce="{{ $cspNonce ?? '' }}">
 
         function delConfirm (id){
             //alert(id);

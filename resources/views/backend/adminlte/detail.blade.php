@@ -4,7 +4,7 @@
     <section class="content">
       <div class="container-fluid">
         <!-- SELECT2 EXAMPLE -->
-        <button type="button" class="btn btn-outline-danger me-2 cancel" onclick="history.back()"><i class="fas fa fa-ban"></i> Retour</button>
+        <button type="button" class="btn btn-outline-danger me-2 cancel" data-csp-click="__retour"><i class="fas fa fa-ban"></i> Retour</button>
         <center><h4>
         {{$demandes->commercial_name}}    
         - @if($demandes->company_type=="EI")
@@ -53,12 +53,12 @@
                 <input class="form-control"  disabled="disabled" type="text" value="{{$typejointe->libelle}}">
                 @if(getformalite($typejointe->id,$demandes->id))
                 @can('save_formalite_retour',Auth::user())
-                  <a  href="#modal-update-piece" data-toggle="modal"  onclick="gettypepiece_update('{{$typejointe->id}}','{{$typejointe->libelle}}');" style="margin-left:10px;"  class="btn btn-md btn-success" > <i class="fas fa-pen"></i> </a>
+                  <a  href="#modal-update-piece" data-toggle="modal"  data-csp-click="gettypepiece_update" data-csp-click-args="{{ json_encode([(string) ($typejointe->id), (string) ($typejointe->libelle)]) }}" style="margin-left:10px;"  class="btn btn-md btn-success" > <i class="fas fa-pen"></i> </a>
                 @endcan
                   <a href="{{ route('show_formalite_retour',getformalite($typejointe->id,$demandes->id)) }}" style="margin-left:10px;" target="_blank"   class="btn btn-md btn-success "> <i class="fas fa-eye"></i> </a>
                 @else
                 @can('save_formalite_retour',Auth::user())
-                    <a href="#modal-add-piece" data-toggle="modal" onclick="gettypepiece('{{$typejointe->id}}','{{$typejointe->libelle}}');"  style="margin-left:10px;"  class="btn btn-md btn-success" > <i class="fas fa-plus"></i> </a>
+                    <a href="#modal-add-piece" data-toggle="modal" data-csp-click="gettypepiece" data-csp-click-args="{{ json_encode([(string) ($typejointe->id), (string) ($typejointe->libelle)]) }}"  style="margin-left:10px;"  class="btn btn-md btn-success" > <i class="fas fa-plus"></i> </a>
                 @endcan
                 @endif
                 </div>
@@ -186,7 +186,7 @@
                   <label>Secteur d'activité</label>
                   <input class="form-control edit_demande" disabled="disabled" type="text" value="{{$demandes->activity_sector}}">
                   <div class="mb-3 save_demande" style="display:none;">
-                      <select id="secteur_activite" name="secteur_activite"  class="form-control select" data-placeholder="Choisir le secteur ..." style="width: 100%;" onchange="changeActivite('secteur_activite','activite_principale');" required>                                                                          
+                      <select id="secteur_activite" name="secteur_activite"  class="form-control select" data-placeholder="Choisir le secteur ..." style="width: 100%;" data-csp-change="changeActivite" data-csp-change-args='["secteur_activite", "activite_principale"]' required>                                                                          
                           <option value="{{$demandes->activity_sector}}">{{$demandes->activity_sector}}</option>
                               @foreach ($activites_all as $activite )
                                 <option value="{{ $activite->secteur_activite }}">{{ $activite->secteur_activite }}</option>
@@ -319,7 +319,7 @@
             </div>         <br>   
             @if($demandes->paye==1 && $demandes->etat==2)                      
           <center>
-            <a  style="margin-left:10px;" id="declaration_edit"  data-toggle="modal" class="btn btn-md btn-success declaration edit_demande" onclick="editdemande()" > <i class="fas fa-pen"></i> Corriger Entreprise </a>
+            <a  style="margin-left:10px;" id="declaration_edit"  data-toggle="modal" class="btn btn-md btn-success declaration edit_demande" data-csp-click="editdemande" > <i class="fas fa-pen"></i> Corriger Entreprise </a>
             <button type="submit" style="margin-left:10px;display:none" id="declaration_edit"  data-toggle="modal" class="btn btn-md btn-success save_demande" > <i class="fas fa-pen"></i> Enregistrer </button>
             <!-- <a  style="margin-left:10px;" id="declaration_edit"  data-toggle="modal" style="display:none" class="btn btn-md btn-danger declaration save_demande" onclick="editdemande()" > <i class="fa fa-window-close"></i> Annuler </a> -->
           </center>
@@ -407,7 +407,7 @@
                   <label>Situation matrimoniale</label>
                   <input class="form-control edit_usager" disabled="disabled" type="text" value="@if($usager->SituationMatrimoniale==1) Célibataire @elseif($usager->SituationMatrimoniale==2) Marié @else Divorcé @endif">
                   <div class="mb-3 save_usager" style="display:none;">                    
-                       <select id="situation_matrimoniale" name="situation_matrimoniale" class="form-control select2" data-placeholder="Choisir votre situation matrimoniale" style="width: 100%;" required="Ce champ est obligatoire" title="Ce champ est obligatoire" onchange="afficher_conjoint();">
+                       <select id="situation_matrimoniale" name="situation_matrimoniale" class="form-control select2" data-placeholder="Choisir votre situation matrimoniale" style="width: 100%;" required="Ce champ est obligatoire" title="Ce champ est obligatoire" data-csp-change="afficher_conjoint">
                             <option value="{{$usager->SituationMatrimoniale}}">@if($usager->SituationMatrimoniale==1) Célibataire @elseif($usager->SituationMatrimoniale==2) Marié @else Divorcé @endif</option>
                             <option value="1" {{ old('situation_matrimoniale') == 1 ? 'selected' : '' }}>Celibataire</option>
                             <option value="2" {{ old('situation_matrimoniale') == 2 ? 'selected' : '' }}>Marié</option>
@@ -468,7 +468,7 @@
                   <label>Région</label>
                   <input class="form-control" disabled="disabled" type="text" value="{{$regions->name}}">
                   <div class="mb-3" style="display:none;">                       
-                            <select id="region_usager" name="region_usager" data-placeholder="{{$regions->name}}" value="{{old("region_usager")}}" class="form-control select2" style="width: 100%;"  onchange="changeValue('region_usager', 'province_usager', 'provinces','region_usager');">
+                            <select id="region_usager" name="region_usager" data-placeholder="{{$regions->name}}" value="{{old("region_usager")}}" class="form-control select2" style="width: 100%;"  data-csp-change="changeValue" data-csp-change-args='["region_usager", "province_usager", "provinces", "region_usager"]'>
                                  <option value="{{$regions->id}}">{{$regions->name}}</option>
                                     @foreach ($regions_all as $region )
                                  <option value="{{ $region->id }}">{{ $region->name }}</option>
@@ -480,7 +480,7 @@
                   <label>Province</label>
                   <input class="form-control" disabled="disabled" type="text" value="{{$provinces->name}}">
                   <div class="mb-3" style="display:none;">                  
-                      <select id="province_usager" name="province_usager" data-placeholder="{{$provinces->name}}" class="form-control select2" style="width: 100%;"   onchange="changeValue('province_usager', 'commune_usager', 'communes','region_usager');">
+                      <select id="province_usager" name="province_usager" data-placeholder="{{$provinces->name}}" class="form-control select2" style="width: 100%;"   data-csp-change="changeValue" data-csp-change-args='["province_usager", "commune_usager", "communes", "region_usager"]'>
                             <option value="{{$provinces->id}}">{{$provinces->name}}</option>                                                                   
                       </select>
                   </div>                
@@ -508,7 +508,7 @@
               <!-- /.col -->
             </div>
             @if($demandes->paye==1 && $demandes->etat==2)                      
-          <center><a  style="margin-left:10px; color:black;" id="declaration_edit"  data-toggle="modal" class="btn btn-md btn-success declaration edit_usager" onclick="editusager()" > <i class="fas fa-pen"></i> Corriger Dirigeant</a>
+          <center><a  style="margin-left:10px; color:black;" id="declaration_edit"  data-toggle="modal" class="btn btn-md btn-success declaration edit_usager" data-csp-click="editusager" > <i class="fas fa-pen"></i> Corriger Dirigeant</a>
             <button type="submit" style="margin-left:10px;display:none" id="declaration_edit"  data-toggle="modal" class="btn btn-md btn-success save_usager" > <i class="fas fa-pen"></i> Enregistrer </button>
             <!-- <a  style="margin-left:10px;" id="declaration_edit"  data-toggle="modal" style="display:none;" class="btn btn-md btn-danger save_usager" onclick="editusager()" > <i class="fa fa-window-close"></i> Annuler </a> -->
           </center>
@@ -714,7 +714,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
   function gettypepiece(id,libelle)
       {
     

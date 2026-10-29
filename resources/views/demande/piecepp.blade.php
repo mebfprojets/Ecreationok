@@ -1,4 +1,5 @@
 @extends('layouts.frontend')
+@section('alertes_locales', '1')
 
 @section('content')
 <style>
@@ -66,7 +67,7 @@
                     <div class="card-body">
                         <!-- Messages de session -->
                         @if(session('success'))
-                            <div class="alert alert-success">
+                            <div class="alert alert-success fade show" data-fermeture-auto="10">
                                 {{ session('success') }}
                             </div>
                         @endif
@@ -447,7 +448,7 @@
 </div>
 @endsection
 
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     class FileUploadManager {
         constructor() {
             this.initEvents();
@@ -660,7 +661,7 @@
         new FileUploadManager();
     });
 </script>
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     document.addEventListener('DOMContentLoaded', function() {
         const dateEtab = document.getElementById('date_etablissement');
         const dateExp = document.getElementById('date_expiration');

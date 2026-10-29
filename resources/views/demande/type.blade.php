@@ -1,4 +1,5 @@
 @extends('layouts.frontend')
+@section('alertes_locales', '1')
 
 @section('content')
 <style>
@@ -52,6 +53,11 @@
 
                 </div>
                 <div class="card-body">
+                    @if(session('success'))
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
+                    @endif
                     @if(session('error'))
                         <div class="alert alert-danger">
                             {{ session('error') }}
@@ -140,7 +146,7 @@
 </div>
 @endsection
 
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
 document.addEventListener('DOMContentLoaded', function() {
     // Animation au survol des cartes
     const cards = document.querySelectorAll('.card-type-entreprise-link .card');

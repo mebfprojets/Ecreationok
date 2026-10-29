@@ -8,7 +8,7 @@
     <div class="form-group mt-2 row" >
             <label  class="col-md-4 control-label" for="parametre">Parametre concerné <span class="text-danger">*</span> :</label>
             <div class="col-md-8">
-                <select   id="parametre" name="parametre"  class="form-control select-select2" onchange="changelistevale();">
+                <select   id="parametre" name="parametre"  class="form-control select-select2" data-csp-change="changelistevale">
                     <option></option>
 
                     @foreach($parametres as $parametre)
@@ -73,7 +73,7 @@
     </div>
 
 @endsection
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     function delConfirm(id){
             //alert(id);
             document.getElementById("id_table").setAttribute("value", id);
@@ -96,7 +96,7 @@
                          for (var x = 1; x < data.length; x++) {
                              var rout= '{{ route("valeurs.edit",":id")}}';
                              var rout = rout.replace(':id', data[x]['id']);
-                             options +='<tr> <td  width="5%" > ' + x + '</td><td width="20%" > ' + data[x]['libelle'] + '</td><td  width="40%"> ' + data[x]['description'] + '  </td> <td  width="15%"><div class="btn-group"><a  onclick="detailvaleur(' + data[x]['id'] + ' );" href="#modal-voir-detail" data-toggle="modal" title="Voir details" class="btn btn-xs btn-default"><i class="fa fa-eye"></i></a><a href="'+rout+'" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-primary"><i class="fa fa-pencil"></i></a><a href="#modal-confirm-delete" onclick="delConfirm(' + data[x]['id'] + ');" data-toggle="modal" title="Supprimer" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a></div></td></tr>';
+                             options +='<tr> <td  width="5%" > ' + x + '</td><td width="20%" > ' + data[x]['libelle'] + '</td><td  width="40%"> ' + data[x]['description'] + '  </td> <td  width="15%"><div class="btn-group"><a  data-csp-click="detailvaleur" data-csp-click-args="[' + parseInt(data[x]['id'], 10) + ']" href="#modal-voir-detail" data-toggle="modal" title="Voir details" class="btn btn-xs btn-default"><i class="fa fa-eye"></i></a><a href="'+rout+'" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-primary"><i class="fa fa-pencil"></i></a><a href="#modal-confirm-delete" data-csp-click="delConfirm" data-csp-click-args="[' + parseInt(data[x]['id'], 10) + ']" data-toggle="modal" title="Supprimer" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a></div></td></tr>';
                               }
                         $('#tbadys').html(options);
                      }

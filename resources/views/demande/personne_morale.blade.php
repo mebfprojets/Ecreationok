@@ -141,7 +141,7 @@
                                                                     <div class="input-group declaration_group_edit" style="display: none" >
                                                                         <input type="text" id="input_declaration" name="declaration_sur_lhonneur" disabled class="form-control col-md-7 input_declaration"  value="Declaration sur l'honneur" >
                                                                          <div class="col-md-5">
-                                                                            <a href="#updatepiecejointe" id="declaration_edit"  data-bs-toggle="modal" class="btn btn-md btn-success" onclick="editpiecejointe('declaration')" > <i class="fas fa-pen"></i> </a>
+                                                                            <a href="#updatepiecejointe" id="declaration_edit"  data-bs-toggle="modal" class="btn btn-md btn-success" data-csp-click="editpiecejointe" data-csp-click-args='["declaration"]' > <i class="fas fa-pen"></i> </a>
                                                                              <a href="{{ route('detaildocument') }}?categoriepiece=declaration"  id="declaration_view"   class="btn btn-md btn-success declaration_view"> <i class="fas fa-eye"></i> </a>
                                                                         </div>
                                                                     </div>
@@ -149,7 +149,7 @@
                                                                     <div class="input-group">
                                                                         <input type="text" id="input_declaration" name="declaration_sur_lhonneur" disabled class="form-control col-md-7 input_declaration piece_declaration"  value="Declaration sur l'honneur" >
                                                                          <div class="col-md-5">
-                                                                            <a href="#updatepiecejointe" id="declaration_edit"  data-bs-toggle="modal" class="btn btn-md btn-success" onclick="editpiecejointe('declaration')" > <i class="fas fa-pen"></i> </a>
+                                                                            <a href="#updatepiecejointe" id="declaration_edit"  data-bs-toggle="modal" class="btn btn-md btn-success" data-csp-click="editpiecejointe" data-csp-click-args='["declaration"]' > <i class="fas fa-pen"></i> </a>
                                                                             <a href="{{ route('detaildocument') }}?categoriepiece=declaration" id="declaration_view"   class="btn btn-md btn-success declaration_view"> <i class="fas fa-eye"></i> </a>
                                                                         </div>
                                                                     </div>
@@ -170,7 +170,7 @@
                                                                     <div class="input-group acte_de_depot_group_edit" style="display: none">
                                                                         <input type="text" name="acte_de_depot_input" id="acte_de_depot_input" disabled class="form-control col-md-7 acte_de_depot_input"  value="Acte de depot" >
                                                                          <div class="col-md-5">
-                                                                            <a href="#updatepiecejointe" id="acte_de_depot_edit"   data-bs-toggle="modal"  class="btn btn-md btn-success" onclick="editpiecejointe('acte_de_depot')"> <i class="fas fa-pen"></i> </a>
+                                                                            <a href="#updatepiecejointe" id="acte_de_depot_edit"   data-bs-toggle="modal"  class="btn btn-md btn-success" data-csp-click="editpiecejointe" data-csp-click-args='["acte_de_depot"]'> <i class="fas fa-pen"></i> </a>
                                                                             <a  href="{{ route('detaildocument') }}?categoriepiece=acte_de_depot" id="acte_de_depot_view"   class="btn btn-md btn-success acte_de_depot_view"> <i class="fas fa-eye"></i> </a>
                                                                         </div>
                                                                     </div>
@@ -178,7 +178,7 @@
                                                                     <div class="input-group">
                                                                         <input type="text" name="acte_de_depot_input" id="acte_de_depot_input" disabled class="form-control col-md-7 acte_de_depot_input piece_acte_depot"  value="Acte de depot" >
                                                                          <div class="col-md-5">
-                                                                            <a href="#updatepiecejointe" id="acte_de_depot_edit"   data-bs-toggle="modal"  class="btn btn-md btn-success" onclick="editpiecejointe('acte_de_depot')"> <i class="fas fa-pen"></i> </a>
+                                                                            <a href="#updatepiecejointe" id="acte_de_depot_edit"   data-bs-toggle="modal"  class="btn btn-md btn-success" data-csp-click="editpiecejointe" data-csp-click-args='["acte_de_depot"]'> <i class="fas fa-pen"></i> </a>
                                                                             <a  href="{{ route('detaildocument') }}?categoriepiece=acte_de_depot" id="acte_de_depot_view"   class="btn btn-md btn-success acte_de_depot_view"> <i class="fas fa-eye"></i> </a>
                                                                         </div>
                                                                     </div>
@@ -186,7 +186,7 @@
                                                                     <div class="input-group acte_de_depot_group_add">
                                                                         <input type="text" name="acte_de_depot_input" id="acte_de_depot_input" disabled class="form-control col-md-7 acte_de_depot_input piece_acte_depot">
                                                                          <div class="col-md-5">
-                                                                            <a href="#addpiecejointe" id='acte_de_depot' data-bs-toggle="modal" class="btn btn-md btn-success acte_de_depot" onclick="redefinir_formulaire('formulaire_dem_cpc')"  > <i class=" fas fa-plus"></i> </a>
+                                                                            <a href="#addpiecejointe" id='acte_de_depot' data-bs-toggle="modal" class="btn btn-md btn-success acte_de_depot" data-csp-click="redefinir_formulaire" data-csp-click-args='["formulaire_dem_cpc"]'  > <i class=" fas fa-plus"></i> </a>
                                                                         </div>
                                                                     </div>
                                                                  @endif
@@ -198,7 +198,7 @@
                                                                     <div class="input-group edit_statut_group_hide " style="display: none">
                                                                         <input type="text" name="statut" id="statut_input" disabled class="form-control col-md-7 statut_input"  value="staut" >
                                                                          <div class="col-md-5">
-                                                                        <a href="#updatepiecejointe" id="statut_edit"  data-bs-toggle="modal"  class="btn btn-md btn-success" onclick="editpiecejointe('acte_de_depot')"> <i class="fas fa-pen"></i> </a>
+                                                                        <a href="#updatepiecejointe" id="statut_edit"  data-bs-toggle="modal"  class="btn btn-md btn-success" data-csp-click="editpiecejointe" data-csp-click-args='["acte_de_depot"]'> <i class="fas fa-pen"></i> </a>
                                                                          <a href="{{ route('detaildocument') }}?categoriepiece=statut"  id="statut_view"   class="btn btn-md btn-success statut_view"> <i class="fas fa-eye"></i> </a>
                                                                         </div>
                                                                     </div>
@@ -206,7 +206,7 @@
                                                                     <div class="input-group" >
                                                                         <input type="text" name="statut" id="statut_input" disabled class="form-control col-md-7 statut_input piece_statut"  value="staut" >
                                                                          <div class="col-md-5">
-                                                                        <a href="#updatepiecejointe" id="statut_edit"  data-bs-toggle="modal"  class="btn btn-md btn-success" onclick="editpiecejointe('statut')"> <i class="fas fa-pen"></i> </a>
+                                                                        <a href="#updatepiecejointe" id="statut_edit"  data-bs-toggle="modal"  class="btn btn-md btn-success" data-csp-click="editpiecejointe" data-csp-click-args='["statut"]'> <i class="fas fa-pen"></i> </a>
                                                                         <a href="{{ route('detaildocument') }}?categoriepiece=statut"  id="statut_view"   class="btn btn-md btn-success statut_view"> <i class="fas fa-eye"></i> </a>
                                                                         </div>
                                                                     </div>
@@ -214,7 +214,7 @@
                                                                 <div class="input-group add_statut_group">
                                                                     <input type="text" name="statut" id="statut_input" disabled class="form-control col-md-7 statut_input piece_statut">
                                                                      <div class="col-md-5">
-                                                                        <a href="#addpiecejointe" id='statut' data-bs-toggle="modal" class="btn btn-md btn-success statut" onclick="redefinir_formulaire('formulaire_dem_cpc')"  > <i class=" fas fa-plus"></i> </a>
+                                                                        <a href="#addpiecejointe" id='statut' data-bs-toggle="modal" class="btn btn-md btn-success statut" data-csp-click="redefinir_formulaire" data-csp-click-args='["formulaire_dem_cpc"]'  > <i class=" fas fa-plus"></i> </a>
                                                                     </div>
                                                                 </div>
                                                                 @endif
@@ -226,7 +226,7 @@
                                                                     <div class="input-group formulaire_rccm_group_edit" style="display: none">
                                                                         <input type="text" name="formulaire_rccm" id="formulaire_rccm_input" disabled class="form-control col-md-7 formulaire_rccm_input"  value="Formulaire RCCM" >
                                                                          <div class="col-md-5">
-                                                                            <a href="#updatepiecejointe" id="formulaire_rccm_edit"  data-bs-toggle="modal"  class="btn btn-md btn-success" onclick="editpiecejointe('formulaire_rccm')"> <i class="fas fa-pen"></i> </a>
+                                                                            <a href="#updatepiecejointe" id="formulaire_rccm_edit"  data-bs-toggle="modal"  class="btn btn-md btn-success" data-csp-click="editpiecejointe" data-csp-click-args='["formulaire_rccm"]'> <i class="fas fa-pen"></i> </a>
                                                                            <a href="{{ route('detaildocument') }}?categoriepiece=formulaire_rccm" id="formulaire_rccm_view"   class="btn btn-md btn-success formulaire_rccm_view"> <i class="fas fa-eye"></i> </a> 
                                                                         </div>
                                                                     </div>
@@ -234,7 +234,7 @@
                                                                     <div class="input-group">
                                                                         <input type="text" name="formulaire_rccm" id="formulaire_rccm_input" disabled class="form-control col-md-7 formulaire_rccm_input piece_rccm"  value="Formulaire RCCM" >
                                                                          <div class="col-md-5">
-                                                                            <a href="#updatepiecejointe" id="formulaire_rccm_edit"  data-bs-toggle="modal"  class="btn btn-md btn-success" onclick="editpiecejointe('formulaire_rccm')"> <i class="fas fa-pen"></i> </a>
+                                                                            <a href="#updatepiecejointe" id="formulaire_rccm_edit"  data-bs-toggle="modal"  class="btn btn-md btn-success" data-csp-click="editpiecejointe" data-csp-click-args='["formulaire_rccm"]'> <i class="fas fa-pen"></i> </a>
                                                                             <a href="{{ route('detaildocument') }}?categoriepiece=formulaire_rccm" id="formulaire_rccm_view"   class="btn btn-md btn-success formulaire_rccm_view"> <i class="fas fa-eye"></i> </a>
                                                                         </div>
                                                                     </div>
@@ -242,7 +242,7 @@
                                                                 <div class="input-group formulaire_rccm_group_add">
                                                                     <input type="text" name="formulaire_rccm" id="formulaire_rccm_input" disabled class="form-control col-md-7 formulaire_rccm_input piece_rccm">
                                                                      <div class="col-md-5">
-                                                                        <a href="#addpiecejointe" id='formulaire_rccm' data-bs-toggle="modal" class="btn btn-md btn-success formulaire_rccm" onclick="redefinir_formulaire('formulaire_dem_cpc')" > <i class=" fas fa-plus"></i> </a>
+                                                                        <a href="#addpiecejointe" id='formulaire_rccm' data-bs-toggle="modal" class="btn btn-md btn-success formulaire_rccm" data-csp-click="redefinir_formulaire" data-csp-click-args='["formulaire_dem_cpc"]' > <i class=" fas fa-plus"></i> </a>
                                                                     </div>
                                                                 </div>
                                                                 @endif
@@ -255,7 +255,7 @@
                                                                         <div class="input-group piece_didentite_group_edit" style="display: none">
                                                                             <input type="text" name="piece_didentite" id="piece_didentite_input" disabled class="form-control col-md-7 piece_didentite_input" value="Piece d'identité" >
                                                                              <div class="col-md-5">
-                                                                                <a href="#updatepiecejointe" id="piece_didentite_edit"  data-bs-toggle="modal"  class="btn btn-md btn-success" onclick="editpiecejointe('piece_didentite')"> <i class="fas fa-pen"></i> </a>
+                                                                                <a href="#updatepiecejointe" id="piece_didentite_edit"  data-bs-toggle="modal"  class="btn btn-md btn-success" data-csp-click="editpiecejointe" data-csp-click-args='["piece_didentite"]'> <i class="fas fa-pen"></i> </a>
                                                                                  <a href="{{ route('detaildocument') }}?categoriepiece=piece_didentite" id="piece_didentite_view"  class="btn btn-md btn-success piece_didentite_view"> <i class="fas fa-eye"></i> </a> 
                                                                             </div>
                                                                         </div>
@@ -263,7 +263,7 @@
                                                                         <div class="input-group">
                                                                             <input type="text" name="piece_didentite" id="piece_didentite_input" disabled class="form-control col-md-7 piece_didentite_input piece_identite" value="Piece d'identité" >
                                                                              <div class="col-md-5">
-                                                                                <a href="#updatepiecejointe" id="piece_didentite_edit"  data-bs-toggle="modal"  class="btn btn-md btn-success" onclick="editpiecejointe('piece_didentite')"> <i class="fas fa-pen"></i> </a>
+                                                                                <a href="#updatepiecejointe" id="piece_didentite_edit"  data-bs-toggle="modal"  class="btn btn-md btn-success" data-csp-click="editpiecejointe" data-csp-click-args='["piece_didentite"]'> <i class="fas fa-pen"></i> </a>
                                                                                 <a href="{{ route('detaildocument') }}?categoriepiece=piece_didentite"  id="piece_didentite_view"  class="btn btn-md btn-success piece_didentite_view"> <i class="fas fa-eye"></i> </a>
                                                                             </div>
                                                                         </div>
@@ -271,7 +271,7 @@
                                                                     <div class="input-group piece_didentite_group_add">
                                                                         <input type="text" name="piece_didentite" id="piece_didentite_input" disabled class="form-control col-md-7 piece_didentite_input piece_identite">
                                                                          <div class="col-md-5">
-                                                                            <a href="#addpiecejointe" id='piece_didentite' data-bs-toggle="modal" class="btn btn-md btn-success piece_didentite" onclick="redefinir_formulaire('formulaire_dem_cpc')"  > <i class=" fas fa-plus"></i> </a>
+                                                                            <a href="#addpiecejointe" id='piece_didentite' data-bs-toggle="modal" class="btn btn-md btn-success piece_didentite" data-csp-click="redefinir_formulaire" data-csp-click-args='["formulaire_dem_cpc"]'  > <i class=" fas fa-plus"></i> </a>
                                                                            
                                                                         </div>
                                                                     </div>
@@ -285,7 +285,7 @@
                                                                     <div class="input-group titre_de_propriete_group_edit" style="display: none">
                                                                         <input type="text" name="titre_de_propriete" id="titre_de_propriete_input" disabled class="form-control col-md-7 titre_de_propriete_input"  value="Titre de propriété" >
                                                                          <div class="col-md-5">
-                                                                            <a href="#updatepiecejointe" id="titre_de_propriete_edit" data-bs-toggle="modal"  class="btn btn-md btn-success titre_de_propriete" onclick="editpiecejointe('titre_de_propriete')"> <i class="fas fa-pen"></i> </a>
+                                                                            <a href="#updatepiecejointe" id="titre_de_propriete_edit" data-bs-toggle="modal"  class="btn btn-md btn-success titre_de_propriete" data-csp-click="editpiecejointe" data-csp-click-args='["titre_de_propriete"]'> <i class="fas fa-pen"></i> </a>
                                                                             <a  href="{{ route('detaildocument') }}?categoriepiece=titre_de_propriete" id="titre_de_propriete_view"  class="btn btn-md btn-success titre_de_propriete_view"> <i class="fas fa-eye"></i> </a>
                                                                         </div>
                                                                     </div>
@@ -293,7 +293,7 @@
                                                                     <div class="input-group">
                                                                         <input type="text" name="titre_de_propriete" id="titre_de_propriete_input" disabled class="form-control col-md-7 titre_de_propriete_input piece_propriete"  value="Titre de propriété" >
                                                                          <div class="col-md-5">
-                                                                            <a href="#updatepiecejointe" id="titre_de_propriete_edit" data-bs-toggle="modal"  class="btn btn-md btn-success" onclick="editpiecejointe('titre_de_propriete')"> <i class="fas fa-pen"></i> </a>
+                                                                            <a href="#updatepiecejointe" id="titre_de_propriete_edit" data-bs-toggle="modal"  class="btn btn-md btn-success" data-csp-click="editpiecejointe" data-csp-click-args='["titre_de_propriete"]'> <i class="fas fa-pen"></i> </a>
                                                                             <a  href="{{ route('detaildocument') }}?categoriepiece=titre_de_propriete" id="titre_de_propriete_view"  class="btn btn-md btn-success titre_de_propriete_view"> <i class="fas fa-eye"></i> </a>
                                                                         </div>
                                                                     </div>
@@ -313,7 +313,7 @@
                                                                     <div class="input-group formulaire_cpc_es_group_edit" style="display: none">
                                                                         <input type="text" name="formulaire_cpc_es" id="formulaire_cpc_es" disabled class="form-control col-md-7 formulaire_cpc_es_input"  value="Formulaire de demande CPC" >
                                                                          <div class="col-md-5">
-                                                                            <a href="#updatepiecejointe" id="formulaire_cpc_es_edit" data-bs-toggle="modal"  class="btn btn-md btn-success" onclick="editpiecejointe('formulaire_cpc_es')"> <i class="fas fa-pen"></i> </a>
+                                                                            <a href="#updatepiecejointe" id="formulaire_cpc_es_edit" data-bs-toggle="modal"  class="btn btn-md btn-success" data-csp-click="editpiecejointe" data-csp-click-args='["formulaire_cpc_es"]'> <i class="fas fa-pen"></i> </a>
                                                                             <a  href="{{ route('detaildocument') }}?categoriepiece=formulaire_cpc_es" id="formulaire_cpc_es_view"  class="btn btn-md btn-success formulaire_cpc_es_view"> <i class="fas fa-eye"></i> </a>
                                                                         </div>
                                                                     </div>
@@ -321,7 +321,7 @@
                                                                     <div class="input-group">
                                                                         <input type="text" name="formulaire_cpc_es" id="formulaire_cpc_es_input" disabled class="form-control col-md-7 formulaire_cpc_es_input formulaire_cpc_es"  value="Formulaire de demande CPC" >
                                                                          <div class="col-md-5">
-                                                                            <a href="#updatepiecejointe" id="formulaire_cpc_es_edit" data-bs-toggle="modal"  class="btn btn-md btn-success" onclick="editpiecejointe('formulaire_cpc_es')"> <i class="fas fa-pen"></i> </a>
+                                                                            <a href="#updatepiecejointe" id="formulaire_cpc_es_edit" data-bs-toggle="modal"  class="btn btn-md btn-success" data-csp-click="editpiecejointe" data-csp-click-args='["formulaire_cpc_es"]'> <i class="fas fa-pen"></i> </a>
                                                                             <a  href="{{ route('detaildocument') }}?categoriepiece=formulaire_cpc_es" id="formulaire_cpc_es_view"  class="btn btn-md btn-success formulaire_cpc_es_view"> <i class="fas fa-eye"></i> </a>
                                                                         </div>
                                                                     </div>
@@ -355,12 +355,13 @@
                                                             <div class="col-lg-6">
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="progress-basicpill-vatno-input">Nom Commercial (<font color="red">*</font>)</label>
-                                                                    <input type="text" id="nom_commercial_pm" name="nom_commercial" class="form-control"  onchange="valider_nom_commercial('nom_commercial_pm');" required>
+                                                                    <input type="text" id="nom_commercial_pm" name="nom_commercial" class="form-control"  data-csp-change="valider_nom_commercial" data-csp-change-args='["nom_commercial_pm"]' required>
                                                                     <!--  -->
                                                                     <input type="hidden" name="type_request"  class="form-control" id="type_demande">
                                                                     <!-- <input type="text" name="nom" class="form-control" id="progress-basicpill-pancard-input"> -->
                                                                 </div>
-                                                                <p class='nomCommercialindispo' style="color:red; display:none"> Ce Nom commercial est indisponible</p>
+                                                                <div class="nomCommercialindispo text-danger small mt-1" role="alert" style="display:none"><i class="fas fa-exclamation-circle me-1" aria-hidden="true"></i>Ce nom commercial est indisponible.</div>
+                                                                <div class="nomCommercialErreur text-danger small mt-1" role="alert" style="display:none"><i class="fas fa-exclamation-circle me-1" aria-hidden="true"></i>Impossible de vérifier le nom commercial.</div>
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <div class="mb-3">
@@ -371,9 +372,10 @@
                                                             <div class="col-lg-6">
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="progress-basicpill-vatno-input">Dénomination Sociale (<font color="red">*</font>)</label>
-                                                                    <input type="text" id="denomination_sociale_pm" name="denomination_sociale" class="form-control"  onchange="valider_nom_commercial('denomination_sociale_pm');" required>
+                                                                    <input type="text" id="denomination_sociale_pm" name="denomination_sociale" class="form-control"  data-csp-change="valider_nom_commercial" data-csp-change-args='["denomination_sociale_pm"]' required>
                                                                 </div>
-                                                                <p class='nomCommercialindispo' style="color:red; display:none"> Cette Dénomination Sociale est indisponible</p>
+                                                                <div class="nomCommercialindispo text-danger small mt-1" role="alert" style="display:none"><i class="fas fa-exclamation-circle me-1" aria-hidden="true"></i>Cette dénomination sociale est indisponible.</div>
+                                                                <div class="nomCommercialErreur text-danger small mt-1" role="alert" style="display:none"><i class="fas fa-exclamation-circle me-1" aria-hidden="true"></i>Impossible de vérifier la dénomination sociale.</div>
                                                             </div>   
                                                             <div class="col-lg-6">
                                                                 <div class="mb-3">
@@ -428,7 +430,7 @@
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="progress-basicpill-cstno-input">Chiffre d'affaire Prévisionnel (FCFA) (<font color="red">*</font>)</label>  
                                                                 <p class="chiffre_pm" style="color:red; display:none;">La valeur doit être supérieure ou égale à 1 000 000 FCFA</p>                                                        
-                                                                    <input type="number" name="chiffre_daffaire_previsionnel" class="form-control" id="chiffre_daffaire_prev_pm" onchange="chiffre_daffaire();" required>                                                                    
+                                                                    <input type="number" name="chiffre_daffaire_previsionnel" class="form-control" id="chiffre_daffaire_prev_pm" data-csp-change="chiffre_daffaire" required>                                                                    
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -439,7 +441,7 @@
                                                             <div class="col-lg-6">
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="progress-basicpill-cstno-input">Secteur d'activité (<font color="red">*</font>)</label>
-                                                                    <select id="secteur_activite_pm" name="secteur_activite" data-placeholder="Choisir l'activité ..." class="form-control select" onchange="changeActivite('secteur_activite_pm','activite_principale_pm');" style="width: 100%;" required>
+                                                                    <select id="secteur_activite_pm" name="secteur_activite" data-placeholder="Choisir l'activité ..." class="form-control select" data-csp-change="changeActivite" data-csp-change-args='["secteur_activite_pm", "activite_principale_pm"]' style="width: 100%;" required>
                                                                             <option></option>   
                                                                             @foreach ($activites as $activite )
                                                                             <option value="{{ $activite->secteur_activite }}">{{ $activite->secteur_activite }}</option>
@@ -487,7 +489,7 @@
                                                             <div class="col-lg-4">
                                                                 <div class="mb-3">
                                                                 <label class="form-label" for="progress-basicpill-vatno-input">Dont Numéraire</label>
-                                                                    <input type="number" name="capital_en_numeraire" class="form-control" id="dont_numeraire" onchange="montantCapital();" required>
+                                                                    <input type="number" name="capital_en_numeraire" class="form-control" id="dont_numeraire" data-csp-change="montantCapital" required>
                                                                 </div>
                                                             </div>
                                                             <!-- <div class="col-lg-3">
@@ -499,7 +501,7 @@
                                                             <div class="col-lg-4"> 
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="progress-basicpill-vatno-input">Dont Nature</label>
-                                                                    <input type="number" name="capital_en_nature" class="form-control" id="dont_nature" onchange="montantCapital();" required>
+                                                                    <input type="number" name="capital_en_nature" class="form-control" id="dont_nature" data-csp-change="montantCapital" required>
                                                                 </div>
                                                             </div>
                                                             <div class="col-lg-4">
@@ -513,7 +515,7 @@
                                                             <div class="col-lg-6">
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="progress-basicpill-vatno-input">Montant Action ou Montant Part Social</label>
-                                                                    <input type="number" name="montant_action" class="form-control" id="montant_action" onchange="montantAction();" required>
+                                                                    <input type="number" name="montant_action" class="form-control" id="montant_action" data-csp-change="montantAction" required>
                                                                 </div>
                                                             </div>  
                                                             <div class="col-lg-6">
@@ -616,7 +618,7 @@
                                                             </div> 
                                                             <div class="col-lg-2">
                                                                 <div class="mb-" style="margin-top: 30px;"> 
-                                                                <a href="javascript:void(0);"  class="btn btn-md btn-success add-line"> <i class="fas fa-plus"></i> </a>
+                                                                <a href="#" data-csp-click="__aucune"  class="btn btn-md btn-success add-line"> <i class="fas fa-plus"></i> </a>
                                                                 <a href="#addusager" id="addusager" data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" >Créé Dirigeant</a>
                                                                 </div>
                                                             </div>
@@ -688,7 +690,7 @@
                                                             <div class="col-lg-6">
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="progress-basicpill-cstno-input">Région (<font color="red">*</font>)</label>                                                                    
-                                                                    <select id="region_entreprise" name="region_entreprise" data-placeholder="Choisir la région" class="form-control select" style="width: 100%;"  onchange="changeValue('region_entreprise', 'province_entreprise', 'provinces','region_entreprise');" required>
+                                                                    <select id="region_entreprise" name="region_entreprise" data-placeholder="Choisir la région" class="form-control select" style="width: 100%;"  data-csp-change="changeValue" data-csp-change-args='["region_entreprise", "province_entreprise", "provinces", "region_entreprise"]' required>
                                                                         <option></option>
                                                                         @foreach ($regions as $region )
                                                                             <option value="{{ $region->id }}">{{ $region->name }}</option>
@@ -698,20 +700,20 @@
                                                                 </div>
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="progress-basicpill-cstno-input">Province (<font color="red">*</font>)</label>                                                                    
-                                                                    <select id="province_entreprise" name="province_entreprise" data-placeholder="Choisir la province" class="form-control select" style="width: 100%;"   onchange="changeValue('province_entreprise', 'commune_entreprise', 'communes','region_entreprise');" required>
+                                                                    <select id="province_entreprise" name="province_entreprise" data-placeholder="Choisir la province" class="form-control select" style="width: 100%;"   data-csp-change="changeValue" data-csp-change-args='["province_entreprise", "commune_entreprise", "communes", "region_entreprise"]' required>
                                                                         <option></option>                                                                     
                                                                     </select>                                                                    
                                                                 </div>
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="progress-basicpill-cstno-input">Commune ou Département (<font color="red">*</font>)</label>                                                                    
-                                                                    <select id="commune_entreprise" name="commune_entreprise" data-placeholder="Choisir la commune" class="form-control select" style="width: 100%;"   onchange="changeValue('commune_entreprise', 'arrondissement_entreprise', 'arrondissements','province_entreprise');" >
+                                                                    <select id="commune_entreprise" name="commune_entreprise" data-placeholder="Choisir la commune" class="form-control select" style="width: 100%;"   data-csp-change="changeValue" data-csp-change-args='["commune_entreprise", "arrondissement_entreprise", "arrondissements", "province_entreprise"]' >
                                                                         <option></option>
                                                                     </select>
                                                                     
                                                                 </div>
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="progress-basicpill-cstno-input">Arrondissement</label>                                                                    
-                                                                    <select id="arrondissement_entreprise" name="arrondissement_entreprise" data-placeholder="Choisir l'arrondissement" class="form-control select" style="width: 100%;"  onchange="changeValue('arrondissement_entreprise', 'secteur_entreprise', 'secteur_villages','commune_entreprise');" required>
+                                                                    <select id="arrondissement_entreprise" name="arrondissement_entreprise" data-placeholder="Choisir l'arrondissement" class="form-control select" style="width: 100%;"  data-csp-change="changeValue" data-csp-change-args='["arrondissement_entreprise", "secteur_entreprise", "secteur_villages", "commune_entreprise"]' required>
                                                                         <option> -- Selectionner --</option>
                                                                     </select>
                                                                     
@@ -790,7 +792,7 @@
                                                                     </div>
                                                                     <div class="col-md-3">
                                                                         <label class="form-label" for="progress-basicpill-cstno-input">Superficie en m² (<font color="red">*</font>)</label>   
-                                                                        <input type="number" min="0" name="superficie" class="form-control" > 
+                                                                        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="9" name="superficie" class="form-control" title="Nombre entier de m², sans virgule ni point" data-csp-input="__entier"> 
                                                                     </div>
                                                                 </div>                              
 
@@ -942,8 +944,8 @@
 
                                       
                                             <!-- <ul class="pager wizard twitter-bs-wizard-pager-link">
-                                                <li class="previous"><a href="javascript: void(0);">Previous</a></li>
-                                                <li class="next"><a href="javascript: void(0);">Next</a></li>
+                                                <li class="previous"><a href="#" data-csp-click="__aucune">Previous</a></li>
+                                                <li class="next"><a href="#" data-csp-click="__aucune">Next</a></li>
                                             </ul> -->
                                         </div>
                                     </div>

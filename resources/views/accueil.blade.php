@@ -373,7 +373,7 @@ du Conseiller CEFORE si vous êtes dans une localité disposant d'un bureau CEFO
                 <img loading="lazy" src="frontend/images/icon-image/fact3.png" alt="facts-img">
               </div>
               <div class="ts-facts-content">
-                <h2 class="ts-facts-num"><span class="counterUp" data-count="{{$nbr_mois}}">0</span></h2>
+                <h2 class="ts-facts-num"><span class="counterUp" data-count="{{ $nbr_mois ?? 0 }}">0</span></h2>
                 <h3 class="ts-facts-title">Créations du mois</h3>
               </div>
           </div><!-- Col end -->

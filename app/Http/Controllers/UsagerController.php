@@ -103,40 +103,55 @@ class UsagerController extends Controller
        
     }
     public function store(Request $request){
-        `$request->validate(['piece_jointe_m' => 'nullable'.self::REGLE_FICHIER]);`;
-        //dd($request->all());
-        // $this->validate($request, [
-    	// 	'nom_usager'=> "required",
-    	// 	'prenom_usager'=> "required",
-    	// 	'lieu_de_naissance'=> "required",
-        //     'date_de_naissance'=> "required",
-    	// 	'profession'=> "required",
-        //     'situation_matrimoniale'=> "required",
-        //     'nationalite_usager'=> "required",
-        //     'region_usager'=> "required",
-        //     'region_usager'=> "required",
-        //     'region_usager'=> "required",
-        //     'region_usager'=> "required",
-        //     'region_usager'=> "required",
+        // Deux usages : profil du promoteur connecté (formulaire classique, province_usager renseignée)
+        // ou ajout d'un conjoint / associé / dirigeant depuis une fenêtre (appel AJAX).
+        $estAjax = $request->ajax() || $request->expectsJson();
 
+        $request->validate([
+            'numero_piece' => ['required_without:numero_ifu', 'nullable', 'string', 'max:50', function ($attribut, $valeur, $echec) {
+                $numero = mb_strtoupper(trim((string) $valeur));
+                if ($numero !== '' && Usager::whereRaw('UPPER(LTRIM(RTRIM(CIN))) = ?', [$numero])->exists()) {
+                    $echec('Un promoteur est enregistré dans la base avec les mêmes informations.');
+                }
+            }],
+            'nom_usager' => 'nullable|string|max:255',
+            'prenom_usager' => 'nullable|string|max:255',
+            'email_usager' => 'nullable|email|max:255',
+            'telephone_mobile1' => 'nullable|string|max:30',
+            'piece_jointe_m' => 'nullable|'.self::REGLE_FICHIER,
+            'piece_jointe_c' => 'nullable|'.self::REGLE_FICHIER,
+        ], [
+            'numero_piece.required_without' => 'Le numéro de la pièce d’identité est obligatoire.',
+            'numero_piece.max' => 'Le numéro de la pièce d’identité est trop long (50 caractères au maximum).',
+            'nom_usager.max' => 'Le nom est trop long (255 caractères au maximum).',
+            'prenom_usager.max' => 'Le prénom est trop long (255 caractères au maximum).',
+            'email_usager.email' => 'L’adresse e-mail du promoteur n’est pas valide.',
+            'telephone_mobile1.max' => 'Le numéro de téléphone est trop long.',
+            'piece_jointe_m.file' => 'L’acte de mariage n’a pas été reçu correctement. Sélectionnez de nouveau le fichier.',
+            'piece_jointe_m.mimes' => 'L’acte de mariage doit être un fichier PDF, JPG ou PNG.',
+            'piece_jointe_c.file' => 'L’autorisation de commerce n’a pas été reçue correctement. Sélectionnez de nouveau le fichier.',
+            'piece_jointe_c.mimes' => 'L’autorisation de commerce doit être un fichier PDF, JPG ou PNG.',
+            'piece_jointe_m.max' => 'L’acte de mariage ne doit pas dépasser 10 Mo.',
+            'piece_jointe_c.max' => 'L’autorisation de commerce ne doit pas dépasser 10 Mo.',
+            'piece_jointe_m.uploaded' => 'L’acte de mariage n’a pas pu être envoyé : il est probablement trop volumineux.',
+            'piece_jointe_c.uploaded' => 'L’autorisation de commerce n’a pas pu être envoyée : elle est probablement trop volumineuse.',
+        ]);
 
-    	// ]);
-     
-        $village = DB::table('secteur_villages')->where('id',$request['secteur_usager'])->first(); 
+        $village = DB::table('secteur_villages')->where('id',$request['secteur_usager'])->first();
         if($village){
             $code_village= $village->code;
         }else{
             $code_village=null;
         }
 
-        if( $request->situation_matrimoniale != null){             
-            
-            $user= Auth::user()->id;             
+        if( $request->situation_matrimoniale != null){
+
+            $user= Auth::user()->id;
         }
         else{
-            $user=null;  
+            $user=null;
         }
-      
+
         if( $request->civilite=="M." || $request->civilite=="MR" || $request->civilite=="EL HADJ"){
             $genre=2;
         }
@@ -144,19 +159,12 @@ class UsagerController extends Controller
             $genre=1;
         }
 
-        $cin=Usager::where('CIN', $request->numero_piece)->first();
-        if ($cin){
-            //dd($cin->CIN);
-            return redirect()->route('create.demande');
-        }
-        else{
-
-            if($request->situation_matrimoniale==null){ 
+            if($request->situation_matrimoniale==null){
                 $situation=1;
                 }
                 else{
                     $situation=$request->situation_matrimoniale;
-                }            
+                }
                if($request->boite_postale==null){
                     $boite_postale="NP";
                 }
@@ -176,6 +184,9 @@ class UsagerController extends Controller
                     $professions=$request->profession;
                 }
 
+        DB::beginTransaction();
+        try {
+
         $usager= Usager::create([
             'Type' => 1,
             'Civility' => $request['civilite'],
@@ -183,7 +194,7 @@ class UsagerController extends Controller
             'Prenom' => $request['prenom_usager'],
             'Gender' => $genre,
             'DateNaissance' => $request['date_de_naissance'],
-            'LieuNaissance' => $request['lieu_de_naissance'], 
+            'LieuNaissance' => $request['lieu_de_naissance'],
             'IdFonction' => $professions,
             'SituationMatrimoniale' => $situation,
             'IdCategorieUsager' => 4,
@@ -193,142 +204,96 @@ class UsagerController extends Controller
             'Province_Code'=> $request ['province_usager'],
             'Commun_Departement_Code' => $request ['commune_usager'],
             'Arrondissement_Code'=> $request ['arrondissement_usager'],
-            'Code_Secteur_Village' => $code_village, 
+            'Code_Secteur_Village' => $code_village,
             'Boite_postale' => $boite_postale,
             'Phone_No_' => $request['telephone_mobile1'],
             'Tel_Bureau' => $request['telephone_bureau'],
             'IdAdresse' => $request['adresse'],
             'user_id' => $user,
             'E-Mail'=>$email,
-           // 'IdAdresse'=>$request['boite_postale'],
-            'CIN'=>$request->numero_piece,
+            'CIN'=>$request->numero_piece !== null ? trim($request->numero_piece) : null,
             'titre' => $request['civilite']
         ]);
 
-        if($request->hasFile('piece_jointe_m')) {
-            $file = $request->file('piece_jointe_m');
-            //dd($file);
-            $extension=$file->getClientOriginalExtension();
-            $type_doc="acte_de_mariage";
-            $fileName = $type_doc.'.'.$extension;
+        // Pièces jointes facultatives : acte de mariage et autorisation de commerce
+        $pieces = [
+            'piece_jointe_m' => ['fichier' => 'acte_de_mariage', 'type' => 'acte_mariage'],
+            'piece_jointe_c' => ['fichier' => 'autorisation_de_commerce', 'type' => 'autorisation_de_commerce'],
+        ];
+        foreach ($pieces as $champ => $piece) {
+            if (! $request->hasFile($champ)) {
+                continue;
+            }
+            $file = $request->file($champ);
+            $extension = strtolower($file->extension());
+            $fileName = $piece['fichier'].'.'.$extension;
             //Definir l'emplacement de sorte à créer un sous repertoire pour chaque entreprise
-           // $fileName = $file->getClientOriginalName();
-//dd($file);
             $emplacement='public/files/'.$usager->id;
-            $file_url= $request['piece_jointe_m']->storeAs($emplacement, $fileName);
+            $file_url= $file->storeAs($emplacement, $fileName);
             $url_local= $usager->id.'/'.$fileName;
-            $docName = $type_doc;
-           // $file = $request->file('piece_jointe_1')->storeAs('public/casier', $docName.'.'.$guessExtension);
-            $piecejointe_enrs= PieceJointe::where('usager_id',$usager->id)->where('type_piece', $type_doc)->get();
-           // dd(count($piecejointe_enrs));
-        if(count($piecejointe_enrs)==0)
-        {
-            $date = new \DateTime();
-            $pj= PieceJointe::create([
-                'usager_id'=>$usager->id,
-                'type_piece'=> 'acte_mariage',
-                'url'=> $file_url,
-                'numero'=> 'test',
-                'date_etablissement'=> $date,
-                'lieu_etablissement' => 'test',
-                'categorie_piece'=> 'acte_mariage',
-                'url_local'=>$url_local,
-                'file_extension'=>$extension
-            ]);
-            // if ($pj) {
-            //     $data_json= array('data'=>'success','status'=>'201', 'type_doc'=>'test');
-            //     return json_encode($data_json);
-            // }
-            // else{
-            //     $data_json = array('data'=>'fail','status'=>'400', 'type_doc'=>'test');
-            //     return json_encode($data_json);
-            // }
-        }
-        }
-        
-        if($request->hasFile('piece_jointe_c')) {
-            $file = $request->file('piece_jointe_c');
-            //dd($file);
-            $extension=$file->getClientOriginalExtension();
-            $type_doc="autorisation_de_commerce";
-            $fileName = $type_doc.'.'.$extension;
-            //Definir l'emplacement de sorte à créer un sous repertoire pour chaque entreprise
-           // $fileName = $file->getClientOriginalName();
-//dd($file);
-            $emplacement='public/files/'.$usager->id;
-            $file_url= $request['piece_jointe_c']->storeAs($emplacement, $fileName);
-            $url_local= $usager->id.'/'.$fileName;
-            $docName = $type_doc;
-           // $file = $request->file('piece_jointe_1')->storeAs('public/casier', $docName.'.'.$guessExtension);
-            $piecejointe_enrs= PieceJointe::where('usager_id',$usager->id)->where('type_piece', $type_doc)->get();
-           // dd(count($piecejointe_enrs));
-        if(count($piecejointe_enrs)==0)
-        {
-            $date = new \DateTime();
-            $pj= PieceJointe::create([
-                
-                'usager_id'=>$usager->id,
-                'type_piece'=> 'autorisation_de_commerce',
-                'url'=> $file_url,
-                'numero'=> 'test',
-                'date_etablissement'=> $date,
-                'lieu_etablissement' => 'test',
-                'categorie_piece'=> 'autorisation_de_commerce',
-                'url_local'=>$url_local,
-                'file_extension'=>$extension
-            ]);
-            // if ($pj) {
-            //     $data_json= array('data'=>'success','status'=>'201', 'type_doc'=>'test');
-            //     return json_encode($data_json);
-            // }
-            // else{
-            //     $data_json = array('data'=>'fail','status'=>'400', 'type_doc'=>'test');
-            //     return json_encode($data_json);
-            // }
-        }
-        }
-        //dd(count($request['conjoints']));
-        if( $request['conjoints']){
-            $conjoints =$request['conjoints'];
-        foreach( $conjoints as $conjoint){
-            if($conjoint){
-                UsagerConjoint::create([
+
+            if (PieceJointe::where('usager_id',$usager->id)->where('type_piece', $piece['type'])->doesntExist()) {
+                PieceJointe::create([
                     'usager_id'=>$usager->id,
-                    'conjoint_id'=>$conjoint,
-                    'regime_matrimonial'=>$request->regime_matrimonial,
-                    'date_mariage'=>$request->date_mariage,
-                    'lieu_mariage'=>$request->lieu_mariage
+                    'type_piece'=> $piece['type'],
+                    'url'=> $file_url,
+                    'numero'=> 'test',
+                    'date_etablissement'=> new \DateTime(),
+                    'lieu_etablissement' => 'test',
+                    'categorie_piece'=> $piece['type'],
+                    'url_local'=>$url_local,
+                    'file_extension'=>$extension
                 ]);
             }
         }
-           
+
+        if( $request['conjoints']){
+            foreach( (array) $request['conjoints'] as $conjoint){
+                if($conjoint){
+                    UsagerConjoint::create([
+                        'usager_id'=>$usager->id,
+                        'conjoint_id'=>$conjoint,
+                        'regime_matrimonial'=>$request->regime_matrimonial,
+                        'date_mariage'=>$request->date_mariage,
+                        'lieu_mariage'=>$request->lieu_mariage
+                    ]);
+                }
+            }
         }
-        //Ce controle permet de savoir si c'est un usager qui est créer pour une demande ou un usager creer pour completer mles information d'un autre usager 
+
+        DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            report($e);
+            $message = 'L’enregistrement du promoteur n’a pas pu aboutir. Vérifiez les informations saisies puis réessayez ; '
+                .'si le problème persiste, contactez le CEFORE.';
+
+            if ($estAjax) {
+                return response()->json(['message' => $message], 500);
+            }
+
+            return redirect()->back()
+                ->withInput($request->except(['piece_jointe_m', 'piece_jointe_c', '_token']))
+                ->with('error', $message);
+        }
+
+        //Ce controle permet de savoir si c'est un usager qui est créer pour une demande ou un usager creer pour completer mles information d'un autre usager
         //tel que le conjoint ou autre
-    if( $request ['province_usager'] != null){             
-        //return redirect()->route('create.demande');    
-        return redirect()->route('type.entreprise')
-        ->with('success', 'Usager créé avec succès. Vous pouvez maintenant créer une demande.');  
-    }
-   
-    else{
-            // $usagers= Usager::all();
-            //     foreach ($usagers as $usager) {
-            //         $data[] = array("id" => $usager->id, "nom" => $usager->NomRaisonSociale,'prenom'=>$usager->Prenom,'phone'=>$usager->Phone_No_,);
-            //     }  
+        if( $request ['province_usager'] != null && ! $estAjax){
+            return redirect()->route('type.entreprise')
+            ->with('success', 'Usager créé avec succès. Vous pouvez maintenant créer une demande.');
+        }
 
-            $data=[
-                'success'=>200,
-                'message'=>'Créé avec succès'
-            ];       
-                return json_encode($data);
-                //return redirect()->route('create.demande');      
+        return response()->json([
+            'success' => 200,
+            'message' => 'Promoteur enregistré avec succès.',
+            'usager' => [
+                'id' => $usager->id,
+                'text' => $usager->CIN.' - '.$usager->NomRaisonSociale.' '.mb_substr((string) $usager->Prenom, 0, 1).'.',
+            ],
+        ]);
+    }
 
-       }
-     
-    }
-    }
-    
     public function promoteur()
     {
         $usagers= Usager::where('id', '!=', null)->orderBy('updated_at', 'desc')

@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="{{asset('adminlte/plugins/fontawesome-free/css/all.min.css')}}">
   
   <!-- Ionicons -->
-  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" integrity="sha384-4r9SMzlCiUSd92w9v1wROFY7DlBc5sDYaEBhcCJR7Pm2nuzIIGKVRtYWlf6w+GG4" crossorigin="anonymous">
   <!-- Tempusdominus Bootstrap 4 -->
   <link rel="stylesheet" href="{{asset('adminlte/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css')}}">
   <!-- iCheck -->
@@ -83,8 +83,7 @@
           </a> --}}
           
             <a href="{{ route('logout') }}" class="dropdown-item"
-            onclick="event.preventDefault();
-                     document.getElementById('logout-form').submit();"><i class="fa fa-ban fa-fw pull-right"></i>
+            data-csp-click="__deconnexion"><i class="fa fa-ban fa-fw pull-right"></i>
             Se Deconnecter
           </a>
           <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

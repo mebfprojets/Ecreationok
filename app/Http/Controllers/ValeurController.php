@@ -177,15 +177,24 @@ class ValeurController extends Controller
             ->get();
         }
 
+        // Table inconnue : liste vide au lieu d'une erreur 500
+        if (! isset($valeurs)) {
+            return json_encode([]);
+        }
+
+        $array = [];
         $nbvaleurs= $valeurs->count();
-            
+
         if ($nbvaleurs == 0) {
+            // Pas de sous-niveau (ex. commune sans arrondissement) : un seul choix, la commune elle-même,
+            // que le formulaire sélectionne automatiquement pour charger les secteurs / villages.
             $valeurs= DB::table('commune_departements')
             ->where('id',$valeur_actuel)
             ->first();
-        //dd($valeurs->id);
-            $array[] = array("id" => $valeurs->id, "name" => '-- Selectionné --');
-        } 
+            if ($valeurs) {
+                $array[] = array("id" => $valeurs->id, "name" => '-- Selectionné --');
+            }
+        }
         else{
             foreach ($valeurs as $valeur) {
                 $array[] = array("id" => $valeur->id, "name" => $valeur->name);

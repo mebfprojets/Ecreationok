@@ -13,10 +13,11 @@ use App\Http\Controllers\DemandeController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::post('/callback', [DemandeController::class,'reponse_paiement'])
-->withoutMiddleware('throttle')
-->name('callback');
-//Route::post('/callback', [DemandeController::class,'reponse_paiement'])->name('callback');
+// Désactivé (sécurité) : callback TouchPay public et sans signature, il permettait de marquer
+// n'importe quelle demande comme payée. TouchPay n'est plus utilisé.
+// Route::post('/callback', [DemandeController::class,'reponse_paiement'])
+// ->withoutMiddleware('throttle')
+// ->name('callback');
 Route::get('/fnrccm', [DemandeController::class,'fnrccm'])->name('fnrccm');
 // Ajout BARRO
 

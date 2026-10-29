@@ -35,7 +35,7 @@
                                                             <div class="col-lg-6">
                                                                 <div class="mb-3">                                                                    
                                                                     <label class="form-label" for="nom_usager">Nom (<font color="red">*</font>)</label>
-                                                                        <input type="text" id="nom" name="nom_usager" class="form-control uppercase" style="width: 100%;" value="{{old('nom')}}" onchange="this.value = this.value.toUpperCase()" placeholder="Entrez votre nom" title="Ce champ est obligatoire" required >
+                                                                        <input type="text" id="nom" name="nom_usager" class="form-control uppercase" style="width: 100%;" value="{{old('nom')}}" data-csp-change="__majuscules" placeholder="Entrez votre nom" title="Ce champ est obligatoire" required >
                                                                             @if ($errors->has('nom'))
                                                                                     <span class="help-block">
                                                                                         <strong>{{ $errors->first('nom_usager') }}</strong>
@@ -44,7 +44,7 @@
                                                                 </div>
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="val_username">Prénom (s) (<font color="red">*</font>)</label>
-                                                                        <input type="text" id="prenom" name="prenom_usager" class="form-control uppercase" value="{{old('prenom')}}"placeholder="Entrez votre prenom.." required="Ce champ est obligatoire" onchange="this.value = this.value.charAt(0).toUpperCase()+ this.value.substr(1);">
+                                                                        <input type="text" id="prenom" name="prenom_usager" class="form-control uppercase" value="{{old('prenom')}}"placeholder="Entrez votre prenom.." required="Ce champ est obligatoire" data-csp-change="__majuscule_initiale">
                                                                     <!-- <input type="text" name="prenom_usager" class="form-control" id="progress-basicpill-vatno-input" > -->
                                                                 </div>
                                                                 <div class="mb-3" id="">
@@ -87,7 +87,7 @@
                                                                 </div>
                                                                 <div class="mb-3">
                                                                     <label class="form-label" for="val_username">Situation matrimoniale (<font color="red">*</font>)</label>
-                                                                        <select id="situation_matrimoniale" name="situation_matrimoniale" class="form-control select2" data-placeholder="Choisir votre situation matrimoniale" style="width: 100%;" required="Ce champ est obligatoire" title="Ce champ est obligatoire" onchange="afficher_conjoint();">
+                                                                        <select id="situation_matrimoniale" name="situation_matrimoniale" class="form-control select2" data-placeholder="Choisir votre situation matrimoniale" style="width: 100%;" required="Ce champ est obligatoire" title="Ce champ est obligatoire" data-csp-change="afficher_conjoint">
                                                                             <option></option>
                                                                             <option value="1" {{ old('situation_matrimoniale') == 1 ? 'selected' : '' }}>Celibataire</option>
                                                                             <option value="2" {{ old('situation_matrimoniale') == 2 ? 'selected' : '' }}>Marié</option>
@@ -115,7 +115,7 @@
                                                             
                                                             <div class="col-lg-2">
                                                                 <div class="mb-"> 
-                                                                    <a href="javascript:void(0);"  class="btn btn-md btn-success add_button2"> <i class="fas fa-plus"></i> </a>
+                                                                    <a href="#" data-csp-click="__aucune"  class="btn btn-md btn-success add_button2"> <i class="fas fa-plus"></i> </a>
                                                                 </div>
                                                                 <a href="#addusager" style="margin-left: 45px; margin-top:-34px;" id="addusager" data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" > Créé Conjoint </a>
 
@@ -145,7 +145,7 @@
                                                                 </div>
                                                                 <div class="col-md-5 mariage" style="display:none">
                                                                 <label class=" control-label" for="example-chosen">Joindre l'acte de mariage (<font color="red">*</font>)</label>
-                                                                <input class="form-control input_file" type="file" id='piece_jointe_1' name="piece_jointe_m" accept=".pdf, .jpeg, .png"   placeholder="Joindre une copie de la pièce" required  onchange="VerifyUploadSizeIsOK('piece_jointe_1');" >  
+                                                                <input class="form-control input_file" type="file" id='piece_jointe_m' name="piece_jointe_m" accept=".pdf, .jpg, .jpeg, .png"   placeholder="Joindre une copie de la pièce" required  data-csp-change="VerifyUploadSizeIsOK" data-csp-change-args='["piece_jointe_m"]' >  
                                                                     
                                                                 </div> 
                                                             </div>
@@ -160,7 +160,7 @@
                                                             <div class="col-lg-6">
                                                                 <div class="mb-3">                                                                    
                                                                 <label class=" control-label" for="example-chosen">Nationalité (<font color="red">*</font>)</label>
-                                                                <select id="code" name="nationalite_usager" data-placeholder="Choisir votre Nationalité" class="form-control select2" onchange="afficherPj();" style="width: 100%;" required >
+                                                                <select id="code" name="nationalite_usager" data-placeholder="Choisir votre Nationalité" class="form-control select2" data-csp-change="afficherPj" style="width: 100%;" required >
                                                                     <option></option>
                                                                         @foreach ($nationalites as $nationalite )
                                                                             <option value="{{ $nationalite->code }}">{{ $nationalite->libelle }}</option>
@@ -170,14 +170,14 @@
                                                                 </div>
                                                                 <div class="mb-3 commerce" style="display:none">
                                                                 <label class=" control-label" for="example-chosen">Joindre l'autorisation d'exercer le commerce (<font color="red">*</font>)</label>
-                                                                <input class="form-control input_file" type="file" id='piece_jointe_1' name="piece_jointe_c" id="piece_jointe" accept=".pdf, .jpeg, .png"   placeholder="Joindre une copie de la pièce" required  onchange="VerifyUploadSizeIsOK('piece_jointe_1');" >  
+                                                                <input class="form-control input_file" type="file" id='piece_jointe_c' name="piece_jointe_c" accept=".pdf, .jpg, .jpeg, .png"   placeholder="Joindre une copie de la pièce" required  data-csp-change="VerifyUploadSizeIsOK" data-csp-change-args='["piece_jointe_c"]' >  
                                                                     
                                                                 </div> 
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <div class="mb-3">                                                                    
                                                                 <label class=" control-label" for="example-chosen">Pays de residence (<font color="red">*</font>)</label>
-                                                                <select id="code_pays" name="pays_usager" data-placeholder="Choisir le pays de residence" class="form-control select2" style="width: 100%;" required onchange="afficherDecoupage();">
+                                                                <select id="code_pays" name="pays_usager" data-placeholder="Choisir le pays de residence" class="form-control select2" style="width: 100%;" required data-csp-change="afficherDecoupage">
                                                                     <option></option>
                                                                         @foreach ($pays as $pay )
                                                                             <option value="{{ $pay->code }}">{{ $pay->libelle }}</option>
@@ -190,7 +190,7 @@
                                                             <div class="col-lg-6">
                                                                 <div class="mb-3 decoupage_administratif" >
                                                                     <label class=" control-label" for="example-chosen">Region (<font color="red">*</font>)</label>
-                                                                        <select id="region_usager" name="region_usager" data-placeholder="Choisir région" class="form-control select2" style="width: 100%;" required onchange="changeValue('region_usager', 'province_usager', 'provinces','region_usager');" required>
+                                                                        <select id="region_usager" name="region_usager" data-placeholder="Choisir région" class="form-control select2" style="width: 100%;" required data-csp-change="changeValue" data-csp-change-args='["region_usager", "province_usager", "provinces", "region_usager"]' required>
                                                                             <option></option>
                                                                                 @foreach ($regions as $region )
                                                                                     <option value="{{ $region->id }}">{{ $region->name }}</option>
@@ -199,18 +199,18 @@
                                                                 </div>
                                                                 <div class="mb-3 decoupage_administratif">
                                                                     <label class=" control-label" for="example-chosen">Province (<font color="red">*</font>)</label>
-                                                                    <select id="province_usager" name="province_usager" data-placeholder="Choisir province" class="form-control select2" style="width: 100%;" required  onchange="changeValue('province_usager', 'commune_usager', 'communes','region_usager');" required>
+                                                                    <select id="province_usager" name="province_usager" data-placeholder="Choisir province" class="form-control select2" style="width: 100%;" required  data-csp-change="changeValue" data-csp-change-args='["province_usager", "commune_usager", "communes", "region_usager"]' required>
                                                                             <option></option>                                                          </select>
                                                                 </div>
                                                                 <div class="mb-3 decoupage_administratif">
                                                                     <label class=" control-label" for="example-chosen">Commune (<font color="red">*</font>)</label>
-                                                                    <select id="commune_usager" name="commune_usager" data-placeholder="Choisir commune" class="form-control select2" style="width: 100%;" required  onchange="changeValue('commune_usager', 'arrondissement_usager', 'arrondissements','province_usager');" required>
+                                                                    <select id="commune_usager" name="commune_usager" data-placeholder="Choisir commune" class="form-control select2" style="width: 100%;" required  data-csp-change="changeValue" data-csp-change-args='["commune_usager", "arrondissement_usager", "arrondissements", "province_usager"]' required>
                                                                             <option></option>
                                                                         </select>
                                                                 </div>
                                                                 <div class="mb-3 decoupage_administratif">
                                                                     <label class=" control-label" for="example-chosen">Arrondissement </label>
-                                                                        <select id="arrondissement_usager" name="type_identite_promoteur" data-placeholder="Choisir arrondissement" class="form-control select2" style="width: 100%;" required onchange="changeValue('arrondissement_usager', 'secteur_usager', 'secteur_villages','commune_usager');" required>
+                                                                        <select id="arrondissement_usager" name="type_identite_promoteur" data-placeholder="Choisir arrondissement" class="form-control select2" style="width: 100%;" required data-csp-change="changeValue" data-csp-change-args='["arrondissement_usager", "secteur_usager", "secteur_villages", "commune_usager"]' required>
                                                                             <option></option>
                                                                             <option> -- Selectionner --</option>
                                                                         </select>
@@ -338,7 +338,7 @@
                         <div class="form-group">
                             <label class="control-label" for="nom_usager">Nom Raison Sociale <span class="text-danger">*</span></label>
                             <div class="input-group">
-                                <input type="text" id="nom" name="nom_usagedr" class="form-control" style="width: 100%;" value="{{old('nom')}}" onchange="this.value = this.value.toUpperCase()" placeholder="Entrez votre nom" title="Ce champ est obligatoire" required >
+                                <input type="text" id="nom" name="nom_usagedr" class="form-control" style="width: 100%;" value="{{old('nom')}}" data-csp-change="__majuscules" placeholder="Entrez votre nom" title="Ce champ est obligatoire" required >
                                 @if ($errors->has('nom'))
                                         <span class="help-block">
                                             <strong>{{ $errors->first('nom_usager') }}</strong>
@@ -352,7 +352,7 @@
                         <div class="form-group">
                             <label class="control-label" for="val_username">Numéro IFU (s) <span class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <input type="text" id="numero_ifu" name="numero_ifu" class="form-control" value="{{old('numero_ifu')}}"placeholder="Entrez le numéro IFU.." required="Ce champ est obligatoire" onchange="this.value = this.value.charAt(0).toUpperCase()+ this.value.substr(1);">
+                                    <input type="text" id="numero_ifu" name="numero_ifu" class="form-control" value="{{old('numero_ifu')}}"placeholder="Entrez le numéro IFU.." required="Ce champ est obligatoire" data-csp-change="__majuscule_initiale">
                                 </div>
                         </div>
                   
@@ -387,7 +387,7 @@
           <div class="row">
               <div class="col-md-12">
                 <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Annuler <i class="fa fa-unlock"></i></button>
-                <button type="button" class="btn btn-success" onclick="soumettre('form_usager_personne_physique')" >Valider </i></button>
+                <button type="button" class="btn btn-success" data-csp-click="soumettre" data-csp-click-args='["form_usager_personne_physique"]' >Valider </i></button>
               </div>
           </div>
           
@@ -415,7 +415,7 @@
                         <div class="col-lg-6">
                             <div class="mb-3">                                                                    
                                 <label class="form-label" for="nom_usager">Nom</label>
-                                    <input type="text" id="nom" name="nom_usager" class="form-control" style="width: 100%;" value="{{old('nom')}}" onchange="this.value = this.value.toUpperCase()" placeholder="Entrez votre nom" title="Ce champ est obligatoire" required >
+                                    <input type="text" id="nom" name="nom_usager" class="form-control" style="width: 100%;" value="{{old('nom')}}" data-csp-change="__majuscules" placeholder="Entrez votre nom" title="Ce champ est obligatoire" required >
                                         @if ($errors->has('nom'))
                                                 <span class="help-block">
                                                     <strong>{{ $errors->first('nom_usager') }}</strong>
@@ -437,7 +437,7 @@
                         <div class="col-lg-6">
                             <div class="mb-3">
                                 <label class="form-label" for="val_username">Prénom (s)</label>
-                                    <input type="text" id="prenom" name="prenom_usager" class="form-control" value="{{old('prenom')}}"placeholder="Entrez le prenom.." required="Ce champ est obligatoire" onchange="this.value = this.value.charAt(0).toUpperCase()+ this.value.substr(1);">
+                                    <input type="text" id="prenom" name="prenom_usager" class="form-control" value="{{old('prenom')}}"placeholder="Entrez le prenom.." required="Ce champ est obligatoire" data-csp-change="__majuscule_initiale">
                             </div>
                         </div>   
                         <div class="col-lg-6">
@@ -490,7 +490,7 @@
                         <div class="col-lg-6">
                             <div class="mb-3">                                                                    
                             <label class=" control-label" for="example-chosen">Pays de residence (<font color="red">*</font>)</label>
-                            <select  name="pays_usager" data-placeholder="Choisir" class="form-control" style="width: 100%;" required onchange="afficherDecoupage();" >
+                            <select  name="pays_usager" data-placeholder="Choisir" class="form-control" style="width: 100%;" required data-csp-change="afficherDecoupage" >
                                 <option></option>
                                     @foreach ($pays as $pay )
                                         <option value="{{ $pay->code }}">{{ $pay->libelle }}</option>
@@ -541,7 +541,7 @@
     </div>
 </div>
 @section('additionnel_script')
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     function afficherDecoupage(){
       var valeur =  $('#code_pays').val();
       if(valeur!='BF'){
@@ -561,7 +561,7 @@
     }
 } 
 </script>
-<script type="text/javascript">
+<script nonce="{{ $cspNonce ?? '' }}" type="text/javascript">
         function afficher_conjoint(){
         var val=$('#situation_matrimoniale').val();
 
@@ -575,7 +575,7 @@
             }
             }   
 </script>
-<script type="text/javascript">
+<script nonce="{{ $cspNonce ?? '' }}" type="text/javascript">
 
     $(document).ready(function(){
        // alert('okok');
@@ -591,7 +591,7 @@
                 x++; //Increment field counter
                 var desi="desi"+x;
                 var cout='cout'+x ;
-                var fieldHTML = '<div class="row" style="margin-top:10px;">  <select name="conjoints[]" data-placeholder="Selectionner le conjoint ..."  class="form-control select2 conjoints" style="width: 77%;" required >  <option></option> @foreach ($all_usagers as $all_usager )<option value="{{ $all_usager->id }}">{{ $all_usager->Phone_No_ }}-{{ $all_usager->NomRaisonSociale }}{{ $all_usager->prenom }}</option>@endforeach </select> <a style="width:2%" href="javascript:void(0);" class="remove_button"><span> <i class="fa fa-minus"></i></a> </div>';
+                var fieldHTML = '<div class="row" style="margin-top:10px;">  <select name="conjoints[]" data-placeholder="Selectionner le conjoint ..."  class="form-control select2 conjoints" style="width: 77%;" required >  <option></option> @foreach ($all_usagers as $all_usager )<option value="{{ $all_usager->id }}">{{ $all_usager->Phone_No_ }}-{{ $all_usager->NomRaisonSociale }}{{ $all_usager->prenom }}</option>@endforeach </select> <a style="width:2%" href="#" data-csp-click="__aucune" class="remove_button"><span> <i class="fa fa-minus"></i></a> </div>';
                    
                 $(wrapper2).append(fieldHTML);
                 $(".select2").select2();

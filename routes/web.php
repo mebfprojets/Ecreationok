@@ -1,15 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UsagerController;
 use App\Http\Controllers\ValeurController;
 use App\Http\Controllers\AccueilController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\DemandeController;
-use App\Http\Controllers\CreaController;
-use App\Http\Controllers\TestsController;
+use App\Http\Controllers\InscriptionController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ParametreController;
@@ -43,9 +41,6 @@ Route::get('/detail/demande/{id}', [DemandeController::class,'detail'])->name('d
 // Route::get('/', [DemandeController::class,'test'])->name('test');
 Route::get('/', [DemandeController::class,'index'])->name('index');
 
-// Test wizard
-Route::get('/testdemande', [TestsController::class, 'index'])->name("createtest");
-Route::post('/storetest', [TestsController::class, 'store'])->name("testdemande");
 Route::post('/paiement/orange/index', [DemandeController::class, 'orange'])->name('orange.index');
 Route::post('/paiement/orange/store', [DemandeController::class, 'orange_paiement'])->name('orange.store');
 Route::post('/paiement/moov/index', [DemandeController::class, 'moov'])->name('moov.index');
@@ -53,7 +48,9 @@ Route::post('/paiement/moov/store', [DemandeController::class, 'moov_store'])->n
 Route::post('/paiement/moov/verifotp', [DemandeController::class, 'moov_verif_otp'])->name('moov.otp');
 
 //Verifier email
-Route::get('/email/existe', [UserController::class,'email_existe'])->name('email_existe');
+Route::get('/email/existe', [UserController::class,'email_existe'])->name('email_existe')->middleware('throttle:20,1');
+// Inscription : envoi du code de vérification de l'adresse e-mail (avant la création du compte)
+Route::post('/inscription/code', [InscriptionController::class, 'envoyerCode'])->name('inscription.code')->middleware('throttle:6,1');
 // Demande update
 Route::put('demande/update/{id}', [DemandeController::class, 'update_demande'])->name('demande.update');
 Route::post('demande/update/promoteur/{id}', [DemandeController::class, 'update_rejet'])->name('update.promoteur');
@@ -74,7 +71,7 @@ Route::get('type/entreprise', [DemandeController::class,'typeEntreprise'])->name
 Route::get('/process-type-entreprise/{type}', [DemandeController::class, 'processTypeEntreprise'])->name('process.type.entreprise');
 
 Route::post('/update/piecejointe', [DemandeController::class, 'updatepiecejointe'])->name("piecejointe.update");
-Route::post('/verifier/nom_commercial', [DemandeController::class, 'verifier_nom_commercial'])->name("verifier_nom_commercial");
+Route::post('/verifier/nom_commercial', [DemandeController::class, 'verifier_nom_commercial'])->name("verifier_nom_commercial")->middleware('throttle:20,1');
 
 Route::get('/create/usager', [UsagerController::class, 'create'])->name("create.usager");
 Route::post('/usager-storing', [UsagerController::class, 'store'])->name("store.usager");
@@ -86,7 +83,7 @@ Route::get('/valeur/activite', [ValeurController::class, 'activite'])->name("val
 //Route::get('/Valider/Paiement{iddemande}', [DemandeController::class, 'valider_paiement'])->name("valider.paiement");
 
 Route::post('/user/store', [UserController::class, 'store_user'])->name("user.store");
-Route::get('/tour', [DemandeController::class, 'ourr']);
+// Route::get('/tour', [DemandeController::class, 'ourr']); // route de test désactivée (sécurité)
 Route::get('piecejointe/modif',[DemandeController::class, 'modifier'] )->name('piecejointe.modif');
 Route::get('piecejointe/correct',[DemandeController::class, 'correct_piece'] )->name('piecejointe.correct_piece');
 
@@ -94,17 +91,18 @@ Route::get('piecejointe/getall', [DemandeController::class, 'getallpiecejointe']
 Route::post('reset_password_without_token',[AccountController::class, 'validatePasswordRequest']);
 Route::post('reset-password', [AccountController::class, 'resetPassword'])->name('reset.password.post');
 Route::get('forget-password/{token}', [AccountController::class, 'showForgetPasswordForm'])->name('reset.password.get');
-Route::get('/test', [TestController::class,'syncrodata']);
 Route::get('/loginss',[AccountController::class, 'getlogin']);
+
+//Ajout BARRO
+//Commente
+Route::middleware(['auth', 'admin'])->group(function () {
+// Comptes, usagers, rôles et permissions : réservés aux agents (données personnelles)
 Route::get('/user/compte', [UserController::class,'compte'])->name('user.compte');
 Route::get('promoteur/liste', [UsagerController::class, 'promoteur'])->name('promoteur.liste');
 Route::resource('user', UserController::class);
 Route::resource('permissions', PermissionController::class);
 Route::resource("role",RoleController::class);
 
-//Ajout BARRO
-//Commente
-Route::middleware(['auth', 'admin'])->group(function () {
 Route::get('/backend/liste', [DemandeController::class, 'liste_demande'])->name("list");
 Route::get('/backend/liste/all', [DemandeController::class, 'all'])->name("all.list");
 Route::get('/backend/liste/attentedepqrtenaire', [DemandeController::class, 'liste_en_attente_de_partenaire'])->name("list.en_attente_de_partenaire");
@@ -122,27 +120,8 @@ Route::get('/piecejointe/liste/{piecejointe}', [DemandeController::class, 'showp
 Route::get('/piecejointe/edit/{piecejointe}', [DemandeController::class, 'editpj'])->name("edit.pj");
 Route::post('/piecejointe/update/{piecejointe}', [DemandeController::class, 'updatepj'])->name("update.pj");
 
-// Autre Routes
-Route::get('/admin', function () {
-    return view('backend.index');
-});
-
-Route::get('/createdemande', function () {
-    return view('demande.create');
-})->name('create');
-
-Route::get('/signature', function () {
-    return view('sign');
-});
-Route::get('/api', function () {
-    return view('api');
-});
-Route::get('/facture', function () {
-    return view('pdf.facture');
-});
-Route::get('/dash', function () {
-    return view('backend.adminlte.main');
-})->name('backend');
+// Anciennes routes de démonstration (/admin, /createdemande, /signature, /api, /facture, /dash)
+// supprimées (sécurité) : gabarits non utilisés, contenant du JavaScript incompatible avec la CSP.
 });
 Route::post('/piecejointecorrect/update', [DemandeController::class, 'updatepj_correct'])->name("update.pjcorrect");
 Route::get('/usagers/recherche', [UsagerController::class, 'rechercher'])

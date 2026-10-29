@@ -51,7 +51,7 @@
         <div class="row align-items-center" style="margin-top:-25px;">
         <center><div class="col-md-6">
            <div class="copyright-info">
-              <span>Copyright &copy; <script>
+              <span>Copyright &copy; <script nonce="{{ $cspNonce ?? '' }}">
                   document.write(new Date().getFullYear())
                 </script>, Designed &amp; Developed by <a href="https://themefisher.com">MEBF</a></span>
             </div>
@@ -370,6 +370,10 @@
   {{-- <script src="{{asset('frontend/js/vendor/jquery.min.js')}}"></script> --}}
 
   {{-- <script src="{{asset('frontend/plugins/jQuery/jquery.min.js')}}"></script> --}}
+  <!-- Gestionnaires data-csp-* (remplacent les onclick/onchange interdits par la CSP) -->
+  <script src="{{asset('js/csp-handlers.js')}}"></script>
+  <!-- Messages lisibles pour les erreurs des appels AJAX -->
+  <script src="{{asset('js/erreurs-ajax.js')}}"></script>
   <!-- Slick Carousel -->
   <script src="{{asset('frontend/plugins/slick/slick.min.js')}}"></script>
   <script src="{{asset('frontend/plugins/slick/slick-animation.min.js')}}"></script>
@@ -378,10 +382,7 @@
   <!-- shuffle -->
   <script src="{{asset('frontend/plugins/shuffle/shuffle.min.js')}}" defer></script>
   
-  <!-- Google Map API Key-->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcABaamniA6OL5YvYSpB3pFMNrXwXnLwU" defer></script>
-  <!-- Google Map Plugin-->
-  <script src="{{asset('frontend/plugins/google-map/map.js')}}" defer></script>
+  {{-- Google Maps retiré : aucune page n'affiche de carte (#map), et la clé d'API était exposée --}}
   <!-- Template custom -->
   <script src="{{asset('frontend/js/login.js')}}"></script>
   <script src="{{asset('frontend/js/script.js')}}"></script>
@@ -392,7 +393,7 @@
   <script src="{{asset('frontend/js/app.js')}}"></script> -->
   {{-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> --}}
   {{-- <script src="{{asset('backend/libs/jquery/jquery.min.js')}}"></script> --}}
-  <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
+  <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js" integrity="sha384-FZQ08l5R7r04XTTouN8gcfgfYy+ZpoFzZrYKyl3HxnTUw+JHVFGaw+rqQ7Y/TkhU" crossorigin="anonymous"></script>
   {{-- <script src=https://cdnjs.cloudflare.com/ajax/libs/formvalidation/0.6.2-dev/js/formValidation.min.js></script> --}}
 
 
@@ -423,47 +424,180 @@
   <script src="{{asset('backend/js/signature.js')}}"></script>
   <script src="{{asset('frontend/js/front-personal.js')}}"></script>
   <script src="{{asset('backend/js/loaddata.js')}}"></script>
-  <script>$(function(){ Login.init(); });</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.fr.min.js"></script>
-  <script>$(document).ready(function()
+  <script nonce="{{ $cspNonce ?? '' }}">$(function(){ Login.init(); });</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha384-duAtk5RV7s42V6Zuw+tRBFcqD8RjRKw6RFnxmxIj1lUGAQJyum/vtcUQX8lqKQjp" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.fr.min.js" integrity="sha384-0QYShvU8+CrUwWRv5soLL/H+9wcwZLBj/F+0l2U1jwetUpy+beDjuDRzKylb7UFH" crossorigin="anonymous"></script>
+  <script nonce="{{ $cspNonce ?? '' }}">$(document).ready(function()
    {$('.select2').select2();});</script>
-  <script>
+  <script nonce="{{ $cspNonce ?? '' }}">
     // $("#next").click(function() { $(".select2").select2(); });
   </script>
-  <script>
+  <script nonce="{{ $cspNonce ?? '' }}">
+      // Création de compte : longueur du mot de passe et concordance avec la confirmation
       function verifier_password(){
-        //alert('ok');
-        var pass=$('.password').val();
-        var nbr= pass.length;
-        $('#mot_de_passe').show();
+        var pass = $('#password_cc').val() || '';
+        var confirmation = $('#password_confirmation_cc').val() || '';
+        var tropCourt = pass.length > 0 && pass.length < 8;
+        var differents = confirmation.length > 0 && confirmation !== pass;
+        $('#mot_de_passe').toggle(tropCourt);
+        $('#password_cc').toggleClass('is-invalid', tropCourt);
+        $('#mots_de_passe_differents').toggle(differents);
+        $('#password_confirmation_cc').toggleClass('is-invalid', differents);
       }
     </script>
-  <script>
-    function email_existe(){
+  <script nonce="{{ $cspNonce ?? '' }}">
+    // Création de compte : l'adresse e-mail doit être vérifiée par un code avant de pouvoir créer le compte.
+    // Le bouton « Vérifier l'adresse » n'apparaît qu'une fois une adresse complète saisie.
+    var inscription = {
+        adresseCode: @json(($codeDejaEnvoye ?? false) ? mb_strtolower(trim(old('email'))) : ''),  // adresse à laquelle le code a été envoyé
+        emailExiste: false,
+        envoiEnCours: false,
+        attente: 0,
+        minuterie: null,
+        temporisation: null
+    };
 
-     var username= $('#email_cc').val();
-     //alert(username);
-      var url = "{{ route('email_existe') }}";
-            $.ajax({
-                    url: url,
-                    type: 'GET',
-                    data: {username: username},
-                    dataType: 'json', 
-                    error:function(data){alert("Erreur");},
-                    success: function (data) {
-                    
-                       if(data==0){
-                         $('#email_existe').show();
-                       }
-                       else{
-                        $('#email_existe').hide();
-                       }
-                    }
-            });
+    function adresseSaisie() {
+        return $.trim($('#email_cc').val() || '').toLowerCase();
     }
+
+    function adresseComplete(adresse) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(adresse);
+    }
+
+    function majBoutonsInscription() {
+        var adresse = adresseSaisie();
+        var codeEnvoye = inscription.adresseCode !== '' && inscription.adresseCode === adresse;
+        var adresseUtilisable = adresseComplete(adresse) && !inscription.emailExiste;
+        $('#btn_envoyer_code')
+            .toggleClass('d-none', !adresseUtilisable)
+            .prop('disabled', inscription.envoiEnCours || inscription.attente > 0);
+        $('#btn_creer_compte').prop('disabled', !adresseUtilisable || !codeEnvoye);
+        $('#aide_creer_compte').toggle(!codeEnvoye);
+    }
+
+    // Message sous l'adresse e-mail : vert (code envoyé) ou rouge (échec)
+    function statutCodeInscription(type, message) {
+        var ok = (type === 'ok');
+        $('#code_statut')
+            .removeClass('alert-success alert-danger')
+            .addClass('alert py-2 px-3 mb-0 ' + (ok ? 'alert-success' : 'alert-danger'))
+            .empty()
+            .append($('<i class="fas me-1" aria-hidden="true"></i>').addClass(ok ? 'fa-check-circle' : 'fa-exclamation-triangle'))
+            .append(document.createTextNode(message))
+            .show();
+    }
+
+    // Délai avant de pouvoir redemander un code
+    function attenteCodeInscription(secondes) {
+        clearInterval(inscription.minuterie);
+        inscription.attente = secondes;
+        var libelle = $('#btn_envoyer_code .libelle');
+        var tic = function () {
+            if (inscription.attente <= 0) {
+                clearInterval(inscription.minuterie);
+                libelle.text('Renvoyer le code');
+            } else {
+                libelle.text('Renvoyer le code (' + inscription.attente + ' s)');
+            }
+            majBoutonsInscription();
+            inscription.attente--;
+        };
+        tic();
+        inscription.minuterie = setInterval(tic, 1000);
+    }
+
+    // Saisie de l'adresse : on repart de zéro si elle diffère de celle qui a reçu le code,
+    // puis on vérifie (après une courte pause de frappe) qu'aucun compte ne l'utilise déjà.
+    function saisie_email_inscription() {
+        var adresse = adresseSaisie();
+        if (adresse !== inscription.adresseCode && !inscription.envoiEnCours) {
+            inscription.adresseCode = '';
+            clearInterval(inscription.minuterie);
+            inscription.attente = 0;
+            $('#bloc_code').hide();
+            $('#code_verification').val('');
+            $('#code_statut').hide();
+            $('#btn_envoyer_code .libelle').text('Vérifier l’adresse');
+        }
+        inscription.emailExiste = false;
+        $('#email_existe').hide();
+        $('#email_cc').removeClass('is-invalid');
+        majBoutonsInscription();
+
+        clearTimeout(inscription.temporisation);
+        if (adresseComplete(adresse)) {
+            inscription.temporisation = setTimeout(function () { email_existe(adresse); }, 400);
+        }
+    }
+
+    function email_existe(adresse) {
+        $.ajax({
+            url: "{{ route('email_existe') }}",
+            type: 'GET',
+            data: {username: adresse},
+            dataType: 'json',
+            // Vérification de confort : le serveur contrôle de toute façon l'adresse à l'envoi du code
+            success: function (data) {
+                if (adresseSaisie() !== adresse) { return; }  // l'usager a modifié l'adresse entre-temps
+                inscription.emailExiste = (data == 0);
+                $('#email_existe').toggle(inscription.emailExiste);
+                $('#email_cc').toggleClass('is-invalid', inscription.emailExiste);
+                if (inscription.emailExiste) { $('#code_statut').hide(); }
+                majBoutonsInscription();
+            }
+        });
+    }
+
+    function envoyer_code_inscription(){
+        var adresse = adresseSaisie();
+        if (!adresseComplete(adresse)) {
+            statutCodeInscription('erreur', 'Saisissez une adresse e-mail complète (exemple : nom@gmail.com).');
+            $('#email_cc').trigger('focus');
+            return;
+        }
+        var libelle = $('#btn_envoyer_code .libelle');
+        var texteAvant = libelle.text();
+        inscription.envoiEnCours = true;
+        libelle.text('Envoi en cours…');
+        majBoutonsInscription();
+
+        $.ajax({
+            url: "{{ route('inscription.code') }}",
+            type: 'POST',
+            dataType: 'json',
+            data: {email: adresse},
+            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+            success: function (data) {
+                inscription.envoiEnCours = false;
+                inscription.adresseCode = adresse;
+                $('#bloc_code').show();
+                $('#code_verification').val('').trigger('focus');
+                statutCodeInscription('ok', data.message);
+                attenteCodeInscription(data.attente || 60);
+            },
+            error: function (xhr) {
+                inscription.envoiEnCours = false;
+                var json = xhr.responseJSON || {};
+                // Adresse refusée : on affiche directement le message (sans la liste « Veuillez corriger… »)
+                var erreurs = xhr.status === 422 && json.errors;
+                statutCodeInscription('erreur', erreurs && erreurs.email ? erreurs.email[0] : messageErreurAjax(xhr));
+
+                if (json.attente) {
+                    // Un code vient déjà de partir : renvoi possible après le délai
+                    attenteCodeInscription(json.attente);
+                    return;
+                }
+                // Le code n'est pas parti (service d'envoi, connexion...) : on peut le renvoyer immédiatement
+                libelle.text(xhr.status === 0 || xhr.status >= 500 ? 'Renvoyer le code' : texteAvant);
+                majBoutonsInscription();
+            }
+        });
+    }
+
+    $(function () { majBoutonsInscription(); });
   </script>
-  <script>
+  <script nonce="{{ $cspNonce ?? '' }}">
     function sendData(){
     var form = $('#fileUploadForm')[0];
     // Create an FormData object 
@@ -481,7 +615,7 @@
   return false;
 }
   </script>
-  <script>
+  <script nonce="{{ $cspNonce ?? '' }}">
    function verifier_nom_commercial(champ_nom_commercial){
       var nom_commercial= $('#'+champ_nom_commercial).val();
       $('#pNomindisponible').hide();
@@ -503,8 +637,8 @@
                     complete: function(){
                       $('#loading').hide();
                     },
-                    error:function(xhr, status, error)
-                    {alert('Une erreur est survenue lors de la vérification, Veuillez réessayer plus tard !');},
+                    error:function(xhr)
+                    {alert(messageErreurAjax(xhr));},
                     success:function(data){
                      // alert('oko');
                      if(data.status=='200'){
@@ -520,8 +654,22 @@
                     }
                 });
       }
+      // Étape 2 « Entreprise » : disponibilité du nom commercial / de la dénomination sociale.
+      // Les messages s'affichent sous le champ vérifié uniquement (jamais en alerte).
       function valider_nom_commercial(champ_nom_commercial){
-      var nom_commercial= $('#'+champ_nom_commercial).val();
+      var champ = $('#'+champ_nom_commercial);
+      var bloc = champ.closest('[class*="col-"]');
+      var indisponible = bloc.find('.nomCommercialindispo');
+      var erreur = bloc.find('.nomCommercialErreur');
+      var nom_commercial = champ.val();
+
+      indisponible.hide();
+      erreur.hide();
+      champ.removeClass('is-invalid');
+      if (!$.trim(nom_commercial)) {
+          return;
+      }
+
       var url = "{{ route('verifier_nom_commercial') }}";
       $.ajaxSetup({
             headers: {
@@ -533,20 +681,17 @@
                     type:'POST',
                     dataType:'json',
                     data: {nom_commercial: nom_commercial} ,
-                    error:function(){alert('error');},
+                    // Vérification impossible (service FNRCCM injoignable, trop de tentatives...)
+                    error:function(){ erreur.show(); },
                     success:function(data){
-                     // alert('oko');
-                     if(data.status=='200'){
-                        $('.nomCommercialindispo').hide()
-                     }
-                     if(data.status!='200'){
-                        $('.nomCommercialindispo').show()
-                     }                     
+                     var pris = (data.status != '200');
+                     indisponible.toggle(pris);
+                     champ.toggleClass('is-invalid', pris);
                     }
                 });
       }
   </script>
-  <script>
+  <script nonce="{{ $cspNonce ?? '' }}">
       function editpiecejointes(categoriepiece){
        // var id=id;     
         console.log("categoriepiece")
@@ -556,15 +701,15 @@
                     type:'GET',
                     dataType:'json',
                     data: {categoriepiece: categoriepiece} ,
-                    error:function(){alert('error');},
+                    error:function(xhr){alert(messageErreurAjax(xhr));},
                     success:function(data){
                      $("#piece_name_update").html(data.categorie_piece);
                         $("#piece_id_u").val(data.id);
                         $("#piece_id_correct").val(data.id);
-                        
+
                        $("#reference_piece_u").val(data.reference);
-                       $("#reference_correct_piece_u").val(data.reference); 
-                       $("#date_etablissement_correct_u").val(data.date_etablissement); 
+                       $("#reference_correct_piece_u").val(data.reference);
+                       $("#date_etablissement_correct_u").val(data.date_etablissement);
                        $("#lieu_etablissement_correct_u").val(data.lieu_etablissement);
                        $("#date_etablissement_u").val(data.date_etablissement);
                        $("#lieu_etablissement_u").val(data.lieu_etablissement);
@@ -591,7 +736,7 @@
                     type:'GET',
                     dataType:'json',
                     data: {categoriepiece: categoriepiece} ,
-                    error:function(){alert('error');},
+                    error:function(xhr){alert(messageErreurAjax(xhr));},
                     success:function(data){
                      $("#piece_name_update").html(data.categorie_piece);
                         $("#piece_id_u").val(data.id);
@@ -618,47 +763,45 @@
                 });
       }
   </script>
- <script>
+ <script nonce="{{ $cspNonce ?? '' }}">
           
+          // Cascade Région > Province > Commune > Arrondissement > Secteur / Village.
+          // - le niveau suivant est vidé à chaque changement (et, par enchaînement, tous ceux d'après) ;
+          // - s'il n'y a qu'un seul choix (commune sans arrondissement, arrondissement unique),
+          //   il est sélectionné automatiquement, ce qui charge directement le niveau suivant.
           function changeValue(champ_actuel,champ_suivant, table, champ_precedent)
         {
             var valeur_actuel = $("#"+champ_actuel).val();
             var val_precedent=  $("#"+champ_precedent).val();
-            var val_actuel = $("#"+champ_actuel).val(); 
-           
-            //alert(niveau);
+            var suivant = $('#'+champ_suivant);
+
+            suivant.empty().append('<option></option>');
+            if (!valeur_actuel) {
+                suivant.trigger('change');
+                return;
+            }
+
             var url = '{{ route('valeur.selection') }}';
             $.ajax({
                     url: url,
                     type: 'GET',
                     data: {valeur_actuel: valeur_actuel, table: table, val_precedent:val_precedent},
-                    dataType: 'json', 
-                    error:function(data){alert("Erreur");},
+                    dataType: 'json',
+                    error:function(xhr){alert(messageErreurAjax(xhr));},
                     success: function (data) {
-                        var options = '<option></option>';
-                      if( data.length==1){
-                        for (var x = 0; x < data.length; x++) {
-                          console.log(data[x]['id']);
-                          var id_val= data[x]['id'];
-                         // $('#'+champ_suivant).val(id_val);
-                         
-                          options += '<option value="' + id_val + '"  >' + data[x]['name'] + '</option>';
-                         // $('#'+champ_suivant).val(id_val)
- 
+                        suivant.empty().append('<option></option>');
+                        $.each(data || [], function (i, ligne) {
+                            suivant.append($('<option></option>').val(ligne.id).text(ligne.name));
+                        });
+                        if (data && data.length === 1) {
+                            suivant.val(String(data[0].id));
                         }
-                      }
-                      else{
-                        for (var x = 0; x < data.length; x++) {
-                            options += '<option value="' + data[x]['id'] + '">' + data[x]['name'] + '</option>';
-                        }
-                      }
-                        
-                       $('#'+champ_suivant).html(options);
+                        suivant.trigger('change');
                     }
             });
         }
  </script>
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
           
           function changeActivite(champ_actuel,champ_suivant)
           {
@@ -670,8 +813,8 @@
                     url: url,
                     type: 'GET', 
                     data: {valeur_actuel: valeur_actuel},
-                    dataType: 'json', 
-                    error:function(data){alert("Erreur");},
+                    dataType: 'json',
+                    error:function(xhr){alert(messageErreurAjax(xhr));},
                     success: function (data) {
                         var options = '<option></option>';
                       if( data.length==1){
@@ -696,7 +839,7 @@
             });
         }
 </script>
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
   $(document).ready(function() {
     jQuery.extend(jQuery.validator.messages, {
     required: "Ce champ est obligatoire.",
@@ -719,7 +862,7 @@
 });
 });
 </script>
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
   function detail_morale(){
     var denomination_sociale_pm=$("#denomination_sociale_pm").val();
     $("#val_denomination_sociale_pm").text(denomination_sociale_pm);
@@ -841,7 +984,7 @@
  @yield('additionnel_script')
 
 
-  <script type="text/javascript">
+  <script nonce="{{ $cspNonce ?? '' }}" type="text/javascript">
     function makeid(length) {
     let result = '';
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -854,40 +997,44 @@
     return result;
   }
 </script>
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     function empty_input_file(input) {
       // alert($('.'+input).val());
         $('.'+input).val('');
 }
+// Contrôle d'un fichier choisi : type (PDF, JPG, JPEG, PNG) et taille (10 Mo au maximum).
+// Contrôle le champ réellement modifié (this) ; l'identifiant passé en argument ne sert qu'en secours.
 function VerifyUploadSizeIsOK(docsize)
 {
-    //alert(document.getElementById(docsize));
-   /* Attached file size check. Will Bontrager Software LLC, https://www.willmaster.com */
-   var UploadFieldID = docsize;
+   var fld = (this && this.nodeType === 1 && this.type === 'file') ? this : document.getElementById(docsize);
    var MaxSizeInBytes = 10485760;
-   var fld = document.getElementById(UploadFieldID);
-   var val= fld.value;
-   var ext = val.split(".");
-    ext = ext[ext.length-1].toLowerCase();    
-  // alert(ext)
-   var arrayExtensions = ["jpg" , "jpeg", "png", "pdf"];
 
-if (arrayExtensions.lastIndexOf(ext) == -1) {
-    alert("Ce type de fichier n'est pas autorisé. Seul les extensions : jpg, jpeg, png et pdf sont autorisés");
-    $('#'+ docsize).val('');
-}
-   //alert(fld.files.length);
-   if( fld.files && fld.files.length == 1 && fld.files[0].size > MaxSizeInBytes )
+   // Aucun fichier (sélection annulée) : rien à contrôler
+   if (!fld || !fld.files || fld.files.length === 0) {
+      return true;
+   }
+
+   var fichier = fld.files[0];
+   var morceaux = fichier.name.split('.');
+   var ext = morceaux.length > 1 ? morceaux[morceaux.length - 1].toLowerCase() : '';
+   var arrayExtensions = ["jpg", "jpeg", "png", "pdf"];
+
+   if (arrayExtensions.indexOf(ext) === -1) {
+      alert("Le fichier « " + fichier.name + " » n'est pas accepté. Seuls les fichiers PDF, JPG, JPEG et PNG sont autorisés.");
+      fld.value = '';
+      return false;
+   }
+   if (fichier.size > MaxSizeInBytes)
    {
-      alert("La taille de la copie des pièce jointes ne doit pas exceder " + parseInt(MaxSizeInBytes/1024/1024) + "MB");
-      $('#'+ docsize).val('');
+      alert("Le fichier « " + fichier.name + " » est trop volumineux : " + parseInt(MaxSizeInBytes/1024/1024) + " Mo au maximum.");
+      fld.value = '';
       return false;
    }
    return true;
 }
 
 </script>
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
   $(document).on("click", "#ccp_es", function(){
    if($('#ccp_es').prop( "checked" )){
     $('#block_formulaire_cpc').show()
@@ -898,7 +1045,7 @@ if (arrayExtensions.lastIndexOf(ext) == -1) {
     
 })
 </script>
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
 $(function(){
     var today = new Date();
    startDate= new Date(today.getFullYear()-18, today.getMonth(), today.getDate());
@@ -910,7 +1057,7 @@ $(function(){
 });
 }); 
 </script>
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
   $(function(){
       $('.date_piecejointe').datepicker({
               autoclose: true,
@@ -932,7 +1079,7 @@ $(function(){
   });
 
   </script>
-  <script>
+  <script nonce="{{ $cspNonce ?? '' }}">
     function editdemande()
       {
         //alert('ok');
@@ -946,7 +1093,7 @@ $(function(){
           $('.save_usager').show();
       }
   </script>
-   <script>
+   <script nonce="{{ $cspNonce ?? '' }}">
     $(document).ready(function(){
         // Le message disparaît après 5 secondes (5000 ms)
         setTimeout(function() {
@@ -961,7 +1108,7 @@ $(function(){
         }, 5000); // 5000 ms = 5 secondes
     });
 </script>
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
 function initRechercheUsager(selecteur) {
     $(selecteur).select2({
         width: '100%',
@@ -983,7 +1130,7 @@ function initRechercheUsager(selecteur) {
 }
 $(function () { initRechercheUsager('select.recherche-usager'); });
 </script>
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     document.addEventListener('DOMContentLoaded', function() {
       // Sélectionner tous les inputs et textareas
       const inputs = document.querySelectorAll('input[type="text"], input:not([type]), textarea');

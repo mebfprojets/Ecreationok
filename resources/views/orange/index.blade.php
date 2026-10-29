@@ -1,140 +1,100 @@
 @extends('layouts.frontend')
 @section('content')
-@if(session('message'))
-                    <center><div class="custom-alert" style="color: white;">
-                        {{ session('message') }}
-                    </div>
-                    </center>
-@endif
-@if(session('error'))
-                    <center><div class="custom-rouge" style="color: white;">
-                        {{ session('error') }}
-                    </div>
-                    </center>
-@endif
-<div class="block-title align-items-center" style="margin-top: 50px;">
-    
-                    <center><h3><strong>Paiements</strong></h3></center>
-                    <center><p>Choisir le mode de paiement</p>
+@include('demande.partials.styles')
 
-                    <div class="row" style="display: flex; position: relative; align-items: center; justify-content: center;">                    
-                        <div class="col-md-4">                        
-                            <div class="mb-3">
-                                <button type="button" class="btn btn-outline-warning me-2" data-bs-toggle="modal" data-bs-target="#orange" data-bs-whatever="">
-                                    <img src="{{asset('frontend/images/OM.png')}}" width="100" height="100" alt="">
-                                </button><br>
-                                <label for="exampleInputEmail1" class="form-label">
-                                    <!-- Composer *144*4*6*{{$montant}}# pour générer le code OTP -->
-                                    <li>1. Composer <strong><i>*144*4*6*{{$montant}}#</i></strong> Pour générer le code OTP</li>
-                                    <li>2. Renseigner le numéro de téléphone ayant généré le code OTP dans le champ <strong><i>Numéro de Paiement</strong></i></li>
-                                    <li>3. Renseigner le code OTP dans le champ </i></strong>"Code OTP"</strong></i></li>
+@php
+    $demande = $demande ?? \App\Models\Demande::find($demande_id);
+    $montantEntier = (int) round((float) $montant);
+    $codeUssd = '*144*4*6*'.$montantEntier.'#';
+@endphp
 
-                                </label>                                
-                            </div>                                          
-                        </div>
-                        <div class="col-md-4" style="margin-top: 1px;">       
-                            <div class="mb-3">
-                                <!-- Old Paiement par moov qui dirigeait vers l'intégrateur Intouch -->
-                                <!-- <button  onclick="calltouchpay('{{$command}}','{{$montant_telm}}')" class="btn btn-outline-info me-2">
-                                    <img src="{{asset('frontend/images/Moov.png')}}" width="100" height="100" alt="">
-                                </button><br><br> -->
-                                <form action="{{ route('moov.index')}}" method="POST"> 
-                                                                    @csrf  
-                                    <input type="hidden" name="montant" id="demande_montant" value="{{$montant}}"> 
-                                    <input type="hidden" name="id" id="id" value="{{$demande_id}}">
-                                    <input type="hidden" name="numero_command" id="numero_demande" value="{{$command}}">
-                                    <button type="submit" class="btn btn-outline-info me-2">
-                                        <img src="{{asset('frontend/images/Moov.png')}}" width="100" height="100" alt="">
+<div class="ed-page ed-page-etroite">
+    <a href="{{ route('demande.liste') }}" class="d-inline-block mb-3 text-decoration-none">
+        <i class="fas fa-arrow-left me-1" aria-hidden="true"></i> Mes demandes
+    </a>
+    <h1 class="ed-titre h3">Paiement de votre demande</h1>
+    <p class="ed-sous-titre mb-3">Réglez les frais pour que votre demande soit transmise au CEFORE.</p>
+
+    @include('demande.partials.paiement_recap', ['demande' => $demande])
+
+    <h2 class="h5 fw-bold mt-4 mb-3">Choisissez votre moyen de paiement</h2>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="ed-paiement-option orange" data-carte-cliquable>
+                <img src="{{ asset('frontend/images/OM.png') }}" alt="">
+                <h3>Orange Money</h3>
+                <p>Générez un code de paiement (OTP) sur votre téléphone, puis saisissez-le ici.</p>
+                <button type="button" class="btn btn-orange w-100" data-action-principale data-bs-toggle="collapse" data-bs-target="#paiement-orange"
+                        aria-expanded="false" aria-controls="paiement-orange">
+                    Payer avec Orange Money
+                </button>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="ed-paiement-option moov" data-carte-cliquable>
+                <img src="{{ asset('frontend/images/Moov.png') }}" alt="">
+                <h3>Moov Money</h3>
+                <p>Saisissez votre numéro : un code de confirmation vous sera envoyé par Moov Money.</p>
+                <form action="{{ route('moov.index') }}" method="POST" data-envoi-unique>
+                    @csrf
+                    <input type="hidden" name="id" value="{{ $demande_id }}">
+                    <input type="hidden" name="numero_command" value="{{ $command }}">
+                    <button type="submit" class="btn btn-moov w-100" data-action-principale data-libelle-envoi="Chargement…">Payer avec Moov Money</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- Paiement Orange Money --}}
+    <div class="collapse mt-3" id="paiement-orange">
+        <section class="ed-carte" style="--accent-paiement: #ff7900;">
+            <div class="ed-carte-entete">
+                <h2><img src="{{ asset('frontend/images/OM.png') }}" alt="" width="28" height="28" class="me-2">Paiement par Orange Money</h2>
+            </div>
+            <div class="ed-carte-corps">
+                <form action="{{ route('orange.store') }}" method="POST" data-envoi-unique>
+                    @csrf
+                    <input type="hidden" name="id" value="{{ $demande_id }}">
+                    <input type="hidden" name="command" value="{{ $command }}">
+                    <input type="hidden" name="montant" value="{{ $montant }}">
+
+                    <ol class="ed-etapes-paiement">
+                        <li>
+                            <strong>Composez ce code sur votre téléphone Orange</strong> pour générer votre code de paiement (OTP) :
+                            <div>
+                                <span class="ed-ussd">
+                                    <code>{{ $codeUssd }}</code>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-csp-click="__copier"
+                                            data-copier="{{ $codeUssd }}" data-libelle-copie="Copié ✓">
+                                        <i class="far fa-copy me-1" aria-hidden="true"></i> Copier
                                     </button>
-                                    
-                                </form>
-                                <label for="exampleInputEmail1" class="form-label">                                    
-                                        <li>1. Renseigner le numéro de paiement pour générer le code OTP</li>
-                                        <li>3. Renseigner le code OTP puis cliquer sur Valider</li>
-                                </label>
+                                </span>
                             </div>
-                        </div>
+                        </li>
+                        <li>
+                            <label for="numero_orange" class="form-label fw-bold mb-1">Numéro Orange Money</label>
+                            <div class="text-muted small mb-2">Le numéro de téléphone qui a généré le code OTP (8 chiffres, sans espace).</div>
+                            <input type="tel" id="numero_orange" name="numero" class="form-control" inputmode="numeric"
+                                   autocomplete="tel" data-chiffres-max="8" pattern="[0-9]{8}"
+                                   title="Saisissez les 8 chiffres du numéro, sans espace" data-csp-input="__chiffres" required>
+                        </li>
+                        <li>
+                            <label for="otp_orange" class="form-label fw-bold mb-1">Code OTP</label>
+                            <div class="text-muted small mb-2">Le code reçu par SMS après avoir composé le code ci-dessus.</div>
+                            <input type="text" id="otp_orange" name="otp" class="form-control" inputmode="numeric"
+                                   autocomplete="one-time-code" maxlength="10" required>
+                        </li>
+                    </ol>
+
+                    <div class="d-flex flex-wrap justify-content-end gap-2 mt-3">
+                        <button type="button" class="btn btn-light" data-bs-toggle="collapse" data-bs-target="#paiement-orange">Annuler</button>
+                        <button type="submit" class="btn btn-orange" data-libelle-envoi="Paiement en cours…">
+                            <i class="fas fa-lock me-1" aria-hidden="true"></i> Payer {{ number_format($montantEntier, 0, ',', ' ') }} FCFA
+                        </button>
                     </div>
-                    </center>
-<center>            
-                    <!-- <button  onclick="calltouchpay('{{$command}}','{{$montant}}')" class="btn btn-outline-info me-2">Moov Money</button> -->
-
-                    <!-- <a href="" class="btn btn-outline-info me-2" data-bs-toggle="modal" data-bs-target="#addformation" data-bs-whatever="">Moov Money</a>                         -->
-
-                    </center>
-                    <!-- <form action="">
-                      @csrf
-
-                      <div class="row">
-                                                        
-                                                            <div class="col-lg-4">
-                                                                <div class="mb-3">
-                                                                    <label class="form-label" for="progress-basicpill-vatno-input">Nom Commercial (<font color="red">*</font>)</label>                                    
-                                                                    <input type="text" id="nom_commercial_pp" name="nom_commercial" class="form-control" id="progress-basicpill-vatno-input"  required>
-                                                                    <input type="hidden" name="type_request" value="P1" class="form-control" id="progress-basicpill-pancard-input">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-4">
-                                                                <div class="mb-3">
-                                                                <label class="form-label" for="progress-basicpill-vatno-input">Enseigne</label>
-                                                                    <input type="text" name="enseigne" class="form-control" id="progress-basicpill-vatno-input" >                                                                  
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-4">
-                                                                <div class="mb-3">
-                                                                    <label class="form-label" for="progress-basicpill-vatno-input">Sigle</label>
-                                                                    <input type="text" name="sigle" class="form-control" id="sigle_pp" >
-                                                                </div>
-                                                            </div>                                     
-                                                        </div>
-
-                    </form> -->
-
-
+                </form>
+            </div>
+        </section>
+    </div>
 </div>
 @endsection
-<div class="modal fade" id="orange" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Orange Money</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <form action="{{route('orange.store')}}" enctype="multipart/form-data" method="POST">
-        @csrf
-        <input type="hidden" name="id" value="{{$demande_id}}">
-        <input type="hidden" name="command" value="{{$command}}">
-        <input type="hidden" name="montant" value="{{$montant}}">
-        
-
-        <div class="modal-body">
-            <li>1. Composer <strong><i>*144*4*6*{{$montant}}#</i></strong> Pour générer le code OTP</li>
-            <li>2. Renseigner le numéro de téléphone ayant généré le code OTP dans le champ <strong><i>Numéro de Paiement</strong></i></li>
-            <li>3. Renseigner le code OTP dans le champ </i></strong>"Code OTP"</strong></i></li>
-            <br><br>
-                <div class="row g-4">                    
-                        <div class="col-md-6">                        
-                            <div class="mb-3">
-                                <label for="exampleInputEmail1" class="form-label">Numéro de Paiement</label>
-                                <input type="text" name="numero" class="form-control" value="{{ old('libelle') }}" id="" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">                        
-                            <div class="mb-3">
-                                <label for="exampleInputEmail1" class="form-label">Code OTP</label>
-                                <input type="text" name="otp" class="form-control" value="{{ old('libelle') }}" id="" required>
-                            </div>
-                        </div>                        
-                </div>               
-        </div>
-      <center>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fermer</button>
-        <input type="submit" class="btn btn-success" value="Valider">
-        <!-- <button type="button" id="saveButton" class="btn btn-success"></button> -->       
-      </div>
-      </center>
-      </form>
-    </div>
-  </div>
-</div>

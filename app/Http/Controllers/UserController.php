@@ -23,7 +23,9 @@ class UserController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        // email_existe est appelé par le formulaire d'inscription, donc par un visiteur non connecté
+        // (route limitée à 20 requêtes par minute dans routes/web.php)
+        $this->middleware('auth')->except('email_existe');
     }
     public function index()
     {

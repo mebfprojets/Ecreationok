@@ -14,6 +14,10 @@
 
 <!-- jQuery -->
 <!-- For Backend -->
+<!-- Gestionnaires data-csp-* (remplacent les onclick/onchange interdits par la CSP) -->
+<script src="{{asset('js/csp-handlers.js')}}"></script>
+<!-- Messages lisibles pour les erreurs des appels AJAX -->
+<script src="{{asset('js/erreurs-ajax.js')}}"></script>
 <script src="{{asset('adminlte/plugins/jquery/jquery.min.js')}}"></script>
 <script src="{{asset('adminlte/plugins/datatables/jquery.dataTables.min.js')}}"></script>
 <script src="{{asset('adminlte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
@@ -31,7 +35,7 @@
 <!-- jQuery UI -->
 <script src="{{asset('adminlte/plugins/jquery-ui/jquery-ui.min.js')}}"></script>
 <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
   $.widget.bridge('uibutton', $.ui.button)
 </script>
 <!-- Bootstrap 4 -->
@@ -67,7 +71,7 @@
 <script src="{{asset('backend/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js')}}"></script>
 
 
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
   $(function(){
       $('.date_piecejointe').datepicker({
               autoclose: true,
@@ -78,7 +82,7 @@
   });
   });
 </script>
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
   $(function () {
     $("#example1").DataTable({
       "responsive": true, "lengthChange": false, "autoWidth": false,
@@ -96,13 +100,13 @@
   });
 </script>
 
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
   $('#flash-overlay-modal').modal();
 </script>
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
   $('div.alert').not('.alert-important').delay(3000).fadeOut(350);
   </script>
-      <script>
+      <script nonce="{{ $cspNonce ?? '' }}">
         $(document).ready(function() {
            /** add active class and stay opened when selected */
           var url = window.location;

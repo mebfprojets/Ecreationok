@@ -106,7 +106,7 @@
               <!-- /.card-body -->
 </div>
             <!-- /.card -->
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     $('#daterange-btn').daterangepicker(
       {
         ranges   : {

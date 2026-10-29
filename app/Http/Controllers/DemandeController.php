@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\DemandeRefuseeException;
 use App\Models\Usager;
 use App\Models\Paiement;
 use App\Models\User;
@@ -94,10 +95,19 @@ class DemandeController extends Controller
         if(Auth::user())
         {
         $usager= Usager::where('user_id',Auth::user()->id)->first();
+        // Étapes préalables manquantes : on renvoie vers la bonne étape au lieu d'une erreur 500
+        if (! $usager) {
+            return redirect()->route('create.usager')
+                ->with('error', 'Complétez d’abord votre profil de promoteur avant de créer une demande.');
+        }
         $demande_pp=Demande::where('usager_id', $usager->id)->where('company_type','EI')->get();
         $nbr_demande_pp=count($demande_pp);
         if($usager!=null){
             $piecejointe_enrs= PieceJointe::where('usager_id',$usager->id)->get();
+            if ($piecejointe_enrs->isEmpty()) {
+                return redirect()->route('type.entreprise')
+                    ->with('error', 'Choisissez d’abord le type d’entreprise et déposez vos pièces jointes avant de remplir la demande.');
+            }
             $type_dem = $piecejointe_enrs->first()->type_entreprise;
             $regions= DB::table('regions')->get();
             $pays= DB::table('valeurs')->where('parametre_id',5)->get();
@@ -140,8 +150,91 @@ class DemandeController extends Controller
      */
     public function store(Request $request)
     {
-       //dd($request->all());
+        // Champs indispensables au traitement : sans eux, la création échouait en erreur 500.
+        $request->validate([
+            'type_request' => 'required|in:P1,M1,G1',
+            'nom_commercial' => 'required|string|max:255',
+            'region_entreprise' => 'required',
+            'province_entreprise' => 'required',
+            'commune_entreprise' => 'required',
+            'secteur_entreprise' => 'required',
+            'activite_principale' => 'required',
+            'signed' => ['required', 'string', 'regex:/^data:image\/(png|jpe?g);base64,/'],
+            'superficie' => 'nullable|integer|min:0|max:999999999',
+        ], [
+            'superficie.integer' => 'La superficie doit être un nombre entier de m², sans virgule ni point.',
+            'superficie.min' => 'La superficie ne peut pas être négative.',
+            'superficie.max' => 'La superficie saisie est trop grande.',
+            'type_request.required' => 'Le type de demande est manquant. Recommencez la création de la demande depuis le choix du type d’entreprise.',
+            'type_request.in' => 'Le type de demande n’est pas reconnu. Recommencez la création de la demande depuis le choix du type d’entreprise.',
+            'nom_commercial.required' => 'Le nom commercial est obligatoire.',
+            'nom_commercial.max' => 'Le nom commercial est trop long (255 caractères au maximum).',
+            'region_entreprise.required' => 'La région de l’entreprise est obligatoire.',
+            'province_entreprise.required' => 'La province de l’entreprise est obligatoire.',
+            'commune_entreprise.required' => 'La commune de l’entreprise est obligatoire.',
+            'secteur_entreprise.required' => 'Le secteur / village de l’entreprise est obligatoire.',
+            'activite_principale.required' => 'L’activité principale est obligatoire.',
+            'signed.required' => 'La signature est obligatoire : signez dans le cadre prévu avant de valider la demande.',
+            'signed.regex' => 'La signature n’a pas été reçue correctement : effacez-la, signez de nouveau puis validez.',
+        ]);
+
+        $usager = DB::table('usagers')->where('user_id', Auth::user()->id)->first();
+        if (! $usager) {
+            return redirect()->route('create.usager')
+                ->with('error', 'Complétez d’abord votre profil de promoteur avant de créer une demande.');
+        }
+
+        DB::beginTransaction();
+        try {
+            $reponse = $this->enregistrerDemande($request, $usager);
+            DB::commit();
+
+            return $reponse;
+        } catch (DemandeRefuseeException $e) {
+            DB::rollBack();
+
+            return redirect()->back()
+                ->withInput($request->except(['signed', '_token']))
+                ->with('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            report($e);
+
+            return redirect()->back()
+                ->withInput($request->except(['signed', '_token']))
+                ->with('error', 'La demande n’a pas pu être enregistrée. Vérifiez les informations saisies puis réessayez ; '
+                    .'si le problème persiste, contactez le CEFORE.');
+        }
+    }
+
+    /**
+     * Création de la demande (appelée dans une transaction par store()).
+     * Lève DemandeRefuseeException avec un message destiné à l'usager quand une donnée est incohérente.
+     */
+    private function enregistrerDemande(Request $request, $usager)
+    {
+        // Contrôle du nom AVANT toute écriture en base (signature, terrain, demande)
+           if($request->denomination_sociale!=""){
+            $denomination=$request->denomination_sociale;
+           }
+           else{
+            $denomination=$request->nom_commercial;
+           }
+        $nomcom=Demande::where('commercial_name', $request->nom_commercial)->first();
+        $denom=Demande::where('denomination_social', $denomination)->first();
+        if($nomcom || $denom)
+        {
+            $existante = $nomcom ?: $denom;
+            // Même promoteur : c'est en général un double envoi du formulaire -> on affiche ses demandes
+            if ($existante->usager_id == $usager->id) {
+                return redirect()->route('demande.liste')
+                    ->with('error', 'Une entreprise existe déjà avec les mêmes informations.');
+            }
+            throw new DemandeRefuseeException('Une entreprise existe déjà avec les mêmes informations.');
+        }
+
         // Vérification du montant CPC
+        $list_code = [];
         $provinces_ss_ifus= Valeur::where('parametre_id',19)->get();
         foreach($provinces_ss_ifus as $province){
             $list_code[]=$province->code;
@@ -190,10 +283,12 @@ class DemandeController extends Controller
                 //$montant_total= $montant_total - env('montant_societaire_ss_ifu');
             }
      }
-    
+
    }
-   //dd($montant_total);
-        $usager=DB::table('usagers')->where('user_id',Auth::user()->id)->first();
+        if (! isset($montant, $montant_total)) {
+            throw new DemandeRefuseeException('Le tarif correspondant à ce type de demande est introuvable. '
+                .'Vérifiez le type de demande choisi ou contactez le CEFORE.');
+        }
 
        // $num=$request->type_request.
         //Pour la signature
@@ -247,6 +342,10 @@ class DemandeController extends Controller
             $Cefore_code='CEFORE OUA';
         }
         else{
+            if (! $Cefore) {
+                throw new DemandeRefuseeException('Aucun CEFORE n’est rattaché à la région choisie pour l’entreprise. '
+                    .'Vérifiez la région ou contactez le CEFORE.');
+            }
             $Cefore_code=$Cefore->CodeOrganisation;
         }
         //$Cefore_code=$Cefore->CodeOrganisation;
@@ -267,6 +366,9 @@ class DemandeController extends Controller
         $num_command=$request->type_request.$code_command.$annee.$nombre;
 
         $activites=DB::table('activites')->where('Code', $request['activite_principale'])->first();
+        if (! $activites) {
+            throw new DemandeRefuseeException('L’activité principale choisie n’est pas reconnue. Sélectionnez-la de nouveau dans la liste.');
+        }
         $category_code=$activites->category_code;
         if($request->type_request=='P1')
             {
@@ -282,7 +384,9 @@ class DemandeController extends Controller
             $forme_juridique=$request->forme_juridique_gie;
             }
         $secteur_village=DB::table('secteur_villages')->where('id',$request->secteur_entreprise)->first();
-        //dd($secteur_village->code);
+        if (! $secteur_village) {
+            throw new DemandeRefuseeException('Le secteur / village choisi pour l’entreprise n’est pas reconnu. Sélectionnez-le de nouveau dans la liste.');
+        }
         $secteur_village=$secteur_village->code;
         $division=DB::table('secteur_villages')->where('code',$secteur_village)->first();
         $division_code=$division->division_fiscale_code;
@@ -301,23 +405,7 @@ class DemandeController extends Controller
         ]);
            // dd($request->all());
 
-           if($request->denomination_sociale!=""){
-            $denomination=$request->denomination_sociale;
-           }
-           else{
-            $denomination=$request->nom_commercial;
-           }
-        $nomcom=Demande::where('commercial_name', $request->nom_commercial)->first();
-        $denom=Demande::where('denomination_social', $denomination)->first();
-        if($nomcom || $denom)
         {
-            //dd($denom->primary_activity);
-            $usager= Usager::where('user_id',Auth::user()->id)->first();
-            $demandes=Demande::where('usager_id', $usager->id)->orderby('created_at','desc')->get();
-            $c=count($demandes);
-            return view('demande.liste', compact('demandes','c'));
-        }
-        else{
 
         $demande= Demande::create([      
                  'type_entreprise' =>0,
@@ -398,13 +486,14 @@ class DemandeController extends Controller
 
             if($request->type_request!='P1')
             {
-                $associes=$request->associes;
-                $fonction_associes=$request->fonction_associes;
-                $capital_associes=$request->capital_associes;
-                $commissaire=$request->commissaire;
-                $qualite_commissaire=$request->qualite_commissaire;
+                // (array) : aucun associé / commissaire saisi -> liste vide au lieu d'une erreur 500 (count(null) en PHP 8)
+                $associes=array_values((array) $request->associes);
+                $fonction_associes=array_values((array) $request->fonction_associes);
+                $capital_associes=array_values((array) $request->capital_associes);
+                $commissaire=array_values((array) $request->commissaire);
+                $qualite_commissaire=array_values((array) $request->qualite_commissaire);
                 for($i=0; $i<count($associes); $i++){
-                    if($associes[$i]!="" && $fonction_associes[$i]!="" && $capital_associes[$i]!=""){
+                    if(($associes[$i] ?? '')!="" && ($fonction_associes[$i] ?? '')!="" && ($capital_associes[$i] ?? '')!=""){
                         DemandeDirigeant::create([
                             'demande_id'=>$demande->id,
                             'usager_id'=>$associes[$i],
@@ -420,7 +509,7 @@ class DemandeController extends Controller
                 
                 for($i=0; $i<count($commissaire); $i++)
                 {
-                    if($commissaire[$i]!="" && $qualite_commissaire[$i]!="")
+                    if(($commissaire[$i] ?? '')!="" && ($qualite_commissaire[$i] ?? '')!="")
                     {
                         // if($qualite_commissaire[$i]="Titulaire"){
                         //     $qualite_commissaire[$i]=0;
@@ -545,9 +634,13 @@ class DemandeController extends Controller
 public function updatepj_correct(Request $request){
     $request->validate([
         'piece_id_correct' => 'required|integer',
-        'piece_jointe'     => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        'piece_jointe'     => 'required|'.self::REGLE_FICHIER,
         'numero_ref'       => 'nullable|string|max:255',
-    ]);
+    ], array_merge($this->messagesFichier('piece_jointe'), [
+        'piece_id_correct.required' => 'La pièce à corriger n’a pas été identifiée. Fermez la fenêtre puis réessayez.',
+        'piece_id_correct.integer' => 'La pièce à corriger n’a pas été identifiée. Fermez la fenêtre puis réessayez.',
+        'numero_ref.max' => 'Le numéro de référence est trop long.',
+    ]));
 
     $usager = Usager::where('user_id', Auth::user()->id)->firstOrFail();
     $piecejointe = PieceJointe::findOrFail($request->piece_id_correct);
@@ -555,6 +648,10 @@ public function updatepj_correct(Request $request){
     // La pièce doit appartenir à une demande du promoteur connecté
     if (!$piecejointe->demande || $piecejointe->demande->usager_id != $usager->id) {
         abort(403);
+    }
+    // Une pièce ne peut être remplacée que si la demande a été rejetée par le CEFORE
+    if (! $piecejointe->demande->estRejetee()) {
+        return redirect()->back()->with('error', 'Cette pièce ne peut pas être modifiée : seule une demande rejetée par le CEFORE peut être corrigée.');
     }
 
     $file = $request->file('piece_jointe');
@@ -572,7 +669,8 @@ public function updatepj_correct(Request $request){
         'url_local' => $url_local,
     ]);
 
-    return redirect()->back();
+    return redirect()->back()->with('success', 'La pièce « '.str_replace('_', ' ', $piecejointe->type_piece).' » a été remplacée. '
+        .'Une fois toutes les corrections faites, renvoyez la demande pour traitement.');
 }
 
  public function verifier_nom_commercial(Request $request){
@@ -636,7 +734,7 @@ public function updatepj_correct(Request $request){
  }
 
 public function laodpiecejointe(Request $request){
-    `$request->validate(['piece_jointe_1' => 'nullable'.self::REGLE_FICHIER]);`;
+    $request->validate(['piece_jointe_1' => 'nullable|'.self::REGLE_FICHIER], $this->messagesFichier('piece_jointe_1'));
     $usager= Usager::where('user_id',Auth::user()->id)->first();
 //dd($request->type_document_identite);
     if($request->type_document){
@@ -694,7 +792,7 @@ public function laodpiecejointe(Request $request){
         }
     }
     public function updatepiecejointe(Request $request){
-        `$request->validate(['piece_jointe_u' => 'nullable'.self::REGLE_FICHIER]);`;
+        $request->validate(['piece_jointe_u' => 'nullable|'.self::REGLE_FICHIER], $this->messagesFichier('piece_jointe_u'));
         $usager= Usager::where('user_id',Auth::user()->id)->first();
         if($request->type_document){
             $type_doc= $request->type_document;
@@ -841,6 +939,12 @@ public function laodpiecejointe(Request $request){
         {
 
             $usager= Usager::where('user_id',Auth::user()->id)->first();
+            if (! $usager) {
+                // Compte sans profil promoteur : aucune demande possible pour l'instant
+                $demandes = collect();
+                $c = 0;
+                return view('demande.liste', compact('demandes','c'));
+            }
             $demandes=Demande::where('usager_id', $usager->id)->orderby('created_at','desc')->get();
             $c=count($demandes);
             return view('demande.liste', compact('demandes','c'));
@@ -881,13 +985,17 @@ public function laodpiecejointe(Request $request){
            $pays= DB::table('valeurs')->where('parametre_id',5)->orderby('libelle','asc')->get();
            $c=count($demande);
            $cefore=DB::table('organisations')->where('CodeOrganisation',$demandes->organisation_code)->first();
-            $cefore_code=$cefore->Ville;
+            $cefore_code=$cefore ? $cefore->Ville : $demandes->organisation_code;
             $types_formalites=Valeur::where('parametre_id',18)->orderby('libelle','desc')->get();
-            //dd($types_formalites);
+            // Adresse propre du dirigeant (et non celle de l'entreprise)
+            $commune_usager=DB::table('commune_departements')->where('id', $usager->Commun_Departement_Code)->first();
+            // Rejets et renvois pour traitement
+            $historiques=$demandes->historiques()->get();
             return view('demande.detailtest', compact('demandes','usager','activites','forme_juridiques',
             'professions','regions','provinces','communes','arrondissements','secteurs','terrains','piecejointes',
         'secteur_usager','province_usager','region_usager','c','cefore_code','regions_all','FJ_EI','FJ_ES','FJ_GIE',
-    'activites_all','usage_terrains','civilites','professions','nationalites','pays','types_formalites'));   
+    'activites_all','usage_terrains','civilites','professions','nationalites','pays','types_formalites',
+    'commune_usager','historiques'));
   
         
         }
@@ -937,7 +1045,11 @@ public function laodpiecejointe(Request $request){
         public function update_demande(Request $request, $id)
         {//
             $demande=Demande::find($id);
-            $this->autoriserDemande($demande); 
+            $this->autoriserDemande($demande);
+            // Un promoteur ne peut corriger sa demande que lorsqu'elle a été rejetée (les agents, toujours)
+            if (Auth::user()->isadmin == null && ! $demande->estRejetee()) {
+                return redirect()->back()->with('error', 'Cette demande ne peut pas être modifiée : seule une demande rejetée par le CEFORE peut être corrigée.');
+            }
             $demande->commercial_name=$request->nom_commercial;
             $demande->enseigne=$request->enseigne;
             $demande->sigle=$request->sigle;
@@ -960,21 +1072,27 @@ public function laodpiecejointe(Request $request){
             elseif($request->forme_juridique_gie!=null){
                 $forme_juridique=$request->forme_juridique_gie;
             }
+            else{
+                $forme_juridique=$demande->forme_juridique;
+            }
             $demande->forme_juridique=$forme_juridique;
-            $demande->activity_sector=$request->secteur_activite;
-            $demande->primary_activity=$request->activite_principale;
+            $demande->activity_sector=$request->secteur_activite ?: $demande->activity_sector;
+            $demande->primary_activity=$request->activite_principale ?: $demande->primary_activity;
             //$demande->region_code=$request->region_entreprise;
             //Mise à jour du terrain
-            //dd($request->id_terrain);
-            $terrain=Terrain::find($request->id_terrain);
-            $terrain->numero_lot=$request->lot;
-            $terrain->numero_section=$request->section;
-            $terrain->numero_parcelle=$request->parcelle;
-            $terrain->id_usage_terrain=$request->usage;
-            $terrain->update();
+            $terrain=Terrain::find($request->id_terrain ?: $demande->id_terrain);
+            if ($terrain) {
+                $terrain->numero_lot=$request->lot;
+                $terrain->numero_section=$request->section;
+                $terrain->numero_parcelle=$request->parcelle;
+                $terrain->id_usage_terrain=$request->usage;
+                $terrain->update();
+            }
 
             $demande->update();
-            return redirect()->back();
+            return redirect()->back()->with('success', $demande->estRejetee()
+                ? 'Les informations de l’entreprise ont été corrigées. Une fois toutes les corrections faites, renvoyez la demande pour traitement.'
+                : 'Les informations de l’entreprise ont été mises à jour.');
            
         }
 
@@ -1001,7 +1119,7 @@ public function laodpiecejointe(Request $request){
                 // 'Region_Code'=>$request->region_usager,
                 // 'Province_Code'=>$request->province_usager
                ]);
-            return redirect()->back();
+            return redirect()->back()->with('success', 'Les informations du dirigeant ont été mises à jour.');
         }
 
         public function index_admin(){
@@ -1216,7 +1334,7 @@ public function laodpiecejointe(Request $request){
 
 
     public function add_formalite_retour(Request $request){
-        `$request->validate(['copie_de_la_formalite' => 'nullable'.self::REGLE_FICHIER]);`;
+        $request->validate(['copie_de_la_formalite' => 'nullable|'.self::REGLE_FICHIER], $this->messagesFichier('copie_de_la_formalite'));
     if (Auth::user()->can('save_formalite_retour'))
         {
         if ($request->hasFile('copie_de_la_formalite')) {
@@ -1242,7 +1360,7 @@ else{
 
 
 public function update_formalite_retour(Request $request){
-    `$request->validate(['copie_de_la_formalite' => 'nullable'.self::REGLE_FICHIER]);`;
+    $request->validate(['copie_de_la_formalite' => 'nullable|'.self::REGLE_FICHIER], $this->messagesFichier('copie_de_la_formalite'));
     if (Auth::user()->can('save_formalite_retour'))
      {
         if ($request->hasFile('copie_de_la_formalite'))
@@ -1351,9 +1469,13 @@ else{
         public function update_rejet(Request $request, $id){
             //dd($id);
             $demande=Demande::find($id);
-            $this->autoriserDemande($demande); 
+            $this->autoriserDemande($demande);
+            // Seule une demande rejetée peut être renvoyée pour traitement
+            if (! $demande->estRejetee()) {
+                return redirect()->back()->with('error', 'Cette demande n’est pas en attente de correction : elle ne peut pas être renvoyée pour traitement.');
+            }
             $demande->update([
-                'etat'=>0,             
+                'etat'=>0,
                ]);
 
                $historique=Historique::create([
@@ -1362,7 +1484,7 @@ else{
                 'motif'=>"Envoyer Pour Traitement"
                 ]);
 
-               return redirect()->back();    
+               return redirect()->back()->with('success', 'Votre demande a été renvoyée au CEFORE pour traitement. Vous serez informé(e) de la suite.');
                   
         }
         public function showpj(Piecejointe $piecejointe){
@@ -1373,7 +1495,7 @@ else{
             return view("demande.editPj", compact('piecejointe'));
         }
         public function updatepj(Piecejointe $piecejointe, Request $request){
-            `$request->validate(['piece_jointe_u' => 'nullable'.self::REGLE_FICHIER]);`;
+            $request->validate(['piece_jointe_u' => 'nullable|'.self::REGLE_FICHIER], $this->messagesFichier('piece_jointe_u'));
             $type_doc=$piecejointe->type_piece;
             $usager= $piecejointe->demande->usager;
             $file = $request->file('piece_jointe_u');
@@ -1485,9 +1607,15 @@ else{
             $customer_msisdn = $request->numero;
             $otp = $request->otp;
             $command=$request->command;
-            $montant=$request->montant;
             $token=$request->_token;
-            $demande=Demande::find($request->id);
+            $demande = Demande::findOrFail($request->id);
+            $this->autoriserDemande($demande);
+            if (! preg_match('/^[0-9]{8}$/', (string) $customer_msisdn)) {
+                return redirect()->route('demande.liste')
+                    ->with('error', 'Le numéro Orange Money doit comporter exactement 8 chiffres, sans espace. Veuillez recommencer le paiement.');
+            }
+            // Montant fixé par le serveur, jamais par le formulaire (il était modifiable avec F12)
+            $montant = (int) $demande->montant_total;
 
             //dd($token);
 
@@ -1570,7 +1698,7 @@ else{
                 'message'=>'Erreur dans l\'envoie XML Ou Serveur Orange non disponible !',
                 'echec_orange'=>'Oui'              
             ]);
-            session()->flash('error', "Paiement Echoué, Veuillez Réessayer !1");
+            session()->flash('error', "Le paiement n’a pas abouti. Vérifiez vos informations puis réessayez.");
             return redirect()->route('demande.liste');
             //return response()->json(['error' => 'Erreur cURL : ' . $error], 500);
         }
@@ -1607,7 +1735,7 @@ else{
                         ]);
 
                     }
-                    session()->flash('message', "Paiement Effectué avec succès !");
+                    session()->flash('message', "Paiement effectué avec succès. Votre demande est transmise au CEFORE pour traitement.");
                     return redirect()->route('demande.liste');
                 }
                 else{
@@ -1621,19 +1749,19 @@ else{
                         'echec_orange'=>'Oui'
                     ]);
                     if($status=="990418"){
-                    session()->flash('error', "OTP déjà Utilisé, Veuillez Réessayer !!");
+                    session()->flash('error', "Ce code OTP a déjà été utilisé. Générez un nouveau code puis réessayez.");
                     return redirect()->route('demande.liste');
                     }
                     if($status=="990417"){
-                    session()->flash('error', "OTP Incorrect, Veuillez Réessayer !!");
+                    session()->flash('error', "Le code OTP est incorrect. Vérifiez-le puis réessayez.");
                     return redirect()->route('demande.liste');
                     }
                     if($status=="8"){
-                        session()->flash('error', "Le montant à payer doit être " . $montant . " FCFA. Veuillez Réessayer !!");
+                        session()->flash('error', "Le montant payé ne correspond pas : il doit être de " . $montant . " FCFA. Veuillez réessayer.");
                         return redirect()->route('demande.liste');
                         }
                     
-                    session()->flash('error', "Paiement Echoué, Veuillez Réessayer !!");
+                    session()->flash('error', "Le paiement n’a pas abouti. Vérifiez vos informations puis réessayez.");
                     return redirect()->route('demande.liste');
                 }
                 
@@ -1645,7 +1773,7 @@ else{
                 //dd($status);
             }
             catch (Exception $e) {
-                session()->flash('error', "Paiement Echoué, Veuillez Réessayer !!!");
+                session()->flash('error', "Le paiement n’a pas abouti. Vérifiez vos informations puis réessayez.");
                     return redirect()->route('demande.liste');
                 // Gestion des erreurs lors du traitement de la réponse XML
                // return response()->json(['error' => 'Erreur lors du traitement de la réponse XML : ' . $e->getMessage()], 500);
@@ -1653,7 +1781,7 @@ else{
 
         // Fermeture de la session cURL
         //curl_close($ch);
-        session()->flash('error', "Paiement Echoué, Veuillez Réessayer !!!!");
+        session()->flash('error', "Le paiement n’a pas abouti. Vérifiez vos informations puis réessayez.");
         return redirect()->route('demande.liste');
         
         //return $response;
@@ -1664,11 +1792,16 @@ else{
             //dd($request->all());
             //$command=Demande::where('numero_command', $request->numero_command)->first();
             $id=Demande::where('id', $request->id)->first();
+            $this->autoriserDemande($id);
+            if ($id->paye != 0) {
+                return redirect()->route('demande.liste')->with('message', 'Cette demande est déjà payée ou son paiement est en cours de vérification.');
+            }
             $command=$id->numero_command;
             $montant=$id->montant_total;
             $montant_telm=$id->montant;
             $demande_id=$id->id;
-            return view('orange.index', compact('demande_id', 'command', 'montant','montant_telm'));
+            $demande=$id;
+            return view('orange.index', compact('demande_id', 'command', 'montant','montant_telm','demande'));
         }
 
     private function find_between($xmlBody, $openTag, $closeTag)
@@ -1687,11 +1820,16 @@ else{
         //dd($request->all());
         //$command=Demande::where('numero_command', $request->numero_command)->first();
         $id=Demande::where('id', $request->id)->first();
+        $this->autoriserDemande($id);
+        if ($id->paye != 0) {
+            return redirect()->route('demande.liste')->with('message', 'Cette demande est déjà payée ou son paiement est en cours de vérification.');
+        }
         $command=$id->numero_command;
         $montant=$id->montant_total;
         $otp=0;
         $demande_id=$id->id;
-        return view('moov.index', compact('demande_id', 'command', 'montant','otp'));
+        $demande=$id;
+        return view('moov.index', compact('demande_id', 'command', 'montant','otp','demande'));
     }
 
     public function moov_store(Request $request){
@@ -1699,6 +1837,14 @@ else{
         // Préparation des données
         //dd($request->all());
         $id=Demande::where('id', $request->id)->first();
+        $this->autoriserDemande($id);
+        if ($id->paye != 0) {
+            return redirect()->route('demande.liste')->with('message', 'Cette demande est déjà payée ou son paiement est en cours de vérification.');
+        }
+        if (! preg_match('/^[0-9]{8}$/', (string) $request->numero)) {
+            return redirect()->route('demande.liste')
+                ->with('error', 'Le numéro Moov Money doit comporter exactement 8 chiffres, sans espace. Veuillez recommencer le paiement.');
+        }
         $chaine = Str::random(10);
         $command=$id->numero_command;
         $num_command=$command."-".$chaine;
@@ -1764,7 +1910,7 @@ else{
             //dd($response);
             if ($err) {
                                                         
-                session()->flash('error', "Erreur lors de la connexion au service de paiement !");
+                session()->flash('error', "Le service de paiement est momentanément injoignable. Veuillez réessayer dans quelques instants.");
                 return redirect()->route('demande.liste');
             }
             if ($response){
@@ -1813,7 +1959,7 @@ else{
                         'paye'=>0,
                         'date_initiation'=>$date_format
                     ]);
-                    session()->flash('error', "Solde Insuffisant, Veuillez Recharger puis Réessayer !");
+                    session()->flash('error', "Solde insuffisant : rechargez votre compte Moov Money puis réessayez.");
                     return redirect()->route('demande.liste');
                 }
                 else{
@@ -1826,12 +1972,12 @@ else{
                         'paye'=>0,
                         'date_initiation'=>$date_format
                     ]);
-                    session()->flash('error', "une erreur s'est produite, Veuillez Réessayer !");
+                    session()->flash('error', "Une erreur s’est produite lors du paiement. Veuillez réessayer.");
                     return redirect()->route('demande.liste');
                 }
                 }
                 else{
-                    session()->flash('error', "une erreur s'est produite, Veuillez Réessayer !");
+                    session()->flash('error', "Une erreur s’est produite lors du paiement. Veuillez réessayer.");
                     return redirect()->route('demande.liste');
                 }
             }
@@ -1894,7 +2040,7 @@ else{
     //         //dd($response);
     //         if ($err) {
                                                         
-    //             session()->flash('error', "Erreur lors de la connexion au service de paiement !");
+    //             session()->flash('error', "Le service de paiement est momentanément injoignable. Veuillez réessayer dans quelques instants.");
     //             return redirect()->route('demande.liste');
     //         }
 
@@ -1942,7 +2088,7 @@ else{
     //                     'paye'=>0,
     //                     'date_initiation'=>$date_format
     //                 ]);
-    //                 session()->flash('error', "Solde Insuffisant, Veuillez Recharger puis Réessayer !");
+    //                 session()->flash('error', "Solde insuffisant : rechargez votre compte Moov Money puis réessayez.");
     //                 return redirect()->route('demande.liste');
     //             }
     //             else{
@@ -1955,7 +2101,7 @@ else{
     //                     'paye'=>0,
     //                     'date_initiation'=>$date_format
     //                 ]);
-    //                 session()->flash('error', "une erreur s'est produite, Veuillez Réessayer !");
+    //                 session()->flash('error', "Une erreur s’est produite lors du paiement. Veuillez réessayer.");
     //                 return redirect()->route('demande.liste');
     //             }
     //         }
@@ -2041,7 +2187,7 @@ else{
         //                     'paye'=>1,
         //                     'date_paiement'=>$date_format
         //                 ]);
-        //                 session()->flash('message', "Paiement Effectué avec succès !");
+        //                 session()->flash('message', "Paiement effectué avec succès. Votre demande est transmise au CEFORE pour traitement.");
         //                 return redirect()->route('demande.liste');
         //                 //return view('moov.index', compact('demande_id', 'command', 'montant','otp','transId','requestId','numero'));
         //             }
@@ -2051,7 +2197,7 @@ else{
         //                 $id->update([
         //                     'paye'=>0                                    
         //                 ]);
-        //                 session()->flash('error', "OTP n'existe pas, Veuillez ressayer !");
+        //                 session()->flash('error', "Le code OTP est incorrect ou a expiré. Veuillez recommencer le paiement.");
         //                 return redirect()->route('demande.liste');
         //             }
         //         }
@@ -2145,7 +2291,7 @@ else{
                             'paye'=>1,
                             'date_paiement'=>$date_format
                         ]);
-                        session()->flash('message', "Paiement Effectué avec succès !");
+                        session()->flash('message', "Paiement effectué avec succès. Votre demande est transmise au CEFORE pour traitement.");
                         return redirect()->route('demande.liste');
                         //return view('moov.index', compact('demande_id', 'command', 'montant','otp','transId','requestId','numero'));
                     }
@@ -2155,7 +2301,7 @@ else{
                         $id->update([
                             'paye'=>0                                    
                         ]);
-                        session()->flash('error', "OTP n'existe pas, Veuillez ressayer !");
+                        session()->flash('error', "Le code OTP est incorrect ou a expiré. Veuillez recommencer le paiement.");
                         return redirect()->route('demande.liste');
                     }
                     }
@@ -2163,7 +2309,7 @@ else{
                         $id->update([
                             'paye'=>0                                    
                         ]);
-                        session()->flash('error', "Une erreur s'est produite lors de l'opération, Veuillez ressayer !");
+                        session()->flash('error', "Une erreur s’est produite lors du paiement. Veuillez réessayer.");
                         return redirect()->route('demande.liste');
                     }
                 }

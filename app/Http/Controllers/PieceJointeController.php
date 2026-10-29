@@ -57,6 +57,27 @@ class PieceJointeController extends Controller
     {
         //
         $regle = 'nullable|'.self::REGLE_FICHIER;
+        $libelles = [
+            'declaration'             => 'La déclaration sur l’honneur / le casier judiciaire',
+            'acte_de_depot'           => 'L’acte de dépôt',
+            'statut'                  => 'Les statuts',
+            'formulaire_rccm'         => 'Le formulaire RCCM',
+            'piece_didentite'         => 'La pièce d’identité',
+            'titre_de_propriete'      => 'Le titre de propriété / contrat de bail',
+            'formulaire_cpc_es'       => 'Le formulaire CPC',
+            'formulaire_dem_cpc'      => 'Le formulaire de demande de CPC',
+            'certificat_de_residence' => 'Le certificat de résidence',
+            'photo_didentite'         => 'La photo d’identité',
+        ];
+        $messages = [];
+        foreach ($libelles as $champ => $libelle) {
+            $messages[$champ.'.file'] = $libelle.' n’a pas été reçu(e) correctement. Sélectionnez de nouveau le fichier.';
+            $messages[$champ.'.max'] = $libelle.' ne doit pas dépasser 10 Mo.';
+            $messages[$champ.'.uploaded'] = $libelle.' n’a pas pu être envoyé(e) : fichier probablement trop volumineux.';
+            $messages[$champ.'.mimes'] = $champ === 'photo_didentite'
+                ? $libelle.' doit être une image JPG ou PNG.'
+                : $libelle.' doit être un fichier PDF, JPG ou PNG.';
+        }
         $request->validate([
             'declaration'             => $regle,
             'acte_de_depot'           => $regle,
@@ -68,11 +89,14 @@ class PieceJointeController extends Controller
             'formulaire_dem_cpc'      => $regle,
             'certificat_de_residence' => $regle,
             'photo_didentite'         => 'nullable|file|mimes:jpg,jpeg,png',
-        ]);
-       // dd($request->all());
-      //dd($request->statut);
+        ], $messages);
+
         $user = Auth::user();
         $usager = Usager::where('user_id', $user->id)->first();
+        if (! $usager) {
+            return redirect()->route('create.usager')
+                ->with('error', 'Complétez d’abord votre profil de promoteur avant de déposer les pièces jointes.');
+        }
         $type_entreprise = $request->type_entreprise;
         
         if($request->hasFile('declaration')) {$declaration=$request->file('declaration');}else {$declaration=null;}
@@ -122,18 +146,19 @@ class PieceJointeController extends Controller
 
             if($request->url=="detailfront"){
                 return redirect()->back()
-                ->with('success', 'Les pièces jointes ont été uploadées avec succès');
+                ->with('success', 'Les pièces jointes ont été chargées avec succès.');
             }
             else{
                 return redirect()->route('create.demande')
-                ->with('success', 'Toutes les pièces jointes ont été uploadées avec succès.');
+                ->with('success', 'Toutes les pièces jointes ont été chargées avec succès.');
             }
             
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::error('Erreur upload pièces jointes: ' . $e->getMessage());
+            report($e);
             return redirect()->back()
-                ->with('error', 'Une erreur est survenue lors de l\'upload des fichiers.')
+                ->with('error', 'Les pièces jointes n’ont pas pu être enregistrées. Réessayez ; si le problème persiste, contactez le CEFORE.')
                 ->withInput();
         }
     }

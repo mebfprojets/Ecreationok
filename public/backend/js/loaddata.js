@@ -1,11 +1,16 @@
 
+// Affiche dans la fenêtre de chargement un message d'erreur lisible (voir public/js/erreurs-ajax.js)
+function afficherErreurChargement(xhr) {
+    var message = typeof messageErreurAjax === 'function' ? messageErreurAjax(xhr) : 'Une erreur est survenue. Réessayez.';
+    $('.upload_image').html($('<label class="text-danger" style="white-space: pre-line"></label>').text(message));
+}
+
 $(document).ready(function () {
     $(document).on('submit', '#fileUploadForm', function(e){
         e.preventDefault();
         $.ajaxSetup({
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                "Access-Control-Allow-Origin":"*"
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
                 });
                 var form = $('#fileUploadForm')[0];
@@ -15,7 +20,7 @@ $(document).ready(function () {
                 //form_data.append('file', document.getElementById('piece_jointe_1').files[0]);
                 console.log(formData);
                 $.ajax({
-                    url: 'https://creerentreprise.me.bf/load/piecejointe',
+                    url: '/load/piecejointe',
                     type: "POST",
                    // enctype: 'multipart/form-data',
                     data: formData,
@@ -95,9 +100,8 @@ $(document).ready(function () {
                          
                        
                     },
-                    error: function (e) {
-        
-        
+                    error: function (xhr) {
+                        afficherErreurChargement(xhr);
                     }
                 });
     });
@@ -114,9 +118,8 @@ $(document).ready(function () {
                 formData.append('piece_jointe_u', document.querySelector('#piece_jointe_u').files[0]);
                 //form_data.append('file', document.getElementById('piece_jointe_1').files[0]);
                 console.log(formData);
-                var url = '{{ route("piecejointe.update") }}';
                 $.ajax({
-                    url: 'https://creerentreprise.me.bf/update/piecejointe',
+                    url: '/update/piecejointe',
                     type: "POST",
                    // enctype: 'multipart/form-data',
                     data: formData,
@@ -196,9 +199,8 @@ $(document).ready(function () {
                         // $('.upload_image').html(' ');
 
                     },
-                    error: function (e) {
-        
-        
+                    error: function (xhr) {
+                        afficherErreurChargement(xhr);
                     }
                 });
     });
@@ -213,9 +215,8 @@ $(document).ready(function () {
                 console.log(form);
                 var formData = new FormData(form);
                 console.log(formData);
-                var url = '{{ route("usager.update") }}';
                 $.ajax({
-                    url: 'https://creerentreprise.me.bf/usager-storing',
+                    url: '/usager-storing',
                     type: "POST",
                    // enctype: 'multipart/form-data',
                     data: formData,
@@ -227,76 +228,25 @@ $(document).ready(function () {
                         $('.upload_image').html('<label class="text-success">Chargement en cours ....</label>');
                     },
                     success: function (data) {
-                     console.log(data);
-                     var options = '<option></option>';
-                        $('.upload_image').html('<label class="text-success">Fichier chargé avec succes. Fermer la fenetre</label>');
-                        for (var x = 0; x < data.length; x++) {
-                            var id_val= data[x]['id'];
-                            options += '<option value="' + id_val + '"  >' +data[x]['phone']+'-' + data[x]['nom'] +' '+ data[x]['prenom'] + '</option>';
-                           // $('#'+champ_suivant).val(id_val)
-                          }
-                          $('.conjoints').html(options);
-                        //$("#addusager").modal("hide");
-                 	
-
-$( ".addusager" ).remove();
-                        
-
+                        $('.upload_image').html($('<label class="text-success"></label>').text(
+                            (data && data.message ? data.message : 'Promoteur enregistré.') + ' Vous pouvez fermer la fenêtre.'));
+                        // Le nouveau promoteur devient sélectionnable dans les listes de recherche (Select2)
+                        if (data && data.usager) {
+                            $('select.recherche-usager').each(function () {
+                                if (!$(this).find('option[value="' + data.usager.id + '"]').length) {
+                                    $(this).append(new Option(data.usager.text, data.usager.id, false, false));
+                                }
+                            });
+                        }
+                        $('#formusager')[0].reset();
                     },
-                    error: function (e) {
-        
-        
+                    error: function (xhr) {
+                        afficherErreurChargement(xhr);
                     }
                 });
     });
 
 
 
-    $("#btnSubmit").click(function (event) {
-        alert('on commence');
-        $.ajaxSetup({
-            headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-            });
-        //stop submit the form, we will post it manually.
-        event.preventDefault();
-
-        // Get form
-        var form = $('#fileUploadForm')[0];
-
-		// Create an FormData object 
-        var data = new FormData(form);
-
-		// If you want to add an extra field for the FormData
-        data.append("CustomField", "This is some extra data, testing");
-
-		// disabled the submit button
-        $("#btnSubmit").prop("disabled", true);
-        var url = "{{ route('piecejointe.laod') }}";
-        $.ajax({
-            url: url,
-            type: "get",
-            enctype: 'multipart/form-data',
-            data: data,
-            processData: false,
-            contentType: false,
-            cache: false,
-            timeout: 600000,
-            success: function (data) {
-                $("#result").text(data);
-                console.log("SUCCESS : ", data);
-                $("#btnSubmit").prop("disabled", false);
-            },
-            error: function (e) {
-
-                $("#result").text(e.responseText);
-                console.log("ERROR : ", e);
-                $("#btnSubmit").prop("disabled", false);
-
-            }
-        });
-
-    });
 
 });

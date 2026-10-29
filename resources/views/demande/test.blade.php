@@ -15,7 +15,7 @@
                                                     @endphp
                                                    @if($nbr_demande_pp==0)
                                                    <div class="form-check mb-3 col-md-4" id="switch1">
-                                                        <input class="form-check-input" type="radio" onchange="changer_demande()" switch="bool" name="formRadios"
+                                                        <input class="form-check-input" type="radio" data-csp-change="changer_demande" switch="bool" name="formRadios"
                                                             id="formRadios1" {{ $isEI ? 'checked' : '' }}>
                                                         <label for="formRadios1" data-on-label="Oui" data-off-label="Non"></label>
                                                         <p>Entreprise Individuelle</p>
@@ -24,13 +24,13 @@
                                                     @endif
                                                     <input type="hidden" class="nbr_demande" name="" value="{{$nbr_demande_pp}}">
                                                     <div class="col-md-4">
-                                                        <input class="form-check-input" type="radio" onchange="changer_demande()" switch="bool" name="formRadios"
+                                                        <input class="form-check-input" type="radio" data-csp-change="changer_demande" switch="bool" name="formRadios"
                                                                 id="formRadios2" {{ $isES ? 'checked' : '' }}>
                                                                 <label for="formRadios2" data-on-label="Oui" data-off-label="Non"></label>
                                                                 <p>Entreprise Sociétaire</p>
                                                     </div>
                                                     <div class="col-md-4">
-                                                    <input class="form-check-input" type="radio" onchange="changer_demande()" switch="bool" name="formRadios"
+                                                    <input class="form-check-input" type="radio" data-csp-change="changer_demande" switch="bool" name="formRadios"
                                                             id="formRadios3" {{ $isGIE ? 'checked' : '' }}>
                                                             <label for="formRadios3" data-on-label="Oui" data-off-label="Non"></label>
                                                             <p>Groupement d'intérêt Economique</p>
@@ -127,9 +127,9 @@
                     <label class=" control-label" for="piece_contractuelle">Joindre la piece<span class="text-success">*</span></label>
                     <!-- <input class="form-control" type="file" id='piece_jointe_u' name="piece_jointe" id="piece_jointe" accept=".pdf, .jpeg, .png"   placeholder="Joindre une copie de l'ordre de service" >   -->
                     <div class="input-group col-md-8">
-                        <input class="form-control input_file" type="file" id='piece_jointe_u' name="piece_jointe_u" id="piece_jointe" accept=".pdf, .jpeg, .png"   placeholder="Joindre une copie de la pièce" required  onchange="VerifyUploadSizeIsOK('piece_jointe_u');" >  
+                        <input class="form-control input_file" type="file" id='piece_jointe_u' name="piece_jointe_u" id="piece_jointe" accept=".pdf, .jpeg, .png"   placeholder="Joindre une copie de la pièce" required  data-csp-change="VerifyUploadSizeIsOK" data-csp-change-args='["piece_jointe_u"]' >  
                         <span class="input-group-addon"><i class="gi gi-file"></i></span>
-                        <span class="input-group-addon"><a href="#" class="empty_field" onclick="empty_input_file('input_file')">Vider le champ</a></span>
+                        <span class="input-group-addon"><a href="#" class="empty_field" data-csp-click="empty_input_file" data-csp-click-args='["input_file"]'>Vider le champ</a></span>
                     </div>   
                     @if ($errors->has('piece_jointe'))
                         <span class="help-block">
@@ -230,9 +230,9 @@
                     <label class=" control-label" for="piece_contractuelle">Joindre la piece<span class="text-success">*</span></label>
                     <!-- <input class="form-control" type="file" id='piece_jointe_1' name="piece_jointe" id="piece_jointe" accept=".pdf, .jpeg, .png"   placeholder="Joindre une copie de l'ordre de service" >   -->
                     <div class="input-group col-md-8">
-                        <input class="form-control input_file" type="file" id='piece_jointe_1' name="piece_jointe" id="piece_jointe" accept=".pdf, .jpeg, .png"   placeholder="Joindre la pièce" required  onchange="VerifyUploadSizeIsOK('piece_jointe_1');" >  
+                        <input class="form-control input_file" type="file" id='piece_jointe_1' name="piece_jointe" id="piece_jointe" accept=".pdf, .jpeg, .png"   placeholder="Joindre la pièce" required  data-csp-change="VerifyUploadSizeIsOK" data-csp-change-args='["piece_jointe_1"]' >  
                         <span class="input-group-addon"><i class="gi gi-file"></i></span>
-                        <span class="input-group-addon"><a href="#" class="empty_field" onclick="empty_input_file('input_file')">Vider le champ</a></span>
+                        <span class="input-group-addon"><a href="#" class="empty_field" data-csp-click="empty_input_file" data-csp-click-args='["input_file"]'>Vider le champ</a></span>
                     </div>
                         @if ($errors->has('piece_jointe'))
                         <span class="help-block">
@@ -270,7 +270,7 @@
                         <div class="col-lg-6">
                             <div class="mb-3">                                                                    
                                 <label class="form-label" for="nom_usager">Nom</label>
-                                    <input type="text" id="nom" name="nom_usager" class="form-control" style="width: 100%;" value="{{old('nom')}}" onchange="this.value = this.value.toUpperCase()" placeholder="Entrez votre nom" title="Ce champ est obligatoire" required >
+                                    <input type="text" id="nom" name="nom_usager" class="form-control" style="width: 100%;" value="{{old('nom')}}" data-csp-change="__majuscules" placeholder="Entrez votre nom" title="Ce champ est obligatoire" required >
                                         @if ($errors->has('nom'))
                                                 <span class="help-block">
                                                     <strong>{{ $errors->first('nom_usager') }}</strong>
@@ -292,7 +292,7 @@
                         <div class="col-lg-6">
                             <div class="mb-3">
                                 <label class="form-label" for="val_username">Prénom (s)</label>
-                                    <input type="text" id="prenom" name="prenom_usager" class="form-control" value="{{old('prenom')}}"placeholder="Entrez le prenom.." required="Ce champ est obligatoire" onchange="this.value = this.value.charAt(0).toUpperCase()+ this.value.substr(1);">
+                                    <input type="text" id="prenom" name="prenom_usager" class="form-control" value="{{old('prenom')}}"placeholder="Entrez le prenom.." required="Ce champ est obligatoire" data-csp-change="__majuscule_initiale">
                                 <!-- <input type="text" name="prenom_usager" class="form-control" id="progress-basicpill-vatno-input" > -->
                             </div>
                         </div>   
@@ -324,7 +324,7 @@
                         <div class="col-lg-6">
                             <div class="mb-3">
                                 <label class="form-label" for="val_username">Lieu de naissance</label>
-                                    <input type="text" id="prenom" name="lieu_de_naissance" class="form-control" value="{{old('lieu_de_naissance')}}"placeholder="Entrez le lieu de naissance.." required="Ce champ est obligatoire" onchange="this.value = this.value.charAt(0).toUpperCase()+ this.value.substr(1);">
+                                    <input type="text" id="prenom" name="lieu_de_naissance" class="form-control" value="{{old('lieu_de_naissance')}}"placeholder="Entrez le lieu de naissance.." required="Ce champ est obligatoire" data-csp-change="__majuscule_initiale">
                             </div>
                         </div> 
                     <div class="col-lg-6">
@@ -354,7 +354,7 @@
                         <div class="col-lg-6">
                             <div class="mb-3">                                                                    
                             <label class=" control-label" for="example-chosen">Pays de residence<span class="text-danger">*</span></label>
-                            <select  name="pays_usager" data-placeholder="Choisir la pays de residence" class="form-control" style="width: 100%;" required onchange="afficherDecoupage();" >
+                            <select  name="pays_usager" data-placeholder="Choisir la pays de residence" class="form-control" style="width: 100%;" required data-csp-change="afficherDecoupage" >
                                 <option></option>
                                     @foreach ($pays as $pay )
                                         <option value="{{ $pay->code }}">{{ $pay->libelle }}</option>
@@ -409,7 +409,7 @@
 @section('additionnel_script')
 <script type="javascript/text" src="{{ asset('backend/loaddata.js') }}"></script>
 
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
 
 $( document ).ready(function() {
 $(document).on("click", ".declaration", function(){
@@ -518,7 +518,7 @@ $(document).on("click", ".statut", function(){
      });
 });
 </script>
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
 $( document ).ready(function() {
 var form = $(".form_individuel");
 form.validate({
@@ -586,7 +586,7 @@ form.children("div").steps({
 });
 });
 </script>
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
 $( document ).ready(function() {
 var form = $(".moral");
 form.validate({
@@ -632,7 +632,7 @@ form.children("div").steps({
 });
 });
 </script>
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     function hidemodal(){
         $.ajax({
           url: 'http://localhost:4000/tour',
@@ -643,12 +643,12 @@ form.children("div").steps({
     });
     }
 </script>
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     if($('.piece').val()==null){
         console.log('test');
     }
 </script>
-<script>    
+<script nonce="{{ $cspNonce ?? '' }}">    
     function changer_demande(){
         if($('#formRadios2').is(':checked')){
             $('#progrss-wizar').hide();
@@ -717,7 +717,7 @@ form.children("div").steps({
 
       // Pour la signature Personne Physique
 </script> -->
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     //alert('signa');
     $(document).ready(function()
       {var sign_pp='';
@@ -740,7 +740,7 @@ $(document).ready(function()
     });
 });
     </script>
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     $(document).ready(function(){
         $('#type_piece_declaration').hide();
          $('#type_piece_identite').hide();
@@ -750,7 +750,7 @@ $(document).ready(function()
      });
     
 </script>
-<script type="text/javascript">
+<script nonce="{{ $cspNonce ?? '' }}" type="text/javascript">
 
     $(document).ready(function(){
        // alert('okok');
@@ -767,8 +767,8 @@ $(document).ready(function()
                 var desi="desi"+x;
                 var cout='cout'+x ;
                 var fieldHTML = 
-               // '<div class="row" style="margin-top:10px;">  <select name="conjoints[]" data-placeholder="Selectionner le conjoint ..."  class="form-control select2 conjoints" style="width: 77%;" required >  <option></option> @foreach ($all_usagers as $all_usager )<option value="{{ $all_usager->id }}">{{ $all_usager->Phone_No_ }}-{{ $all_usager->NomRaisonSociale }}{{ $all_usager->prenom }}</option>@endforeach </select> <a style="width:2%" href="javascript:void(0);" class="remove_button"><span> <i class="fa fa-minus"></i></a> </div>';
-                '<div class="row"><div class="col-md-4"> <div class="mb-3" > <label class="form-label" for="progress-basicpill-vatno-input">Associé</label> <select  name="associes[]" data-placeholder="Selectionner associé ..." class="form-control select conjoints" style="width: 100%;" required > <option></option> @foreach ($all_usagers as $all_usager ) <option value="{{ $all_usager->id }}">{{ $all_usager->Phone_No_ }}-{{ $all_usager->NomRaisonSociale }}{{ $all_usager->prenom }}</option> @endforeach </select> </div> </div> <div class="col-lg-4"> <div class="mb-3"> <label class="form-label" for="progress-basicpill-vatno-input">Fonction</label> <select  name="fonction_associes[]" data-placeholder="Choisir lactivité ..." class="form-control select" style="width: 100%;"><option></option> @foreach ($fonctions as $fonction ) <option value="{{ $fonction->id }}">{{ $fonction->libelle }}</option>  @endforeach </select> </div> </div> <div class="col-lg-2"> <div class="mb-3"> <label class="form-label" for="progress-basicpill-vatno-input">% Capital (<font color="red">*</font>)</label> <input type="text" name="capital_associes[]" class="form-control" id="progress-basicpill-cstno-input"> </div> </div> <a href="javascript:void(0);" style="margin-top: 30px; margin-left:7px; width: 40px; height:30px;" class="btn btn-md btn-success remove_button col-md-2"> <i class="fas fa-minus"></i> </a> </div>'
+               // '<div class="row" style="margin-top:10px;">  <select name="conjoints[]" data-placeholder="Selectionner le conjoint ..."  class="form-control select2 conjoints" style="width: 77%;" required >  <option></option> @foreach ($all_usagers as $all_usager )<option value="{{ $all_usager->id }}">{{ $all_usager->Phone_No_ }}-{{ $all_usager->NomRaisonSociale }}{{ $all_usager->prenom }}</option>@endforeach </select> <a style="width:2%" href="#" data-csp-click="__aucune" class="remove_button"><span> <i class="fa fa-minus"></i></a> </div>';
+                '<div class="row"><div class="col-md-4"> <div class="mb-3" > <label class="form-label" for="progress-basicpill-vatno-input">Associé</label> <select  name="associes[]" data-placeholder="Selectionner associé ..." class="form-control select conjoints" style="width: 100%;" required > <option></option> @foreach ($all_usagers as $all_usager ) <option value="{{ $all_usager->id }}">{{ $all_usager->Phone_No_ }}-{{ $all_usager->NomRaisonSociale }}{{ $all_usager->prenom }}</option> @endforeach </select> </div> </div> <div class="col-lg-4"> <div class="mb-3"> <label class="form-label" for="progress-basicpill-vatno-input">Fonction</label> <select  name="fonction_associes[]" data-placeholder="Choisir lactivité ..." class="form-control select" style="width: 100%;"><option></option> @foreach ($fonctions as $fonction ) <option value="{{ $fonction->id }}">{{ $fonction->libelle }}</option>  @endforeach </select> </div> </div> <div class="col-lg-2"> <div class="mb-3"> <label class="form-label" for="progress-basicpill-vatno-input">% Capital (<font color="red">*</font>)</label> <input type="text" name="capital_associes[]" class="form-control" id="progress-basicpill-cstno-input"> </div> </div> <a href="#" data-csp-click="__aucune" style="margin-top: 30px; margin-left:7px; width: 40px; height:30px;" class="btn btn-md btn-success remove_button col-md-2"> <i class="fas fa-minus"></i> </a> </div>'
                 $(wrapper).append(fieldHTML);
                 $(".select").select2();
             }
@@ -783,7 +783,7 @@ $(document).ready(function()
     });
     </script>
     
-<script type="text/javascript">
+<script nonce="{{ $cspNonce ?? '' }}" type="text/javascript">
 
     $(document).ready(function(){
        // alert('okok');
@@ -800,7 +800,7 @@ $(document).ready(function()
                 var desi="desi"+x;
                 var cout='cout'+x ;
                 var fieldHTML =                
-                '<div class="row"><div class="col-md-4"> <div class="mb-3" > <label class="form-label" for="progress-basicpill-vatno-input">Nom et Prénom</label> <select id=""  name="commissaire[]" data-placeholder="Selectionner le commissaire" class="form-control select conjoints" style="width: 100%;" required ><option></option> @foreach ($all_usagers as $all_usager ) <option value="{{ $all_usager->id }}">{{ $all_usager->Phone_No_ }}-{{ $all_usager->NomRaisonSociale }}{{ $all_usager->prenom }}</option> @endforeach </select> </div> </div> <div class="col-lg-4"> <div class="mb-3"> <label class="form-label" for="progress-basicpill-vatno-input">Qualité</label> <select id="" name="qualite_commissaire[]" data-placeholder="Choisir Qualite" class="form-control select" style="width: 100%;"> <option></option> <option value="Titulaire">Titulaire</option> <option value="Supléant">Supléant</option> </select> </div> </div> <a href="javascript:void(0);" style="margin-top: 30px; margin-left:7px; width: 40px; height:30px;" class="btn btn-md btn-success remove_button col-md-2"> <i class="fas fa-minus"></i> </a> </div>'
+                '<div class="row"><div class="col-md-4"> <div class="mb-3" > <label class="form-label" for="progress-basicpill-vatno-input">Nom et Prénom</label> <select id=""  name="commissaire[]" data-placeholder="Selectionner le commissaire" class="form-control select conjoints" style="width: 100%;" required ><option></option> @foreach ($all_usagers as $all_usager ) <option value="{{ $all_usager->id }}">{{ $all_usager->Phone_No_ }}-{{ $all_usager->NomRaisonSociale }}{{ $all_usager->prenom }}</option> @endforeach </select> </div> </div> <div class="col-lg-4"> <div class="mb-3"> <label class="form-label" for="progress-basicpill-vatno-input">Qualité</label> <select id="" name="qualite_commissaire[]" data-placeholder="Choisir Qualite" class="form-control select" style="width: 100%;"> <option></option> <option value="Titulaire">Titulaire</option> <option value="Supléant">Supléant</option> </select> </div> </div> <a href="#" data-csp-click="__aucune" style="margin-top: 30px; margin-left:7px; width: 40px; height:30px;" class="btn btn-md btn-success remove_button col-md-2"> <i class="fas fa-minus"></i> </a> </div>'
                 
                 $(wrapper).append(fieldHTML);
                 $(".select").select2();
@@ -815,7 +815,7 @@ $(document).ready(function()
         });
     });
     </script>
-    <script>
+    <script nonce="{{ $cspNonce ?? '' }}">
         function montantCapital(){
             //alert('ok');
             //dont_numeraire
@@ -842,7 +842,7 @@ $(document).ready(function()
             }
         }
     </script> -->
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     function chiffre_daffaire(){
         var val_pm=$('#chiffre_daffaire_prev_pm').val();
         var val_pp=$('#chiffre_daffaire_prev_pp').val();
@@ -860,7 +860,7 @@ $(document).ready(function()
         }
     }
 </script>
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     // Ajouter la classe à vos inputs
 inputs.forEach(input => {
     input.classList.add('uppercase-input');

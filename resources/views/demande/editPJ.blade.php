@@ -38,7 +38,7 @@
     <label class=" control-label" for="piece_contractuelle">Joindre la piece<span class="text-success">*</span></label>
     <!-- <input class="form-control" type="file" id='piece_jointe_u' name="piece_jointe" id="piece_jointe" accept=".pdf, .jpeg, .png"   placeholder="Joindre une copie de l'ordre de service" >   -->
     <div class="input-group col-md-6">
-        <input class="form-control input_file" type="file" name="piece_jointe_u" id="piece_jointe" accept=".pdf, .jpeg, .png"   placeholder="Joindre une copie de la pièce" required  onchange="VerifyUploadSizeIsOK('piece_jointe_u');" >  
+        <input class="form-control input_file" type="file" name="piece_jointe_u" id="piece_jointe" accept=".pdf, .jpeg, .png"   placeholder="Joindre une copie de la pièce" required  data-csp-change="VerifyUploadSizeIsOK" data-csp-change-args='["piece_jointe_u"]' >  
         <span class="input-group-addon"><i class="gi gi-file"></i></span>
     </div>   
     @if ($errors->has('piece_jointe'))

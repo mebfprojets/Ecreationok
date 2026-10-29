@@ -39,7 +39,7 @@
                                 <a href="{{ route('role.edit',$role) }}" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-warning"><i class="fa fa-edit"></i></a>
                             {{-- @endcan --}}
                             @can('role.delete',Auth::user())
-                                <a href="#modal-confirm-delete" onclick="delConfirm({{ $role->id }});" data-toggle="modal" title="Supprimer" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
+                                <a href="#modal-confirm-delete" data-csp-click="delConfirm" data-csp-click-args="{{ json_encode([($role->id)]) }}" data-toggle="modal" title="Supprimer" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
                             @endcan
                             </div>
                     </td>
@@ -74,7 +74,7 @@
                             <div class="form-group form-actions">
                                 <div class="text-right">
                                     <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Fermer</button>
-                                    <button type="submit" class="btn btn-sm btn-primary" onclick="supp_id();">OUI</button>
+                                    <button type="submit" class="btn btn-sm btn-primary" data-csp-click="supp_id">OUI</button>
                                 </div>
                             </div>
 
@@ -83,7 +83,7 @@
                 </div>
             </div>
     </div>
-    <script>
+    <script nonce="{{ $cspNonce ?? '' }}">
 
     function detailUser(id){
                 var id=id;

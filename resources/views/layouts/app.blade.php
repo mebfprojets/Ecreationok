@@ -11,7 +11,7 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
 
         <!-- Styles -->
-        @livewireStyles
+        @livewireStyles(['nonce' => $cspNonce ?? ''])
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -39,6 +39,6 @@
 
         @stack('modals')
 
-        @livewireScripts
+        @livewireScripts(['nonce' => $cspNonce ?? ''])
     </body>
 </html>

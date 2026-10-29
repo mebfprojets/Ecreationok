@@ -159,7 +159,7 @@
                             <input type="hidden" name="id_table" id="id_table">
                             <div class="text-right">
                                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-sm btn-primary" onclick="recu_id();">OUI</button>
+                                <button type="button" class="btn btn-sm btn-primary" data-csp-click="recu_id">OUI</button>
                             </div>
 
                 </div>
@@ -223,7 +223,7 @@
                         <div class="form-group form-actions">
                             <div class="text-right">
                                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Fermer</button>
-                                <button type="submit" class="btn btn-sm btn-primary" onclick="supp_id();">OUI</button>
+                                <button type="submit" class="btn btn-sm btn-primary" data-csp-click="supp_id">OUI</button>
                             </div>
                         </div>
 
@@ -261,7 +261,7 @@
         </div>
     </div>
     {{-- cette fonction javascript permet de definir l'action du formulaire dynamiquement. l'action route user reinitialise dans le formulaire dont id est reini_user --}}
-    <script>
+    <script nonce="{{ $cspNonce ?? '' }}">
 
     function detailUser(id){
                 var id=id;

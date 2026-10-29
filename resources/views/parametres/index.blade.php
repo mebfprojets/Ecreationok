@@ -33,7 +33,7 @@
                         <td class="text-center">   
                                 <a href="#" class="btn btn-sm btn-success" style="background:#3393FF" title="Afficher les détais"> <i class="fa fa-eye"></i></a>
                                 <a href="{{ route('parametres.edit',$parametre) }}" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-warning"><i class="fa fa-edit"></i></a>
-                                <a  href="#modal-confirm-delete" onclick="delConfirm({{ $parametre->id }});" data-toggle="modal" title="Supprimer" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
+                                <a  href="#modal-confirm-delete" data-csp-click="delConfirm" data-csp-click-args="{{ json_encode([($parametre->id)]) }}" data-toggle="modal" title="Supprimer" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
 
                         </td>
                     </tr>
@@ -52,7 +52,7 @@
 </div>
 
 @endsection
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     function delConfirm(id){
             //alert(id);
             document.getElementById("id_table").setAttribute("value", id);

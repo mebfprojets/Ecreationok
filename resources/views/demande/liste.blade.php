@@ -1,108 +1,120 @@
 @extends('layouts.frontend')
 @section('content')
-@if(session('message'))
-                    <center><div class="custom-alert" style="color: white;">
-                        {{ session('message') }}
-                    </div>
-                    </center>
-@endif
-@if(session('error'))
-                    <center><div class="custom-rouge" style="color: white;">
-                        {{ session('error') }}
-                    </div>
-                    </center>
-@endif
-<div class="block-content" style="margin-top: 50px;">
-<div class="block-title">
-                    <center><h3><strong>Mes demandes</strong></h3></center>
-                    <center><h5>Vous avez {{$c}} demande (s)</h5></center>
-                </div>
-                @foreach($demandes as $demande)
+@include('demande.partials.styles')
 
-    <div class="row">
-    <div class="col-xs-10">
-            <div class="block">
-                <h5>Demande N°: {{$demande->numero_demande}}</h5>
-                <div class="row">
-                      
-                                                            <div class="col-lg-7">
-                                                                <div class="mb-3">
-                                                                    <!-- <label class="form-label" for="progress-basicpill-pancard-input">Type Etablissement</label> -->
-                                                                    <label class="form-label" for="progress-basicpill-vatno-input">
-                                                                    @if($demande->company_type=="EI")
-                                                                            Entreprise Individuelle
-                                                                            @else
-                                                                            Entreprise Sociétaire
-                                                                            @endif                                                                        
-                                                                    </label>
-                                                                    <label style="margin-left:40px" class="form-label" for="progress-basicpill-vatno-input">
-                                                                    {{$demande->commercial_name}}
-                                                                    </label>
-                                                                    <label style="margin-left:40px" class="form-label" for="progress-basicpill-vatno-input">Créé le : {{ date("d-m-Y", strtotime($demande->created_at))}}</label> <br>
-                                                                    <label class="form-label" style="color:#008000;" for="progress-basicpill-vatno-input">{{$demande->organisation_code}}</label>
-                                                                    <label class="form-label" style="margin-left:40px" for="progress-basicpill-vatno-input">{{$demande->commercial_name}}</label> 
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-3">
-                                                                <div class="mb-3">
-                                                                 <label class="form-label" style="color:red;" for="progress-basicpill-vatno-input">
-                                                                 @if($demande->paye==0)
-                                                                 Attente de paiement
-                                                                 @elseif($demande->paye==1 && $demande->etat==0 )
-                                                                 Payée, En Traitement
-                                                                 @elseif($demande->paye==1 && $demande->etat==1)
-                                                                 Demande Validée, Veuillez apporter le dossier physique au CEFORE
-                                                                 @elseif($demande->paye==2)
-                                                                 Attente de Validation du Paiement
-                                                                 @elseif($demande->paye==1 && $demande->etat==2)
-                                                                 Demande Rejétée, Consulter le motif pour corriger et renvoyer pour traitement
-                                                                 @elseif($demande->etat==1 && $demande->statut==2)
-                                                                 RCCM signé, En Attente des autres formalités
-                                                                 @elseif($demande->etat==1 && $demande->statut==3)
-                                                                 Attente de Retrait, Veuillez vous rendre au CEFORE pour le retrait de vos documents signés 
-                                                                 @endif
-                                                                </label>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-1">
-                                                                <div class="mb-3">                                                        
-                                                                <a href="{{ route('demande.detail',$demande->id)}}" class="btn btn-success"><i class="fa fa-eye"></i></a>                                                              
-                                                                </div>
-                                                            </div>                                               
-                                                            <div class="col-lg-1">
-                                                                <div class="mb-2"> 
-                                                                @if($demande->paye==0)                                                           
-                                                                <!-- <button  onclick="calltouchpay('{{$demande->numero_command}}','{{$demande->montant}}')" class="btn btn-success">Payer</button>
-                                                                <input type="hidden" name="" id="demande_montant" value="{{$demande->montant}}"> 
-                                                                <input type="hidden" name="" id="numero_demande" value="{{$demande->numero_command}}">  -->
-                                                                
-                                                                
-                                                                <form action="{{ route('orange.index')}}" method="POST"> 
-                                                                    @csrf  
-                                                                <!-- <button  onclick="calltouchpay('{{$demande->numero_command}}','{{$demande->montant}}')" class="btn btn-success">Payer</button> -->
-                                                                <input type="hidden" name="montant" id="demande_montant" value="{{$demande->montant_total}}"> 
-                                                                <input type="hidden" name="id" id="id" value="{{$demande->id}}">
-                                                                <input type="hidden" name="numero_command" id="numero_demande" value="{{$demande->numero_command}}">
-                                                                <input type="submit" class="btn btn-danger" value="Payer"> 
-                                                                </form>
-                                                                
-                                                                @elseif($demande->paye==1)                                             
-                                                                <a href="{{ route('demande.facture',$demande->id)}}" class="btn btn-success">Facture</a>
-                                                                @endif
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            </div>
-                                                            
-                                                                                                                                                   
-                                                        </div>  
+@php
+    $aCorriger = $demandes->filter(function ($d) { return $d->estRejetee(); })->count();
+    $aPayer = $demandes->where('paye', 0)->count();
+@endphp
+
+<div class="ed-page">
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+        <div>
+            <h1 class="ed-titre h3">Mes demandes</h1>
+            <p class="ed-sous-titre">
+                @if ($c === 0)
+                    Vous n’avez encore déposé aucune demande.
+                @else
+                    {{ $c }} demande{{ $c > 1 ? 's' : '' }} de création d’entreprise
+                @endif
+            </p>
+        </div>
+        <a href="{{ route('create.usager') }}" class="btn btn-success">
+            <i class="fas fa-plus me-1" aria-hidden="true"></i> Nouvelle demande
+        </a>
+    </div>
+
+    @if ($aCorriger > 0)
+        <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+            <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+            <div>
+                <strong>{{ $aCorriger }} demande{{ $aCorriger > 1 ? 's ont été rejetées' : ' a été rejetée' }} par le CEFORE.</strong>
+                Corrigez-la{{ $aCorriger > 1 ? 's' : '' }} puis renvoyez-la{{ $aCorriger > 1 ? 's' : '' }} pour traitement.
+            </div>
+        </div>
+    @endif
+    @if ($aPayer > 0)
+        <div class="alert alert-warning d-flex align-items-center gap-2" role="status">
+            <i class="fas fa-wallet" aria-hidden="true"></i>
+            <div>{{ $aPayer }} demande{{ $aPayer > 1 ? 's sont' : ' est' }} en attente de paiement : elle{{ $aPayer > 1 ? 's' : '' }} ne sera{{ $aPayer > 1 ? 'nt' : '' }} transmise{{ $aPayer > 1 ? 's' : '' }} au CEFORE qu’après règlement.</div>
+        </div>
+    @endif
+
+    @forelse ($demandes as $demande)
+        @php $suivi = $demande->suivi(); @endphp
+        <article class="ed-carte mb-3">
+            <div class="ed-carte-entete">
+                <div>
+                    <h2>{{ $demande->commercial_name ?: 'Demande sans nom commercial' }}</h2>
+                    <div class="ed-meta mt-1">
+                        <span><i class="fas fa-hashtag" aria-hidden="true"></i> {{ $demande->numero_demande }}</span>
+                        <span><i class="fas fa-building" aria-hidden="true"></i>
+                            {{ $demande->company_type == 'EI' ? 'Entreprise individuelle' : 'Entreprise sociétaire' }}</span>
+                    </div>
                 </div>
-    </div>
-    </div>
-    
-    @endforeach
-   
-    
+                <span class="ed-badge {{ $suivi['couleur'] }}">
+                    <i class="fas {{ $suivi['icone'] }}" aria-hidden="true"></i> {{ $suivi['libelle'] }}
+                </span>
+            </div>
+
+            <div class="ed-carte-corps">
+                @include('demande.partials.frise', ['demande' => $demande])
+
+                <div class="ed-meta mt-3">
+                    <span><i class="far fa-calendar-alt" aria-hidden="true"></i>
+                        Déposée le {{ optional($demande->created_at)->format('d/m/Y') }}</span>
+                    <span><i class="fas fa-map-marker-alt" aria-hidden="true"></i> {{ $demande->organisation_code }}</span>
+                    @if ($demande->montant_total)
+                        <span><i class="fas fa-money-bill-wave" aria-hidden="true"></i>
+                            {{ number_format((float) $demande->montant_total, 0, ',', ' ') }} FCFA</span>
+                    @endif
+                </div>
+
+                <p class="mt-3 mb-0">{{ $suivi['consigne'] }}</p>
+
+                @if ($demande->estRejetee() && $demande->motif)
+                    <div class="alert alert-danger py-2 mt-3 mb-0">
+                        <strong>Motif du rejet :</strong> {{ \Illuminate\Support\Str::limit($demande->motif, 180) }}
+                    </div>
+                @endif
+            </div>
+
+            <div class="d-flex flex-wrap justify-content-end gap-2 px-3 py-2 border-top">
+                @if ($demande->estRejetee())
+                    <a href="{{ route('demande.detail', $demande->id) }}#correction" class="btn btn-danger btn-sm">
+                        <i class="fas fa-pen me-1" aria-hidden="true"></i> Corriger ma demande
+                    </a>
+                @endif
+
+                @if ($demande->paye == 0)
+                    <form action="{{ route('orange.index') }}" method="POST" class="d-inline">
+                        @csrf
+                        <input type="hidden" name="id" value="{{ $demande->id }}">
+                        <input type="hidden" name="numero_command" value="{{ $demande->numero_command }}">
+                        <button type="submit" class="btn btn-warning btn-sm">
+                            <i class="fas fa-wallet me-1" aria-hidden="true"></i> Payer
+                        </button>
+                    </form>
+                @elseif ($demande->paye == 1)
+                    <a href="{{ route('demande.facture', $demande->id) }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-file-invoice me-1" aria-hidden="true"></i> Facture
+                    </a>
+                @endif
+
+                <a href="{{ route('demande.detail', $demande->id) }}" class="btn btn-success btn-sm">
+                    <i class="fas fa-eye me-1" aria-hidden="true"></i> Voir le détail
+                </a>
+            </div>
+        </article>
+    @empty
+        <div class="ed-carte text-center p-5">
+            <i class="fas fa-folder-open fa-3x text-muted mb-3" aria-hidden="true"></i>
+            <h2 class="h5">Aucune demande pour le moment</h2>
+            <p class="text-muted mb-3">Créez votre première demande de création d’entreprise : elle apparaîtra ici avec son suivi.</p>
+            <a href="{{ route('create.usager') }}" class="btn btn-success">
+                <i class="fas fa-plus me-1" aria-hidden="true"></i> Créer une demande
+            </a>
+        </div>
+    @endforelse
 </div>
-
 @endsection
