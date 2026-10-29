@@ -1600,7 +1600,7 @@ else{
                 ]);
             }
         }
-
+ 
         public function orange_paiement(Request $request){
             //
            // dd($request->all());
@@ -1610,10 +1610,6 @@ else{
             $token=$request->_token;
             $demande = Demande::findOrFail($request->id);
             $this->autoriserDemande($demande);
-            if (! preg_match('/^[0-9]{8}$/', (string) $customer_msisdn)) {
-                return redirect()->route('demande.liste')
-                    ->with('error', 'Le numéro Orange Money doit comporter exactement 8 chiffres, sans espace. Veuillez recommencer le paiement.');
-            }
             // Montant fixé par le serveur, jamais par le formulaire (il était modifiable avec F12)
             $montant = (int) $demande->montant_total;
 
@@ -1837,14 +1833,6 @@ else{
         // Préparation des données
         //dd($request->all());
         $id=Demande::where('id', $request->id)->first();
-        $this->autoriserDemande($id);
-        if ($id->paye != 0) {
-            return redirect()->route('demande.liste')->with('message', 'Cette demande est déjà payée ou son paiement est en cours de vérification.');
-        }
-        if (! preg_match('/^[0-9]{8}$/', (string) $request->numero)) {
-            return redirect()->route('demande.liste')
-                ->with('error', 'Le numéro Moov Money doit comporter exactement 8 chiffres, sans espace. Veuillez recommencer le paiement.');
-        }
         $chaine = Str::random(10);
         $command=$id->numero_command;
         $num_command=$command."-".$chaine;
