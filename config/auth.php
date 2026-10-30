@@ -39,6 +39,8 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
+            // Durée du cookie « Rester connecté », en minutes (Laravel garde 5 ans par défaut) : 7 jours
+            'remember' => (int) env('AUTH_REMEMBER_MINUTES', 10080),
         ],
 
         'api' => [

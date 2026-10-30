@@ -35,6 +35,8 @@ class Kernel extends HttpKernel
             \Illuminate\Session\Middleware\StartSession::class,
             // \Illuminate\Session\Middleware\AuthenticateSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            // Déconnexion après inactivité (30 min pour les agents, durée de session pour les promoteurs)
+            \App\Http\Middleware\DeconnexionInactivite::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\ContentSecurityPolicy::class,

@@ -26,5 +26,7 @@
 <script src="{{ asset_version('js/erreurs-ajax.js') }}"></script>
 {{-- Tableaux, calendriers et messages de l'espace agents --}}
 <script src="{{ asset_version('js/espace-agents.js') }}"></script>
+{{-- Rechargement de la page après inactivité (le serveur déconnecte alors l'agent) --}}
+<script src="{{ asset_version('js/inactivite.js') }}"></script>
 </body>
 </html>

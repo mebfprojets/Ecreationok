@@ -64,7 +64,7 @@
             </div>
 
             <div class="form-check champ">
-              <input class="form-check-input" type="checkbox" id="login-remember-me" name="remember" checked>
+              <input class="form-check-input" type="checkbox" id="login-remember-me" name="remember">
               <label class="form-check-label" for="login-remember-me">Rester connecté sur cet appareil</label>
             </div>
           </div>
@@ -265,6 +265,12 @@
   </div>
 @yield('modal_parpage')
 @include('partials.frontend.footer')
+@if (session('ouvrir_connexion') && !Auth::check())
+<script nonce="{{ $cspNonce ?? '' }}">
+    // Session expirée pour inactivité : la fenêtre de connexion s'ouvre directement
+    $(function () { $('#modal-login').modal('show'); });
+</script>
+@endif
 @if ($errors->any() && in_array(old('_form'), ['login', 'register'], true))
 <script nonce="{{ $cspNonce ?? '' }}">
     $(function () {

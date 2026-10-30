@@ -372,6 +372,8 @@
   <script src="{{asset_version('js/csp-handlers.js')}}"></script>
   <!-- Messages lisibles pour les erreurs des appels AJAX -->
   <script src="{{asset_version('js/erreurs-ajax.js')}}"></script>
+  {{-- Rechargement de la page après inactivité (le serveur déconnecte alors l'utilisateur) --}}
+  <script src="{{ asset_version('js/inactivite.js') }}"></script>
   <!-- Slick Carousel -->
   <script src="{{asset('frontend/plugins/slick/slick.min.js')}}"></script>
   <script src="{{asset('frontend/plugins/slick/slick-animation.min.js')}}"></script>

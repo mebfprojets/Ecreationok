@@ -19,7 +19,7 @@
   {{-- jQuery dès l'en-tête : les scripts écrits dans les pages s'en servent --}}
   <script src="{{ asset('vendor/jquery-3.7.1/jquery.min.js') }}"></script>
 </head>
-<body class="layout-fixed sidebar-expand-lg sidebar-mini bg-body-tertiary">
+<body class="layout-fixed sidebar-expand-lg sidebar-mini bg-body-tertiary" data-inactivite-minutes="{{ config('session.inactivite_agents', 30) }}">
 <div class="app-wrapper">
 
   <nav class="app-header navbar navbar-expand bg-body">

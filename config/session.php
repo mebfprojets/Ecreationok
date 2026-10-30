@@ -33,6 +33,10 @@ return [
 
     'lifetime' => env('SESSION_LIFETIME', 120),
 
+    // Agents : déconnexion après ce nombre de minutes sans activité (middleware DeconnexionInactivite).
+    // Les promoteurs sont déconnectés au bout de « lifetime » minutes, sauf s'ils ont choisi « Rester connecté ».
+    'inactivite_agents' => (int) env('SESSION_INACTIVITE_AGENTS', 30),
+
     'expire_on_close' => false,
 
     /*

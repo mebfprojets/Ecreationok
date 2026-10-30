@@ -177,7 +177,7 @@ FACEBOOK: https://www.facebook.com/themefisher
     </style>
     <!-- <link rel="stylesheet" type="text/css" href="http://keith-wood.name/css/jquery.signature.css"> -->
 </head>
-<body>
+<body @auth data-inactivite-minutes="{{ Auth::user()->isadmin != null ? config('session.inactivite_agents', 30) : config('session.lifetime', 120) }}" @endauth>
   
     <!--/ Topbar end -->
 <!-- Header start -->
