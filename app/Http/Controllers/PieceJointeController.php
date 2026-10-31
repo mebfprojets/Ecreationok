@@ -98,7 +98,28 @@ class PieceJointeController extends Controller
                 ->with('error', 'Complétez d’abord votre profil de promoteur avant de déposer les pièces jointes.');
         }
         $type_entreprise = $request->type_entreprise;
-        
+        if (!in_array($type_entreprise, ['ei', 'es', 'gie'], true)) {
+            return redirect()->route('type.entreprise')->with('error', 'Choisissez d’abord le type d’entreprise.');
+        }
+
+        // Pièces déjà déposées pour ce type (non encore rattachées à une demande)
+        $dejaDeposees = fn () => PieceJointe::where('usager_id', $usager->id)->whereNull('demande_id')
+            ->where('type_entreprise', $type_entreprise)->pluck('categorie_piece')->unique()->all();
+
+        // Première pièce d'identité : son numéro et sa date d'établissement sont obligatoires
+        if ($request->hasFile('piece_didentite') && !in_array('piece_didentite', $dejaDeposees(), true)) {
+            $request->validate([
+                'reference' => 'required|string|max:50',
+                'date_etablissement' => 'required|date_format:Y-m-d|before_or_equal:today',
+            ], [
+                'reference.required' => 'Saisissez le numéro de la pièce d’identité.',
+                'reference.max' => 'Le numéro de la pièce d’identité est trop long.',
+                'date_etablissement.required' => 'Saisissez la date d’établissement de la pièce d’identité.',
+                'date_etablissement.date_format' => 'La date d’établissement de la pièce d’identité n’est pas valide.',
+                'date_etablissement.before_or_equal' => 'La date d’établissement de la pièce d’identité ne peut pas être dans le futur.',
+            ]);
+        }
+
         if($request->hasFile('declaration')) {$declaration=$request->file('declaration');}else {$declaration=null;}
         if($request->hasFile('acte_de_depot')) {$acte_de_depot=$request->file('acte_de_depot');}else {$acte_de_depot=null;}
         if($request->hasFile('statut')) {$statut=$request->file('statut');}else {$statut=null;}
@@ -131,28 +152,36 @@ class PieceJointeController extends Controller
         //dd($data);
         try {
             // Traitement de chaque fichier
+            $enregistrees = 0;
             foreach ($data as $category => $file) {
-                //$this->processFile($file, $category, $usager);
                 if ($file !== null) {
-                    //dd($category);
-                    $this->processFile($file, 
+                    $this->processFile($file,
                     $category, $usager, $type_entreprise,
                     $reference,
                     $date_etablissement,
                     $date_expiration
                     );
+                    $enregistrees++;
                 }
             }
+            $message = $enregistrees === 0
+                ? 'Aucune pièce n’a été remplacée : les pièces déjà déposées sont conservées.'
+                : ($enregistrees === 1 ? 'La pièce a été enregistrée.' : 'Les '.$enregistrees.' pièces ont été enregistrées.');
 
             if($request->url=="detailfront"){
-                return redirect()->back()
-                ->with('success', 'Les pièces jointes ont été chargées avec succès.');
+                return redirect()->back()->with('success', $message);
             }
-            else{
-                return redirect()->route('create.demande')
-                ->with('success', 'Toutes les pièces jointes ont été chargées avec succès.');
+
+            // Toutes les pièces du type doivent être déposées avant de passer au formulaire
+            $manquantes = array_diff_key(PieceJointe::piecesADeposer($type_entreprise), array_flip($dejaDeposees()));
+            if ($manquantes) {
+                $liste = implode(' ; ', array_map(fn ($piece) => $piece[0], $manquantes));
+                $retour = redirect()->route('process.type.entreprise', $type_entreprise)
+                    ->with('error', (count($manquantes) > 1 ? 'Il manque encore '.count($manquantes).' pièces : ' : 'Il manque encore une pièce : ').$liste.'.');
+                return $enregistrees ? $retour->with('success', $message) : $retour;
             }
-            
+
+            return redirect()->route('create.demande')->with('success', $message);
 
         } catch (\Throwable $e) {
             \Log::error('Erreur upload pièces jointes: ' . $e->getMessage());

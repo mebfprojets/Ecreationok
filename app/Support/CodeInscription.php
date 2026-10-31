@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Mail\CodeVerificationInscription;
+use App\Models\EnvoiMail;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 
@@ -47,7 +48,14 @@ class CodeInscription
         $code = (string) random_int(100000, 999999);
         $expiration = time() + self::DUREE_MINUTES * 60;
 
-        Mail::to($email)->send(new CodeVerificationInscription($code, self::DUREE_MINUTES));
+        // Historique des e-mails : l'objet enregistré ne contient pas le code
+        try {
+            Mail::to($email)->send(new CodeVerificationInscription($code, self::DUREE_MINUTES));
+        } catch (\Throwable $e) {
+            EnvoiMail::noter('code_inscription', $email, 'Votre code de vérification e-Création', $e);
+            throw $e;
+        }
+        EnvoiMail::noter('code_inscription', $email, 'Votre code de vérification e-Création');
 
         Cache::put(self::cle($email), ['empreinte' => self::empreinte($code), 'essais' => 0, 'expiration' => $expiration],
             now()->addMinutes(self::DUREE_MINUTES));

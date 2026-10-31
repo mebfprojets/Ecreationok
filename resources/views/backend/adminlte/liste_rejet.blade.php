@@ -19,7 +19,6 @@
                     <th>Nom Commercial</th>
                     <th>Dénomination Sociale</th>
                     <th>Motif</th>
-                    <th>Actions</th>
                     <th>Réjeter Par</th>  
                     <th>Date Création</th>
                     <th>Activité Principale</th>
@@ -38,7 +37,7 @@
                         $user= CompteUsager($demande->User_ayant_valide);
                         $hasUserValidate = !is_null($user);
                         @endphp
-                  <tr>
+                  <tr data-href="{{ route('detail.demande', $demande->id) }}" tabindex="0" title="Ouvrir le détail de la demande">
                     <td>{{$i}}</td>
                     <td>{{$demande->numero_demande}}</td>
                     <td>{{$demande->legal_rep_name}}</td>
@@ -46,7 +45,6 @@
                     <td>{{$demande->commercial_name}}</td>
                     <td>{{$demande->denomination_social}}</td>
                     <td>{{$demande->motif}}</td>
-                    <td><a href="{{ route('detail.demande', $demande->id) }}" class="btn btn-sm btn-success" style="background:#3393FF" title="Afficher les détais"> <i class="fa fa-eye"></i></a></td>
                     <td>@if($hasUserValidate)
                         {{$user['prenom']}} {{$user['name']}}
                      
@@ -70,7 +68,6 @@
                     <th>Nom Commercial</th>
                     <th>Dénomination Sociale</th>
                     <th>Motif</th>
-                    <th>Actions</th>
                     <th>Réjeter Par</th> 
                     <th>Date Création</th>
                     <th>Activité Principale</th>

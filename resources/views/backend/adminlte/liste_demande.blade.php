@@ -19,7 +19,6 @@
                     <th>Nom Commercial</th>
                     <th>Dénomination Sociale</th>                
                     <th>Sigle</th>   
-                    <th>Actions</th> 
                     <th>Date Création</th>
                     <th>Activité Principale</th>
                     <th>Objet Social</th>
@@ -35,7 +34,7 @@
                         @php
                         $i++;
                         @endphp
-                  <tr>
+                  <tr data-href="{{ route('detail.demande', $demande->id) }}" tabindex="0" title="Ouvrir le détail de la demande">
                     <td>{{$i}}</td>
                     <td>{{$demande->numero_demande}}</td>
                     <td>{{$demande->legal_rep_name}}</td>
@@ -43,7 +42,6 @@
                     <td>{{$demande->commercial_name}}</td>
                     <td>{{$demande->denomination_social}}</td>
                     <td>{{$demande->sigle}}</td>
-                    <td><a href="{{ route('detail.demande', $demande->id) }}" class="btn btn-sm btn-success" style="background:#3393FF" title="Afficher les détais"> <i class="fa fa-eye"></i></a></td>
                     <td>{{format_date($demande->created_at)}}</td>
                     <td>{{$demande->primary_activity}}</td>
                     <td>{{$demande->objet_social}}</td>
@@ -61,7 +59,6 @@
                     <th>Nom Commercial</th>
                     <th>Dénomination Sociale</th>                   
                     <th>Sigle</th>               
-                    <th>Actions</th> 
                     <th>Activité Principale</th>
                     <th>Objet Social</th>
                     <th>CEFORE</th>

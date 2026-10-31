@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use App\Models\EnvoiMail;
 use App\Models\ResetPassword;
 use App\Models\User;
 
@@ -59,15 +60,18 @@ class AccountController extends Controller
             'created_at' => date('d-m-Y H:i:s'),
         ]);
 
+        $objet = 'Réinitialisation de votre mot de passe e-Création';
         try {
-            Mail::send(['html' => 'auth.forgetPassword', 'text' => 'emails.texte.mot_de_passe'], ['token' => $token, 'dureeMinutes' => self::DUREE_MINUTES], function ($message) use ($email) {
-                $message->to($email)->subject('Réinitialisation de votre mot de passe e-Création');
+            Mail::send(['html' => 'auth.forgetPassword', 'text' => 'emails.texte.mot_de_passe'], ['token' => $token, 'dureeMinutes' => self::DUREE_MINUTES], function ($message) use ($email, $objet) {
+                $message->to($email)->subject($objet);
             });
         } catch (\Throwable $e) {
             report($e);
+            EnvoiMail::noter('mot_de_passe', $email, $objet, $e);
             DB::table('password_resets')->where('email', $email)->delete();
             return back()->with('error', 'L’e-mail de réinitialisation n’a pas pu être envoyé. Réessayez dans quelques minutes.');
         }
+        EnvoiMail::noter('mot_de_passe', $email, $objet);
 
         return $reponse();
     }

@@ -221,6 +221,8 @@
       </div>
     </div>
 
+    @include('backend.adminlte.partials.activite_promoteur')
+
     @if ($autresDemandes->isNotEmpty())
       <div class="card mb-3" id="autres-demandes">
         <div class="card-header"><h3 class="card-title"><i class="fas fa-folder me-2 text-secondary" aria-hidden="true"></i>Autres demandes du promoteur</h3></div>

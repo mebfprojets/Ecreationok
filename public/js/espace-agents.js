@@ -152,6 +152,13 @@
                     }
                 });
             });
+            // Tableaux du tableau de bord avec exports, triés au départ sur la 6e colonne (total) décroissante
+            $('table.tableau-export').each(function () {
+                initialiserTableau(this, {
+                    pageLength: 10, order: [[5, 'desc']],
+                    layout: { topStart: { buttons: ['copy', 'csv', 'excel', 'pdf', 'print'] }, topEnd: 'search', bottomStart: 'info', bottomEnd: 'paging' }
+                });
+            });
             $('table[id="example2"]').each(function () {
                 initialiserTableau(this, { searching: false, lengthChange: false, order: [] });
             });
@@ -190,6 +197,31 @@
         }
 
         initialiserTraitementDemande();
+
+        // Listes : toute la ligne ouvre le détail (data-href). Ctrl/Cmd + clic ou clic molette : nouvel onglet.
+        // Les liens, boutons et champs de la ligne, et la flèche des colonnes masquées (DataTables Responsive), gardent leur rôle.
+        function ouvrirLigne(evenement, ligne) {
+            var url = ligne.getAttribute('data-href');
+            if (!url) { return; }
+            if (evenement.ctrlKey || evenement.metaKey || evenement.button === 1) {
+                window.open(url, '_blank', 'noopener');
+            } else {
+                window.location.href = url;
+            }
+        }
+        function clicInterne(evenement) {
+            return $(evenement.target).closest('a, button, input, select, textarea, label, .dtr-control, .dtr-details').length > 0
+                || (window.getSelection && String(window.getSelection()).length > 0);   // sélection de texte : pas de navigation
+        }
+        $(document).on('click', 'tr[data-href]', function (e) {
+            if (!clicInterne(e)) { ouvrirLigne(e, this); }
+        });
+        $(document).on('auxclick', 'tr[data-href]', function (e) {
+            if (e.button === 1 && !clicInterne(e)) { e.preventDefault(); ouvrirLigne(e, this); }
+        });
+        $(document).on('keydown', 'tr[data-href]', function (e) {
+            if (e.key === 'Enter' && e.target === this) { ouvrirLigne(e, this); }
+        });
 
         // Calendrier des dates d'établissement des pièces : même format que le site public (jj/mm/aaaa)
         if ($.fn.datepicker) {

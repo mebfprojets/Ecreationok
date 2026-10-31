@@ -3633,3 +3633,107 @@ legend{
  width: 1000px;
  margin-left: -5%;
  } */
+/* Notifications du promoteur (menu du compte) : nouveautés sur ses dossiers */
+.pastille-notification { font-size: .7rem; margin-left: .3rem; vertical-align: top; animation: pastille-pulse 2s ease-in-out 3; }
+@keyframes pastille-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(197, 20, 37, .6); } 50% { box-shadow: 0 0 0 6px rgba(197, 20, 37, 0); } }
+.menu-notifications { min-width: 320px; }
+.menu-notifications .titre-notifications { padding: .5rem 1rem; font-size: .8rem; font-weight: 700; color: #13731C; text-transform: uppercase; letter-spacing: .03em; border-bottom: 1px solid #e3e9e5; }
+.menu-notifications .lien-notification { display: flex !important; align-items: flex-start; white-space: normal; padding: .55rem 1rem; border-bottom: 1px solid #f0f2f1; text-transform: none; font-size: .88rem; }
+.menu-notifications .lien-notification:hover { background: #eaf6eb; }
+.ed-carte-nouveaute { box-shadow: 0 0 0 2px #c51425 inset, 0 1px 3px rgba(0, 0, 0, .08); }
+
+/* ==========================================================================
+   Parcours de demande : choix du type, dépôt des pièces, fiche du promoteur
+   Couleurs du logo MEBF : vert #1B9925 / #13731C / #0B4A12, jaune #FCE400, rouge #C51425
+   ========================================================================== */
+.parcours-demande { padding-top: 32px; padding-bottom: 48px; }
+.parcours-demande .alert { border-radius: 10px; }
+.titre-parcours { font-size: 1.6rem; font-weight: 700; color: #0B4A12; margin-bottom: .35rem; text-transform: none; }
+.titre-parcours-type { display: inline-block; margin-left: .4rem; padding: .15rem .65rem; border-radius: 999px; background: #eaf6eb; color: #13731C; font-size: .95rem; font-weight: 600; vertical-align: middle; }
+.sous-titre-parcours { color: #5b6b60; margin-bottom: 1.25rem; }
+.actions-parcours { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid #e3e9e5; }
+
+/* Étapes du parcours */
+.etapes-parcours { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; margin-bottom: 1.5rem; padding: .75rem 1rem; background: #f6f9f7; border: 1px solid #e3e9e5; border-radius: 12px; }
+.etape-parcours { display: inline-flex; align-items: center; gap: .5rem; color: #7a877e; font-size: .9rem; font-weight: 600; text-decoration: none; }
+.etape-numero { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: #dfe6e1; color: #5b6b60; font-size: .8rem; }
+.etape-parcours.active { color: #0B4A12; }
+.etape-parcours.active .etape-numero { background: #1B9925; color: #fff; box-shadow: 0 0 0 3px rgba(27, 153, 37, .2); }
+.etape-parcours.faite { color: #13731C; }
+.etape-parcours.faite .etape-numero { background: #eaf6eb; color: #13731C; }
+a.etape-parcours.faite:hover { color: #0B4A12; text-decoration: underline; }
+
+/* Fiche du promoteur */
+.fiche-promoteur { background: #fff; border: 1px solid #e3e9e5; border-radius: 12px; }
+.fiche-promoteur-avatar { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 50%; background: #13731C; color: #FCE400; font-weight: 700; letter-spacing: .03em; }
+.fiche-promoteur-surtitre { font-size: .72rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #13731C; }
+.fiche-promoteur-nom { font-size: 1.05rem; font-weight: 700; color: #1f2a22; text-transform: none; }
+.fiche-promoteur-bandeau { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem 1rem; padding: .85rem 1.1rem; margin-bottom: 1.5rem; border-left: 4px solid #1B9925; }
+.fiche-promoteur-bandeau .fiche-promoteur-identite { flex: 1 1 200px; }
+.fiche-promoteur-contacts { display: flex; flex-wrap: wrap; gap: .35rem 1.25rem; margin: 0; padding: 0; list-style: none; font-size: .88rem; color: #3d4a41; }
+.fiche-promoteur-contacts li { display: inline-flex; align-items: center; gap: .4rem; word-break: break-all; text-transform: none; }
+.fiche-promoteur-contacts i { color: #1B9925; }
+.fiche-promoteur-complete { margin-bottom: 1rem; overflow: hidden; }
+.fiche-promoteur-entete { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; background: linear-gradient(90deg, #eaf6eb, #fff); border-bottom: 1px solid #e3e9e5; }
+.fiche-promoteur-entete .fiche-promoteur-identite { flex: 1 1 auto; text-align: left; }
+.fiche-promoteur-badge { background: #FCE400; color: #0B4A12; font-weight: 600; }
+.fiche-promoteur-champs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem 1.5rem; margin: 0; padding: 1.1rem 1.25rem; text-align: left; }
+.fiche-promoteur-champ dt { font-size: .75rem; font-weight: 600; color: #6b7a70; text-transform: uppercase; letter-spacing: .03em; margin-bottom: .2rem; }
+.fiche-promoteur-champ dt i { color: #1B9925; margin-right: .35rem; }
+.fiche-promoteur-champ dd { margin: 0; font-weight: 600; color: #1f2a22; word-break: break-word; }
+.fiche-promoteur-champ-large { grid-column: span 2; }
+.fiche-promoteur-pied { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .25rem 1rem; padding: .6rem 1.25rem; background: #f6f9f7; border-top: 1px solid #e3e9e5; font-size: .8rem; color: #6b7a70; text-align: left; }
+@media (max-width: 767.98px) {
+  .fiche-promoteur-champs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 479.98px) {
+  .fiche-promoteur-champs { grid-template-columns: 1fr; }
+  .fiche-promoteur-champ-large { grid-column: auto; }
+  .fiche-promoteur-badge { display: none; }
+}
+
+/* Choix du type d'entreprise */
+.carte-type { position: relative; display: flex; flex-direction: column; height: 100%; padding: 1.5rem; background: #fff; border: 2px solid #e3e9e5; border-radius: 14px; color: inherit; text-decoration: none; transition: border-color .2s, box-shadow .2s, transform .2s; }
+a.carte-type:hover, a.carte-type:focus-visible { border-color: #1B9925; box-shadow: 0 10px 24px rgba(11, 74, 18, .12); transform: translateY(-3px); color: inherit; text-decoration: none; }
+a.carte-type:focus-visible { outline: 3px solid #FCE400; outline-offset: 2px; }
+.carte-type-icone { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 14px; font-size: 1.5rem; margin-bottom: 1rem; }
+.carte-type-vert .carte-type-icone { background: #eaf6eb; color: #1B9925; }
+.carte-type-jaune .carte-type-icone { background: #fff9cc; color: #8a7a00; }
+.carte-type-bleu .carte-type-icone { background: #e7f1fb; color: #1f6fb2; }
+.carte-type-titre { font-size: 1.15rem; font-weight: 700; color: #0B4A12; text-transform: none; margin-bottom: .4rem; }
+.carte-type-description { color: #5b6b60; font-size: .92rem; margin-bottom: 1rem; }
+.carte-type-pieces { margin-bottom: 1.25rem; padding: .75rem .9rem; background: #f6f9f7; border-radius: 10px; font-size: .84rem; color: #3d4a41; }
+.carte-type-pieces-titre { font-weight: 700; color: #13731C; margin-bottom: .35rem; }
+.carte-type-pieces ul { margin: 0; padding-left: 1.1rem; }
+.carte-type-pieces li { margin-bottom: .15rem; }
+.carte-type-action { margin-top: auto; font-weight: 700; color: #1B9925; }
+a.carte-type:hover .carte-type-action { color: #0B4A12; }
+.carte-type-indisponible { opacity: .65; background: #f6f7f6; cursor: not-allowed; }
+.carte-type-indisponible .carte-type-action { color: #6b7a70; font-weight: 600; }
+
+/* Dépôt des pièces */
+.suivi-depot { max-width: 420px; margin-bottom: 1.25rem; font-size: .9rem; }
+.suivi-depot .progress { height: 8px; border-radius: 999px; background: #e3e9e5; }
+.carte-piece { height: 100%; padding: 1rem 1.1rem; background: #fff; border: 1px solid #e3e9e5; border-left: 4px solid #c8d1cb; border-radius: 12px; transition: border-color .2s, box-shadow .2s; }
+.carte-piece.etat-deposee { border-left-color: #1B9925; }
+.carte-piece.etat-nouvelle { border-left-color: #FCE400; box-shadow: 0 0 0 3px rgba(252, 228, 0, .25); }
+.carte-piece.etat-erreur { border-color: #C51425; border-left-color: #C51425; }
+.carte-piece-entete { display: flex; gap: .75rem; align-items: flex-start; margin-bottom: .75rem; }
+.carte-piece-statut { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; margin-top: 2px; border-radius: 50%; border: 2px solid #c8d1cb; color: transparent; font-size: .75rem; }
+.etat-deposee .carte-piece-statut { background: #1B9925; border-color: #1B9925; color: #fff; }
+.etat-nouvelle .carte-piece-statut { background: #FCE400; border-color: #e6cf00; color: #0B4A12; }
+.carte-piece-titre { display: block; font-weight: 700; color: #1f2a22; margin-bottom: .1rem; text-transform: none; }
+.carte-piece-aide { font-size: .8rem; color: #6b7a70; }
+.carte-piece-fichier { display: flex; align-items: center; gap: .65rem; padding: .55rem .75rem; background: #f6f9f7; border: 1px dashed #c8d1cb; border-radius: 8px; margin-bottom: .65rem; min-width: 0; }
+.carte-piece-fichier-icone { font-size: 1.4rem; color: #9aa69e; }
+.etat-deposee .carte-piece-fichier-icone { color: #1B9925; }
+.etat-nouvelle .carte-piece-fichier-icone { color: #8a7a00; }
+.etat-deposee .carte-piece-fichier, .etat-nouvelle .carte-piece-fichier { border-style: solid; }
+.carte-piece-nom { font-weight: 600; font-size: .9rem; color: #1f2a22; }
+.etat-vide .carte-piece-nom { color: #9aa69e; font-weight: 400; font-style: italic; }
+.carte-piece-etat { font-size: .78rem; color: #6b7a70; }
+.etat-deposee .carte-piece-etat { color: #13731C; }
+.carte-piece-actions { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+.carte-piece-erreur { margin-top: .6rem; padding: .5rem .7rem; border-radius: 8px; background: #fdecee; color: #9b0f1d; font-size: .85rem; }
+.carte-piece-erreur::before { content: "\f071"; font-family: "Font Awesome 5 Free"; font-weight: 900; margin-right: .4rem; }
+.carte-piece-complement { margin-top: .85rem; padding-top: .85rem; border-top: 1px solid #e3e9e5; }

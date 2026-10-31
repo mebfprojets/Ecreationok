@@ -58,3 +58,132 @@ table.dataTable thead th { vertical-align: middle; }
   .carte-apercu { position: sticky; top: 4rem; }
   .carte-apercu .visionneuse { height: calc(100vh - 10rem); min-height: 480px; }
 }
+
+/* --- Tableau de bord : type d'entreprise, parcours, situation par CEFORE --- */
+.icone-indicateur { display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; border-radius: .6rem; font-size: 1.15rem; flex-shrink: 0; }
+.grille-etapes { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: .5rem; }
+.etape { display: block; padding: .7rem .85rem; border: 1px solid var(--bs-border-color); border-left-width: 4px; border-radius: .5rem; background: var(--bs-body-bg); color: inherit; text-decoration: none; }
+.etape-lien { transition: box-shadow .15s ease, transform .15s ease; }
+.etape-lien:hover, .etape-lien:focus { box-shadow: 0 .25rem .6rem rgba(0, 0, 0, .08); transform: translateY(-1px); color: inherit; }
+.tableau-cefore th { white-space: nowrap; font-size: .85rem; }
+
+/* =====================================================================================
+ * Charte graphique MEBF (couleurs relevées sur le logo de la Maison de l'Entreprise)
+ *   vert du logo #1B9925 · jaune du logo #FCE400 · rouge du logo #C51425
+ * Les verts foncés servent aux boutons et au texte blanc (contraste lisible, ≥ 4,5:1).
+ * ===================================================================================== */
+:root, [data-bs-theme=light] {
+  --mebf-vert: #1B9925;
+  --mebf-vert-fonce: #13731C;
+  --mebf-vert-nuit: #0B4A12;
+  --mebf-vert-pale: #EAF6EB;
+  --mebf-vert-bordure: #B9DFBE;
+  --mebf-jaune: #FCE400;
+  --mebf-jaune-pale: #FFF9C7;
+  --mebf-rouge: #C51425;
+
+  --bs-primary: #13731C;            --bs-primary-rgb: 19, 115, 28;
+  --bs-success: #178321;            --bs-success-rgb: 23, 131, 33;
+  --bs-warning: #FCE400;            --bs-warning-rgb: 252, 228, 0;
+  --bs-danger: #C51425;             --bs-danger-rgb: 197, 20, 37;
+  --bs-primary-text-emphasis: #0B4A12; --bs-primary-bg-subtle: #EAF6EB; --bs-primary-border-subtle: #B9DFBE;
+  --bs-success-text-emphasis: #0B4A12; --bs-success-bg-subtle: #EAF6EB; --bs-success-border-subtle: #B9DFBE;
+  --bs-warning-text-emphasis: #5C5200; --bs-warning-bg-subtle: #FFF9C7; --bs-warning-border-subtle: #F2E37A;
+  --bs-danger-text-emphasis: #7A0C17;  --bs-danger-bg-subtle: #FBE8EA;  --bs-danger-border-subtle: #EFB3B9;
+  --bs-link-color: #13731C;         --bs-link-color-rgb: 19, 115, 28;
+  --bs-link-hover-color: #0B4A12;   --bs-link-hover-color-rgb: 11, 74, 18;
+  --bs-focus-ring-color: rgba(27, 153, 37, .25);
+  --bs-body-bg: #fff;
+}
+body.bg-body-tertiary { background-color: #F4F7F4 !important; }
+
+/* Variantes AdminLTE (cartes, fonds) alignées sur la charte */
+.card-primary, .bg-primary, .text-bg-primary { --lte-card-variant-bg: #13731C; --lte-card-variant-bg-rgb: 19, 115, 28; --lte-card-variant-color: #fff; }
+.card-success, .bg-success, .text-bg-success { --lte-card-variant-bg: #178321; --lte-card-variant-bg-rgb: 23, 131, 33; --lte-card-variant-color: #fff; }
+.card-warning, .bg-warning, .text-bg-warning { --lte-card-variant-bg: #FCE400; --lte-card-variant-bg-rgb: 252, 228, 0; --lte-card-variant-color: #1F1F1F; }
+.card-danger, .bg-danger, .text-bg-danger { --lte-card-variant-bg: #C51425; --lte-card-variant-bg-rgb: 197, 20, 37; --lte-card-variant-color: #fff; }
+
+/* Boutons */
+.btn-primary { --bs-btn-bg: #13731C; --bs-btn-border-color: #13731C; --bs-btn-hover-bg: #0F5E17; --bs-btn-hover-border-color: #0F5E17;
+  --bs-btn-active-bg: #0B4A12; --bs-btn-active-border-color: #0B4A12; --bs-btn-disabled-bg: #13731C; --bs-btn-disabled-border-color: #13731C; --bs-btn-focus-shadow-rgb: 27, 153, 37; }
+.btn-success { --bs-btn-bg: #178321; --bs-btn-border-color: #178321; --bs-btn-hover-bg: #13731C; --bs-btn-hover-border-color: #13731C;
+  --bs-btn-active-bg: #0F5E17; --bs-btn-active-border-color: #0F5E17; --bs-btn-disabled-bg: #178321; --bs-btn-disabled-border-color: #178321; --bs-btn-focus-shadow-rgb: 27, 153, 37; }
+.btn-outline-primary, .btn-outline-success { --bs-btn-color: #13731C; --bs-btn-border-color: #13731C; --bs-btn-hover-bg: #13731C; --bs-btn-hover-border-color: #13731C;
+  --bs-btn-active-bg: #0F5E17; --bs-btn-active-border-color: #0F5E17; --bs-btn-disabled-color: #13731C; --bs-btn-disabled-border-color: #13731C; --bs-btn-focus-shadow-rgb: 27, 153, 37; }
+.btn-danger { --bs-btn-bg: #C51425; --bs-btn-border-color: #C51425; --bs-btn-hover-bg: #A3101F; --bs-btn-hover-border-color: #A3101F;
+  --bs-btn-active-bg: #8A0D1A; --bs-btn-active-border-color: #8A0D1A; --bs-btn-disabled-bg: #C51425; --bs-btn-disabled-border-color: #C51425; --bs-btn-focus-shadow-rgb: 197, 20, 37; }
+.btn-outline-danger { --bs-btn-color: #C51425; --bs-btn-border-color: #C51425; --bs-btn-hover-bg: #C51425; --bs-btn-hover-border-color: #C51425;
+  --bs-btn-active-bg: #A3101F; --bs-btn-active-border-color: #A3101F; --bs-btn-focus-shadow-rgb: 197, 20, 37; }
+.btn-warning { --bs-btn-color: #1F1F1F; --bs-btn-bg: #FCE400; --bs-btn-border-color: #FCE400; --bs-btn-hover-color: #1F1F1F; --bs-btn-hover-bg: #E9D300; --bs-btn-hover-border-color: #E9D300;
+  --bs-btn-active-bg: #D6C200; --bs-btn-active-border-color: #D6C200; --bs-btn-focus-shadow-rgb: 252, 228, 0; }
+
+/* Champs, cases, pagination, barres de progression, menus déroulants */
+.form-control:focus, .form-select:focus { border-color: #6CC375; box-shadow: 0 0 0 .25rem rgba(27, 153, 37, .25); }
+.form-check-input:checked { background-color: #13731C; border-color: #13731C; }
+.form-check-input:focus { border-color: #6CC375; box-shadow: 0 0 0 .25rem rgba(27, 153, 37, .25); }
+.pagination { --bs-pagination-color: #13731C; --bs-pagination-hover-color: #0B4A12; --bs-pagination-focus-color: #0B4A12;
+  --bs-pagination-active-bg: #13731C; --bs-pagination-active-border-color: #13731C; --bs-pagination-focus-box-shadow: 0 0 0 .25rem rgba(27, 153, 37, .25); }
+.progress, .progress-stacked { --bs-progress-bar-bg: #1B9925; }
+.dropdown-menu { --bs-dropdown-link-active-bg: #13731C; }
+
+/* Menu latéral : vert MEBF, élément actif signalé en jaune */
+.app-sidebar, .app-sidebar[data-bs-theme], [data-bs-theme] .app-sidebar {
+  --lte-sidebar-color: rgba(255, 255, 255, .84);
+  --lte-sidebar-hover-color: #fff;
+  --lte-sidebar-hover-bg: rgba(255, 255, 255, .08);
+  --lte-sidebar-active-color: #FCE400;
+  --lte-sidebar-menu-active-color: #FCE400;
+  --lte-sidebar-menu-active-bg: rgba(252, 228, 0, .13);
+  --lte-sidebar-submenu-color: rgba(255, 255, 255, .78);
+  --lte-sidebar-submenu-hover-color: #fff;
+  --lte-sidebar-submenu-hover-bg: rgba(255, 255, 255, .08);
+  --lte-sidebar-submenu-active-color: #FCE400;
+  --lte-sidebar-submenu-active-bg: rgba(252, 228, 0, .13);
+  --lte-sidebar-header-color: rgba(252, 228, 0, .75);
+  background: linear-gradient(180deg, #13731C 0%, #0F5E17 45%, #0B4A12 100%) !important;
+}
+.app-sidebar .sidebar-brand { background: rgba(0, 0, 0, .12); border-bottom: 3px solid #FCE400 !important; }
+.app-sidebar .brand-link .brand-text { color: #fff; font-weight: 600 !important; letter-spacing: .02em; }
+.app-sidebar .brand-image { opacity: 1 !important; background: #fff; }
+.sidebar-wrapper .sidebar-menu .nav-link.active { box-shadow: inset 3px 0 0 #FCE400; }
+.sidebar-wrapper .sidebar-menu .nav-header { font-weight: 600; letter-spacing: .06em; font-size: .75rem; }
+
+/* Bandeau du haut : liseré aux trois couleurs du logo */
+.app-header { border-top: 4px solid transparent; border-image: linear-gradient(90deg, #1B9925 0 62%, #FCE400 62% 86%, #C51425 86% 100%) 1; }
+.app-content-header h3 { color: #0B4A12; }
+.app-content-header .breadcrumb-item a { color: #13731C; }
+
+/* Cartes et tableaux */
+.card { border: 0; }
+.card > .card-header { border-bottom-color: #E3EFE4; }
+.card-title > .fas.text-secondary, .card-title > .fa.text-secondary { color: #1B9925 !important; }
+.table > thead { --bs-table-bg: #EEF6EF; --bs-table-color: #0B4A12; }
+.table > tfoot { --bs-table-bg: #F6FAF6; }
+div.dt-container .dt-buttons .btn-secondary { --bs-btn-bg: #fff; --bs-btn-color: #13731C; --bs-btn-border-color: #B9DFBE;
+  --bs-btn-hover-bg: #EAF6EB; --bs-btn-hover-color: #0B4A12; --bs-btn-hover-border-color: #8CCB94; --bs-btn-active-bg: #D6EED9; --bs-btn-active-color: #0B4A12; }
+
+/* Page de traitement : éléments mis en avant aux couleurs MEBF */
+.dossier-entete { border-top: 3px solid #1B9925; }
+.liste-pieces .active-piece { background: #EAF6EB; box-shadow: inset 3px 0 0 #1B9925; }
+.barre-decision { background: #FFFBE0; border-left-color: #FCE400; }
+
+/* Pied de page */
+.app-footer { border-top: 3px solid #1B9925; }
+.app-footer a { color: #13731C; }
+/* Case « Demandes au total » du tableau de bord : vert nuit, pour la distinguer des « Validées » */
+.small-box.boite-vert-nuit { background: linear-gradient(135deg, #0F5E17, #0B4A12); color: #fff; }
+.small-box.boite-vert-nuit .small-box-icon { color: rgba(252, 228, 0, .35); }
+
+/* Listes : la ligne entière ouvre le détail de la demande */
+.table > tbody > tr[data-href] { cursor: pointer; }
+.table > tbody > tr[data-href]:hover > *, .table > tbody > tr[data-href]:focus-visible > * { --bs-table-bg-state: #EAF6EB; --bs-table-color-state: #0B4A12; }
+.table > tbody > tr[data-href]:focus-visible { outline: 2px solid #1B9925; outline-offset: -2px; }
+
+/* Page de traitement : activité du promoteur (parcours et connexions) */
+.onglets-activite .nav-link { padding: .25rem .7rem; font-size: .85rem; }
+.onglets-activite .nav-link.active { background: #13731C; }
+.liste-activite { list-style: none; margin: 0; padding: 0; max-height: 420px; overflow-y: auto; }
+.liste-activite li { display: flex; gap: .65rem; padding: .5rem 0; border-bottom: 1px solid #EEF2EF; }
+.liste-activite li:last-child { border-bottom: 0; }
+.liste-activite li > .fas { margin-top: .2rem; }
+.resume-connexions .fait-libelle { font-size: .75rem; color: var(--bs-secondary-color); font-weight: 600; text-transform: uppercase; }

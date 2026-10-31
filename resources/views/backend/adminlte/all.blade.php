@@ -65,7 +65,7 @@
     <div class="card">
       <div class="card-body">
         {{-- Tableau rempli page par page par le serveur (route all.list.donnees) : recherche et tri portent sur toutes les demandes --}}
-        <table id="tableau-toutes-demandes" class="table table-bordered table-striped w-100" data-ajax-url="{{ route('all.list.donnees') }}" data-tri="7,desc" data-non-triables="6,9">
+        <table id="tableau-toutes-demandes" class="table table-bordered table-striped w-100" data-ajax-url="{{ route('all.list.donnees') }}" data-tri="6,desc" data-non-triables="8">
           <thead>
             <tr>
               <th>N° demande</th>
@@ -74,7 +74,6 @@
               <th>Nom commercial</th>
               <th>Dénomination sociale</th>
               <th>Sigle</th>
-              <th>Détail</th>
               <th>Création</th>
               <th>Activité principale</th>
               <th>Objet social</th>

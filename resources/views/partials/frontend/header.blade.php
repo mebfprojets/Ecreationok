@@ -91,7 +91,7 @@ FACEBOOK: https://www.facebook.com/themefisher
 <link href="{{asset('backend/css/app.min.css')}}" id="app-style" rel="stylesheet" type="text/css" />
 
 <!-- Pour accueil pour raison de position -->
-<link rel="stylesheet" href="{{asset('frontend/css/style.css')}}">
+<link rel="stylesheet" href="{{asset_version('frontend/css/style.css')}}">
 <link rel="stylesheet" href="{{asset('/css/jquery.steps.css')}}">
 
   <!--  -->
@@ -310,9 +310,34 @@ FACEBOOK: https://www.facebook.com/themefisher
             </ul>
         </li>
        @else 
+       @php $notifications = \App\Models\JournalAction::nonLuesDuPromoteur(Auth::user()); @endphp
        <li id="contenu" class="nav-item dropdown pull-right">
-            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">{{Auth::user()->name}}</a>
-            <ul class="dropdown-menu dropdown-custom dropdown-menu-right dropdown-menu-end">
+            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+               @if ($notifications->isNotEmpty()) title="{{ $notifications->count() }} nouveauté(s) sur vos dossiers" @endif>
+              {{Auth::user()->name}}
+              @if ($notifications->isNotEmpty())
+                <span class="badge rounded-pill bg-danger pastille-notification" aria-label="{{ $notifications->count() }} nouveauté(s) sur vos dossiers">{{ $notifications->count() > 9 ? '9+' : $notifications->count() }}</span>
+              @endif
+            </a>
+            <ul class="dropdown-menu dropdown-custom dropdown-menu-right dropdown-menu-end menu-notifications">
+                @if ($notifications->isNotEmpty())
+                  {{-- Nouveautés sur les dossiers du promoteur : un clic ouvre le dossier (et marque la nouveauté comme vue) --}}
+                  <li class="titre-notifications"><i class="fas fa-bell me-1" aria-hidden="true"></i>Nouveautés sur vos dossiers</li>
+                  @foreach ($notifications->take(5) as $notification)
+                    <li>
+                      <a href="{{ route('demande.detail', $notification->demande_id) }}" class="lien-notification">
+                        <i class="fas {{ $notification->iconePromoteur() }} me-2" aria-hidden="true"></i>
+                        <span>
+                          <span class="d-block fw-semibold">{{ $notification->messagePromoteur() }}</span>
+                          <span class="d-block small text-muted">{{ optional($notification->demande)->commercial_name ?: optional($notification->demande)->denomination_social }} · {{ optional($notification->created_at)->format('d/m/Y à H:i') }}</span>
+                        </span>
+                      </a>
+                    </li>
+                  @endforeach
+                  @if ($notifications->count() > 5)
+                    <li><a href="{{ route('demande.liste') }}" class="small">Voir toutes mes demandes ({{ $notifications->count() - 5 }} autre(s) nouveauté(s))</a></li>
+                  @endif
+                @endif
 
                 <li class="divider"></li>
                 <li>

@@ -69,7 +69,6 @@
                     <th>Ref IFU</th>
                     <th>Ref CNSS</th>
                     <th>Ref CPC</th>
-                    <th>Actions</th> 
                     <th>Numero Demande</th>
                     <th>Promoteur</th>                
                     <th>Dénomination Sociale</th>                
@@ -87,14 +86,13 @@
                         @php
                         $i++;
                         @endphp
-                  <tr>
+                  <tr data-href="{{ route('detail.demande', $demande->id) }}" tabindex="0" title="Ouvrir le détail de la demande">
                     <td>{{$i}}</td>
                     <td>{{$demande->commercial_name}}</td>
                     <td style="width:250px;"> {{($demande->RCCM)}} du {{($demande->DateRCCM)}}</td>
                     <td>@if($demande->IFU) {{($demande->DateIFU)}} {{($demande->IFU)}}  @else En Attente de IFU  @endif</td>
                     <td>@if($demande->CNSS) {{($demande->CNSS)}} {{($demande->DateCNSS)}}  @else En Attente de CNSS  @endif</td>
                     <td>@if($demande->avecCPC==1) {{($demande->CPC)}} {{($demande->DateCPC)}}  @elseif($demande->avecCPC==1 && $demande->CPC==null) En Attente de CPC @else Pas de Prestation CPC  @endif</td>
-                    <td><a href="{{ route('detail.demande', $demande->id) }}" class="btn btn-sm btn-success" style="background:#3393FF" title="Afficher les détais"> <i class="fa fa-eye"></i></a></td>
                     <td>{{$demande->numero_demande}}</td>
                     <td>{{$demande->legal_rep_name}}</td>
                     <td>{{$demande->denomination_social}}</td>
@@ -114,7 +112,6 @@
                     <th>Ref IFU</th>
                     <th>Ref CNSS</th>
                     <th>Ref CPC</th>
-                    <th>Actions</th> 
                     <th>Numero Demande</th>
                     <th>Promoteur</th>                
                     <th>Dénomination Sociale</th>                

@@ -2,166 +2,70 @@
 @section('alertes_locales', '1')
 
 @section('content')
-<style>
-    .card-type-entreprise-link {
-        text-decoration: none;
-        color: inherit;
-    }
+@php
+    // [code, titre, description, icône, couleur, pièces]
+    $types = [
+        ['ei', 'Entreprise individuelle', 'Exploitée par une seule personne physique, sans création de société.', 'fa-user-tie', 'vert', \App\Models\PieceJointe::piecesADeposer('ei')],
+        ['es', 'Entreprise sociétaire', 'SARL, SA, SAS, SASU, EURL et autres formes de société.', 'fa-building', 'jaune', \App\Models\PieceJointe::piecesADeposer('es')],
+        ['gie', 'Groupement d’intérêt économique (GIE)', 'Regroupement d’entreprises ou d’organismes autour d’une activité commune.', 'fa-hands-helping', 'bleu', \App\Models\PieceJointe::piecesADeposer('gie')],
+    ];
+@endphp
+<div class="container parcours-demande">
+  <nav aria-label="Étapes de la demande" class="etapes-parcours">
+    <span class="etape-parcours active"><span class="etape-numero">1</span>Type d’entreprise</span>
+    <span class="etape-parcours"><span class="etape-numero">2</span>Pièces à fournir</span>
+    <span class="etape-parcours"><span class="etape-numero">3</span>Formulaire</span>
+    <span class="etape-parcours"><span class="etape-numero">4</span>Paiement</span>
+  </nav>
 
-    .card-type-entreprise-link .card {
-        cursor: pointer;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
-        height: 100%;
-    }
+  <h1 class="titre-parcours">Quel type d’entreprise souhaitez-vous créer ?</h1>
+  <p class="sous-titre-parcours">Choisissez le type qui correspond à votre projet : la liste des pièces à fournir en dépend.</p>
 
-    .card-type-entreprise-link .card:hover {
-        border-color: #0d6efd;
-        transform: translateY(-5px);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
+  @include('demande.partials.promoteur', ['variante' => 'bandeau'])
 
-    .card-type-entreprise-link .card:hover .fa-3x {
-        transform: scale(1.1);
-        transition: transform 0.3s ease;
-    }
+  @if (session('success'))
+    <div class="alert alert-success" role="status">{{ session('success') }}</div>
+  @endif
+  @if (session('error'))
+    <div class="alert alert-danger" role="alert">{{ session('error') }}</div>
+  @endif
 
-    .badge {
-        font-size: 0.75rem;
-    }
-</style>
-<div class="container-fluid">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0">Choix du Type d'Entreprise</h4>
+  <div class="row g-4 choix-types">
+    @foreach ($types as [$code, $titre, $description, $icone, $couleur, $pieces])
+      @php $indisponible = $code === 'ei' && $aDejaUneEI; @endphp
+      <div class="col-md-6 col-lg-4">
+        @if ($indisponible)
+          <div class="carte-type carte-type-{{ $couleur }} carte-type-indisponible" aria-disabled="true">
+        @else
+          <a href="{{ route('process.type.entreprise', $code) }}" class="carte-type carte-type-{{ $couleur }}">
+        @endif
+            <span class="carte-type-icone" aria-hidden="true"><i class="fas {{ $icone }}"></i></span>
+            <h2 class="carte-type-titre">{{ $titre }}</h2>
+            <p class="carte-type-description">{{ $description }}</p>
+            <div class="carte-type-pieces">
+              <div class="carte-type-pieces-titre">{{ count($pieces) }} pièces à préparer</div>
+              <ul>
+                @foreach ($pieces as [$libelle])
+                  <li>{{ $libelle }}</li>
+                @endforeach
+              </ul>
             </div>
-            
-            <div class="card">
-                <div class="card-header">
-                    <div class="alert alert-danger d-flex align-items-center" role="alert">
-                            <i class="fas fa-info-circle me-2"></i>
-                            <div>
-                                <strong>Promoteur lié au Compte :</strong> 
-                                {{$usager->NomRaisonSociale}} {{$usager->Prenom}} - 
-                                <strong>N°Pièce:  </strong> {{$usager->CIN}} - 
-                                <strong>Email:  </strong> {{Auth::user()->email}}
-                            </div>
-                    </div>
-                    <h5 class="card-title mb-0">Sélectionnez votre type d'entreprise</h5>
-                    <!-- <p class="text-muted mb-0">Cliquez directement sur le type d'entreprise pour continuer.</p> -->
+            @if ($indisponible)
+              <span class="carte-type-action"><i class="fas fa-lock me-1" aria-hidden="true"></i>Vous avez déjà une entreprise individuelle</span>
+            @else
+              <span class="carte-type-action">Choisir <i class="fas fa-arrow-right ms-1" aria-hidden="true"></i></span>
+            @endif
+        @if ($indisponible)
+          </div>
+        @else
+          </a>
+        @endif
+      </div>
+    @endforeach
+  </div>
 
-                </div>
-                <div class="card-body">
-                    @if(session('success'))
-                        <div class="alert alert-success">
-                            {{ session('success') }}
-                        </div>
-                    @endif
-                    @if(session('error'))
-                        <div class="alert alert-danger">
-                            {{ session('error') }}
-                        </div>
-                    @endif
-
-                    <div class="row justify-content-center">
-                        <!-- Entreprise Individuelle --> 
-                         @if($typeDemande != 'EI')                        
-                        <div class="col-lg-6 mb-4">
-                            <a href="{{ route('process.type.entreprise', 'ei') }}" class="card-type-entreprise-link">
-                                <div class="card border">
-                                    <div class="card-body text-center">
-                                        <div class="mb-3">
-                                            <i class="fas fa-user-tie fa-3x text-primary"></i>
-                                        </div>
-                                        <h5 class="card-title">Entreprise Individuelle (EI)</h5>
-                                        <p class="card-text text-muted small">
-                                            Entreprise exploitée par une personne physique sans création de personne morale
-                                        </p>
-                                        <div class="mt-3">
-                                            <span class="badge bg-primary">Cliquer pour continuer</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        @endif
-
-                        <!-- Entreprise Sociétaire -->                        
-                        <div class="col-lg-6 mb-4">
-                            <a href="{{ route('process.type.entreprise', 'es') }}" class="card-type-entreprise-link">
-                                <div class="card border">
-                                    <div class="card-body text-center">
-                                        <div class="mb-3">
-                                            <i class="fas fa-building fa-3x text-success"></i>
-                                        </div>
-                                        <h5 class="card-title">Entreprise Sociétaire</h5>
-                                        <p class="card-text text-muted small">
-                                            SARL, SA, SAS, SASU, EURL et autres formes sociétaires
-                                        </p>
-                                        <div class="mt-3">
-                                            <span class="badge bg-success">Cliquer pour continuer</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-
-                        <!-- Groupement d'Intérêt Général -->
-                        <div class="col-lg-6 mb-4">
-                            <a href="{{ route('process.type.entreprise', 'gie') }}" class="card-type-entreprise-link">
-                                <div class="card border">
-                                    <div class="card-body text-center">
-                                        <div class="mb-3">
-                                            <i class="fas fa-hands-helping fa-3x text-info"></i>
-                                        </div>
-                                        <h5 class="card-title">Groupement d'Intérêt Economique (GIE)</h5>
-                                        <p class="card-text text-muted small">
-                                            Regroupement d'entreprises ou d'organismes pour un projet commun d'intérêt général
-                                        </p>
-                                        <div class="mt-3">
-                                            <span class="badge bg-info">Cliquer pour continuer</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Actions -->
-                    <div class="row mt-4">
-                        <div class="col-12">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <a href="{{ route('index') }}" class="btn btn-light">
-                                    <i class="fas fa-arrow-left me-2"></i>Retour
-                                </a>
-                                <small class="text-muted">Cliquez directement sur un type d'entreprise ci-dessus</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+  <div class="actions-parcours">
+    <a href="{{ route('index') }}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2" aria-hidden="true"></i>Retour à l’accueil</a>
+  </div>
 </div>
 @endsection
-
-<script nonce="{{ $cspNonce ?? '' }}">
-document.addEventListener('DOMContentLoaded', function() {
-    // Animation au survol des cartes
-    const cards = document.querySelectorAll('.card-type-entreprise-link .card');
-    
-    cards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-5px)';
-            this.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-            this.style.boxShadow = 'none';
-        });
-    });
-});
-</script>
-

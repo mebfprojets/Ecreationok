@@ -15,6 +15,8 @@ use App\Models\PieceJointe;
 use App\Models\Valeur;
 use App\Models\Formalite;
 use App\Models\JournalAction;
+use App\Models\ActivitePromoteur;
+use App\Models\EnvoiMail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -675,6 +677,7 @@ public function updatepj_correct(Request $request){
         'lieu_etablissement' => $request->lieu_etablissment,
         'url_local' => $url_local,
     ]);
+    ActivitePromoteur::noter('piece_remplacee', $piecejointe->demande, $piecejointe->libelle());
 
     return redirect()->back()->with('success', 'La pièce « '.str_replace('_', ' ', $piecejointe->type_piece).' » a été remplacée. '
         .'Une fois toutes les corrections faites, renvoyez la demande pour traitement.');
@@ -816,6 +819,7 @@ public function laodpiecejointe(Request $request){
             $file_url= $request['piece_jointe_u']->storeAs($emplacement, $fileName);
             $url_local=$usager->id.'/'.$fileName;
            
+            ActivitePromoteur::noter('piece_remplacee', $piecejointe->demande, \App\Models\PieceJointe::libelleType($type_doc));
             $pj= $piecejointe->update([
                 'type_piece'=> $type_doc,
                 'url'=> $file_url,
@@ -943,7 +947,10 @@ public function laodpiecejointe(Request $request){
             }
             $demandes=Demande::where('usager_id', $usager->id)->orderby('created_at','desc')->get();
             $c=count($demandes);
-            return view('demande.liste', compact('demandes','c'));
+            // Nom lisible du CEFORE (« CEFORE BOBO-DIOULASSO ») plutôt que son code
+            $nomsCefore = DB::table('organisations')->whereIn('CodeOrganisation', $demandes->pluck('organisation_code')->filter()->unique())
+                ->pluck('Ville', 'CodeOrganisation');
+            return view('demande.liste', compact('demandes','c','nomsCefore'));
         }
 
         public function detail($id)
@@ -952,6 +959,10 @@ public function laodpiecejointe(Request $request){
             
             $demandes=Demande::where('id', $id)->first();
             $this->autoriserDemande($demandes);
+            // Le promoteur consulte son dossier : les nouveautés (validation, rejet...) de cette demande sont vues
+            if (!$this->estAgent(Auth::user())) {
+                JournalAction::marquerVuesPourDemande($demandes);
+            }
             $usager=Usager::where('id', $demandes->usager_id)->first();
            $activites= DB::table('activites')->where('Code', $demandes->primary_activity)->first();
            $forme_juridiques= DB::table('forme_juridiques')->where('code', $demandes->forme_juridique)->first();
@@ -1087,6 +1098,9 @@ public function laodpiecejointe(Request $request){
 
             $demande->update();
             JournalAction::noter('demande_corrigee', $demande);
+            if (!$this->estAgent(Auth::user())) {
+                ActivitePromoteur::noter('demande_modifiee', $demande);
+            }
             return redirect()->back()->with('success', $demande->estRejetee()
                 ? 'Les informations de l’entreprise ont été corrigées. Une fois toutes les corrections faites, renvoyez la demande pour traitement.'
                 : 'Les informations de l’entreprise ont été mises à jour.');
@@ -1119,6 +1133,9 @@ public function laodpiecejointe(Request $request){
             // La page détail côté agents indique la demande consultée
             $demandeConcernee = Demande::where('id', (int) $request->demande)->where('usager_id', $usager->id)->first();
             JournalAction::noter('dirigeant_corrige', $demandeConcernee);
+            if (!$this->estAgent(Auth::user())) {
+                ActivitePromoteur::noter('dirigeant_modifie', $demandeConcernee);
+            }
             return redirect()->back()->with('success', 'Les informations du dirigeant ont été mises à jour.');
         }
 
@@ -1132,25 +1149,124 @@ public function laodpiecejointe(Request $request){
             return $requete;
         }
 
-        /** Compteurs des cases du tableau de bord, calculés en base (COUNT) et non en chargeant les demandes. */
-        private function compteursDemandes(): array
+        /**
+         * Période choisie sur le tableau de bord (?du=AAAA-MM-JJ&au=AAAA-MM-JJ, bornes incluses ; sans date : toute la période).
+         * Une date invalide est ignorée et signalée, plutôt que de renvoyer vers la page (ce qui bouclerait sur un lien erroné).
+         */
+        private function periodeTableau(Request $request): array
         {
+            $lire = function ($valeur) {
+                $date = is_string($valeur) ? \DateTime::createFromFormat('!Y-m-d', $valeur) : false;
+                return $date && $date->format('Y-m-d') === $valeur ? $valeur : null;
+            };
+            $du = $lire($request->query('du'));
+            $au = $lire($request->query('au'));
+            $erreur = ($request->filled('du') && !$du) || ($request->filled('au') && !$au)
+                ? 'Une date de la période n’est pas valide : elle a été ignorée.' : null;
+            if ($du && $au && $du > $au) {
+                [$du, $au] = [$au, $du];
+            }
+            $format = fn ($date) => \Carbon\Carbon::parse($date)->format('d/m/Y');
+            $libelle = $du && $au ? ($du === $au ? 'Le '.$format($du) : 'Du '.$format($du).' au '.$format($au))
+                : ($du ? 'Depuis le '.$format($du) : ($au ? 'Jusqu’au '.$format($au) : 'Toute la période'));
+
+            return ['du' => $du, 'au' => $au, 'active' => $du || $au, 'libelle' => $libelle, 'erreur' => $erreur];
+        }
+
+        /** Limite une requête à la période (format ISO avec « T » : interprété de la même façon quelle que soit la langue de SQL Server). */
+        private function dansPeriode($requete, ?array $periode, string $colonne = 'created_at')
+        {
+            return $requete
+                ->when($periode['du'] ?? null, fn ($q, $du) => $q->where($colonne, '>=', $du.'T00:00:00'))
+                ->when($periode['au'] ?? null, fn ($q, $au) => $q->where($colonne, '<', \Carbon\Carbon::parse($au)->addDay()->format('Y-m-d').'T00:00:00'));
+        }
+
+        /** Compteurs des cases du tableau de bord, calculés en base (COUNT) et non en chargeant les demandes ; limités aux demandes créées sur la période. */
+        private function compteursDemandes(?array $periode = null): array
+        {
+            $demandes = fn () => $this->dansPeriode($this->demandesVisibles(), $periode);
             return [
-                'nbr' => $this->demandesVisibles()->whereNotNull('etat')->count(),
-                'nbr_paye' => $this->demandesVisibles()->where('paye', 1)->count(),
-                'nbr_nonpaye' => $this->demandesVisibles()->where('paye', 0)->count(),
-                'nbr_rejet' => $this->demandesVisibles()->where('etat', 2)->count(),
-                'nbr_a_valider' => $this->demandesVisibles()->where('paye', 1)->where('etat', 0)->count(),
-                'nbr_validees' => $this->demandesVisibles()->where('etat', 1)->count(),
+                'nbr' => $demandes()->whereNotNull('etat')->count(),
+                'nbr_paye' => $demandes()->where('paye', 1)->count(),
+                'nbr_nonpaye' => $demandes()->where('paye', 0)->count(),
+                'nbr_rejet' => $demandes()->where('etat', 2)->count(),
+                'nbr_a_valider' => $demandes()->where('paye', 1)->where('etat', 0)->count(),
+                'nbr_validees' => $demandes()->where('etat', 1)->count(),
             ];
         }
 
-        public function index_admin(){
+        /**
+         * Indicateurs du tableau de bord, par CEFORE (une seule requête groupée, limitée aux CEFORE visibles par l'agent).
+         * Étapes après validation : attente RCCM -> attente des partenaires (IFU, CNSS, et CPC s'il a été demandé) -> traitée.
+         */
+        private function indicateursParCefore(?array $periode = null)
+        {
+            $vide = fn ($colonne) => "ISNULL(CAST($colonne AS NVARCHAR(255)), '') = ''";
+            $rempli = fn ($colonne) => "ISNULL(CAST($colonne AS NVARCHAR(255)), '') <> ''";
+            $cpcEnAttente = "(ISNULL(CAST(avecCPC AS NVARCHAR(10)), '0') = '1' AND ".$vide('CPC').")";
+            $partenairesEnAttente = '('.$vide('IFU').' OR '.$vide('CNSS').' OR '.$cpcEnAttente.')';
+            $somme = fn ($condition, $alias) => DB::raw("SUM(CASE WHEN $condition THEN 1 ELSE 0 END) AS $alias");
+
+            return $this->dansPeriode($this->demandesVisibles(), $periode)->whereNotNull('etat')
+                ->groupBy('organisation_code')->orderBy('organisation_code')
+                ->get([
+                    'organisation_code',
+                    DB::raw('COUNT(*) AS total'),
+                    $somme("company_type = 'EI'", 'physique'),
+                    $somme("ISNULL(company_type, '') <> 'EI'", 'morale'),
+                    $somme('paye <> 1', 'attente_paiement'),
+                    $somme('paye = 1', 'payees'),
+                    $somme('paye = 1 AND etat = 0', 'a_valider'),
+                    $somme('etat = 2', 'rejetees'),
+                    $somme('etat = 1', 'validees'),
+                    $somme('etat = 1 AND '.$vide('RCCM'), 'attente_rccm'),
+                    $somme('etat = 1 AND '.$rempli('RCCM').' AND '.$partenairesEnAttente, 'attente_partenaires'),
+                    $somme('etat = 1 AND '.$rempli('RCCM').' AND NOT '.$partenairesEnAttente, 'traitees'),
+                ]);
+        }
+
+        /**
+         * Validations et rejets par agent (journal des actions) sur la période, avec leur CEFORE.
+         * Le siège voit tous les agents ; un agent de CEFORE voit ceux de son CEFORE.
+         */
+        private function statistiquesAgents(?array $periode = null)
+        {
+            $lignes = $this->dansPeriode(JournalAction::whereIn('action', ['validation', 'rejet']), $periode)
+                ->when(!$this->estAgentSiege(Auth::user()), fn ($q) => $q->where('organisation', Auth::user()->organisation))
+                ->groupBy('user_id', 'organisation')
+                ->get([
+                    'user_id', 'organisation',
+                    DB::raw("SUM(CASE WHEN action = 'validation' THEN 1 ELSE 0 END) AS validations"),
+                    DB::raw("SUM(CASE WHEN action = 'rejet' THEN 1 ELSE 0 END) AS rejets"),
+                    DB::raw('MAX(created_at) AS derniere_action'),
+                ]);
+            $agents = User::whereIn('id', $lignes->pluck('user_id')->filter())->get(['id', 'name', 'prenom'])->keyBy('id');
+
+            return $lignes->map(function ($l) use ($agents) {
+                $agent = $agents->get($l->user_id);
+                $total = (int) $l->validations + (int) $l->rejets;
+                return (object) [
+                    'nom' => $agent ? trim($agent->name) : 'Compte supprimé',
+                    'prenom' => $agent ? trim((string) $agent->prenom) : '',
+                    'organisation' => $l->organisation,
+                    'validations' => (int) $l->validations,
+                    'rejets' => (int) $l->rejets,
+                    'total' => $total,
+                    'taux_rejet' => $total ? round($l->rejets * 100 / $total) : 0,
+                    'derniere_action' => $l->derniere_action ? \Carbon\Carbon::parse($l->derniere_action) : null,
+                ];
+            })->sortByDesc('total')->values();
+        }
+
+        public function index_admin(Request $request){
             if (!Auth::user()->can('lister.demande')) {
                 return $this->refuserAcces();
             }
+            // Période choisie : s'applique à tous les blocs (demandes créées, décisions et actions des agents)
+            $periode = $this->periodeTableau($request);
+
             // Les 50 dernières actions des agents (validations, rejets, corrections...), limitées au CEFORE de l'agent
-            $actions = JournalAction::with([
+            $actions = $this->dansPeriode(JournalAction::query(), $periode, 'journal_actions.created_at')->with([
                     'agent:id,name,prenom,organisation',
                     'demande:id,numero_demande,commercial_name,denomination_social,organisation_code',
                 ])
@@ -1166,7 +1282,15 @@ public function laodpiecejointe(Request $request){
                 ->get();
             $siege = $this->estAgentSiege(Auth::user());
 
-            return view('backend.adminlte.dashboard', array_merge($this->compteursDemandes(), compact('actions', 'siege')));
+            $parCefore = $this->indicateursParCefore($periode);
+            $colonnes = ['total', 'physique', 'morale', 'attente_paiement', 'payees', 'a_valider', 'rejetees', 'validees', 'attente_rccm', 'attente_partenaires', 'traitees'];
+            $totaux = collect($colonnes)->mapWithKeys(fn ($c) => [$c => (int) $parCefore->sum($c)])->all();
+            $nomsCefore = DB::table('organisations')->pluck('Ville', 'CodeOrganisation');
+
+            $statsAgents = $this->statistiquesAgents($periode);
+
+            return view('backend.adminlte.dashboard', array_merge($this->compteursDemandes($periode),
+                compact('actions', 'siege', 'parCefore', 'totaux', 'nomsCefore', 'statsAgents', 'periode')));
         }
 
         public function all(){
@@ -1184,7 +1308,7 @@ public function laodpiecejointe(Request $request){
                 abort(403);
             }
             $colonnes = [0 => 'numero_demande', 1 => 'legal_rep_name', 2 => 'paye', 3 => 'commercial_name', 4 => 'denomination_social',
-                5 => 'sigle', 7 => 'created_at', 8 => 'primary_activity', 10 => 'organisation_code', 11 => 'date_paiement'];
+                5 => 'sigle', 6 => 'created_at', 7 => 'primary_activity', 9 => 'organisation_code', 10 => 'date_paiement'];
 
             $base = $this->demandesVisibles()->whereNotNull('etat');
             $total = (clone $base)->count();
@@ -1200,7 +1324,7 @@ public function laodpiecejointe(Request $request){
             }
             $filtre = (clone $base)->count();
 
-            $tri = $colonnes[(int) data_get($request->input('order'), '0.column', 7)] ?? 'created_at';
+            $tri = $colonnes[(int) data_get($request->input('order'), '0.column', 6)] ?? 'created_at';
             $sens = data_get($request->input('order'), '0.dir') === 'asc' ? 'asc' : 'desc';
             $longueur = max(1, min(100, (int) $request->input('length', 25)));
             $debut = max(0, (int) $request->input('start', 0));
@@ -1217,12 +1341,13 @@ public function laodpiecejointe(Request $request){
                         e($d->commercial_name),
                         e($d->denomination_social),
                         e($d->sigle),
-                        '<a href="'.e(route('detail.demande', $d->id)).'" class="btn btn-sm btn-primary" title="Afficher le détail"><i class="fa fa-eye" aria-hidden="true"></i><span class="visually-hidden">Détail</span></a>',
                         $date($d->created_at),
                         e($d->primary_activity),
                         e(\Illuminate\Support\Str::limit((string) $d->objet_social, 80)),
                         e($d->organisation_code),
                         $date($d->date_paiement),
+                        // La ligne entière ouvre le détail de la demande
+                        'DT_RowAttr' => ['data-href' => route('detail.demande', $d->id), 'tabindex' => 0, 'title' => 'Ouvrir le détail de la demande'],
                     ];
                 });
 
@@ -1369,6 +1494,8 @@ public function laodpiecejointe(Request $request){
             }
             $historique = $historique->filter(fn ($e) => $e['date'])->sortByDesc(fn ($e) => $e['date']->timestamp)->values();
 
+            [$parcoursPromoteur, $connexions, $resumeConnexions, $emailsEnvoyes] = $this->activitePromoteur($demandes, $usager);
+
             // Statut lisible et possibilité de décider
             $renvoyee = $historique->first(fn ($e) => in_array($e['type'], ['rejet', 'renvoi'], true));
             $statut = match (true) {
@@ -1387,9 +1514,87 @@ public function laodpiecejointe(Request $request){
                 'secteurs', 'terrains', 'region_usager', 'province_usager', 'commune_usager', 'arrondissement_usager', 'secteur_usager',
                 'nationalites', 'civilites', 'pays', 'professions', 'FJ_EI', 'FJ_ES', 'FJ_GIE', 'activites_all', 'usage_terrains',
                 'typepieceformaliteretours', 'cefore_code', 'piecejointes', 'premierePiece', 'autresDemandes', 'validateur', 'historique', 'statut',
-                'peutTraiter', 'peutCorriger'
+                'peutTraiter', 'peutCorriger', 'parcoursPromoteur', 'connexions', 'resumeConnexions', 'emailsEnvoyes'
             ));
         }
+
+    /**
+     * Activité du promoteur sur cette demande, du plus récent au plus ancien :
+     * parcours reconstitué à partir des tables (compte, fiche promoteur, pièces, demande, paiements, renvois)
+     * et modifications enregistrées ; puis l'historique des connexions de son compte et des e-mails qui lui ont été envoyés.
+     */
+    private function activitePromoteur(Demande $demande, Usager $usager): array
+    {
+        $parcours = collect();
+        $ajouter = function ($date, $titre, $icone, $detail = null) use ($parcours) {
+            if ($date) {
+                $parcours->push(['date' => \Carbon\Carbon::parse($date), 'titre' => $titre, 'icone' => $icone, 'detail' => $detail]);
+            }
+        };
+
+        $compte = DB::table('users')->where('id', $usager->user_id)->first(['id', 'email', 'created_at', 'email_verified_at']);
+        if ($compte) {
+            $ajouter($compte->created_at, 'Compte e-Création créé', 'fa-user-plus text-success', $compte->email);
+            $ajouter($compte->email_verified_at, 'Adresse e-mail vérifiée par code', 'fa-envelope-open-text text-success');
+        }
+        $ajouter($usager->created_at, 'Fiche promoteur enregistrée', 'fa-id-card text-success', trim($usager->Prenom.' '.$usager->NomRaisonSociale));
+        foreach (PieceJointe::where('demande_id', $demande->id)->get(['type_piece', 'created_at']) as $piece) {
+            $ajouter($piece->created_at, 'Pièce jointe déposée', 'fa-paperclip text-secondary', PieceJointe::libelleType($piece->type_piece));
+        }
+        $ajouter($demande->created_at, 'Demande de création enregistrée', 'fa-file-alt text-success', $demande->numero_demande);
+
+        // Paiements : chaque tentative (numero_demande = numéro de commande, parfois suivi d'un suffixe)
+        if ($demande->numero_command) {
+            $paiements = DB::table('paiements')->where('numero_demande', 'like', str_replace(['[', '%', '_'], ['[[]', '[%]', '[_]'], $demande->numero_command).'%')
+                ->orderBy('created_at')->get(['statut', 'mode_paiement', 'created_at']);
+            foreach ($paiements as $paiement) {
+                $mode = strtoupper((string) $paiement->mode_paiement);
+                $moyen = str_contains($mode, 'OM') || str_contains($mode, 'ORANGE') ? 'Orange Money'
+                    : (str_contains($mode, 'MOBICASH') || str_contains($mode, 'MOOV') ? 'Moov Money' : ($paiement->mode_paiement ?: 'paiement mobile'));
+                (string) $paiement->statut === '200'
+                    ? $ajouter($paiement->created_at, 'Paiement réussi ('.$moyen.')', 'fa-check-circle text-success')
+                    : $ajouter($paiement->created_at, 'Tentative de paiement échouée ('.$moyen.')', 'fa-times-circle text-danger', 'Code retourné par l’opérateur : '.$paiement->statut);
+            }
+        }
+        foreach (Historique::where('id_demande', $demande->id)->where('motif', 'Envoyer Pour Traitement')->get(['created_at']) as $renvoi) {
+            $ajouter($renvoi->created_at, 'Demande corrigée et renvoyée au CEFORE', 'fa-paper-plane text-primary');
+        }
+
+        $activites = $compte ? ActivitePromoteur::where('user_id', $compte->id)->orderBy('created_at', 'desc')->orderBy('id', 'desc')->limit(300)->get() : collect();
+        foreach ($activites->whereNotIn('action', ActivitePromoteur::CONNEXIONS) as $activite) {
+            if ($activite->demande_id === null || (int) $activite->demande_id === (int) $demande->id) {
+                $ajouter($activite->created_at, $activite->libelle(), $activite->icone(), $activite->detail);
+            }
+        }
+        $parcours = $parcours->sortByDesc(fn ($e) => $e['date']->timestamp)->values();
+
+        // Connexions : les 30 dernières, et un résumé
+        $connexions = $activites->whereIn('action', ActivitePromoteur::CONNEXIONS)->take(30)->values();
+        $tout = $compte ? ActivitePromoteur::where('user_id', $compte->id)->whereIn('action', ['connexion', 'connexion_echouee']) : null;
+        $derniereSession = $compte ? DB::table('sessions')->where('user_id', $compte->id)->max('last_activity') : null;
+        $resume = [
+            'connexions' => $tout ? (clone $tout)->where('action', 'connexion')->count() : 0,
+            'echecs_30_jours' => $tout ? (clone $tout)->where('action', 'connexion_echouee')
+                ->where('created_at', '>=', now()->subDays(30)->format('Y-m-d').'T00:00:00')->count() : 0,
+            'derniere_connexion' => optional($activites->firstWhere('action', 'connexion'))->created_at,
+            'derniere_activite' => $derniereSession ? \Carbon\Carbon::createFromTimestamp($derniereSession) : null,
+            'suivi_depuis' => optional(ActivitePromoteur::orderBy('id')->first(['created_at']))->created_at,
+        ];
+
+        // E-mails : ceux de cette demande (décisions du CEFORE) et ceux du compte (code d'inscription, mot de passe)
+        $emails = EnvoiMail::with('declencheur:id,name,prenom,isadmin')
+            ->where(function ($q) use ($demande, $compte) {
+                $q->where('demande_id', $demande->id);
+                if ($compte && $compte->email) {
+                    $q->orWhere(fn ($w) => $w->whereNull('demande_id')->where('destinataire', mb_strtolower(trim($compte->email))));
+                }
+            })
+            ->orderBy('created_at', 'desc')->orderBy('id', 'desc')->limit(50)->get();
+        $resume['emails_echec'] = $emails->where('statut', 'echec')->count();
+        $resume['emails_depuis'] = optional(EnvoiMail::orderBy('id')->first(['created_at']))->created_at;
+
+        return [$parcours, $connexions, $resume, $emails];
+    }
 
     public function add_formalite_retour(Request $request){
         return $this->enregistrerFormaliteRetour($request);
@@ -1564,17 +1769,21 @@ public function show_formalite_retour(Formalite $formalite){
      * Envoie au promoteur l'e-mail de décision. La décision est déjà enregistrée : un échec d'envoi
      * ne doit pas l'annuler, il est seulement signalé à l'agent (et écrit dans le journal).
      */
-    private function prevenirPromoteur(\Illuminate\Mail\Mailable $mail, ?Usager $usager): bool
+    private function prevenirPromoteur(\App\Mail\NotificationDemande $mail, ?Usager $usager): bool
     {
+        // Chaque tentative est enregistrée dans l'historique des e-mails (onglet « E-mails » de la page de traitement)
         $email = $usager ? User::where('id', $usager->user_id)->value('email') : null;
         if (!$email) {
+            EnvoiMail::noter($mail::TYPE_ENVOI, null, $mail->objet(), null, $mail->demande, 'Aucune adresse e-mail n’est associée au compte du promoteur.');
             return false;
         }
         try {
             Mail::to($email)->send($mail);
+            EnvoiMail::noter($mail::TYPE_ENVOI, $email, $mail->objet(), null, $mail->demande);
             return true;
         } catch (\Throwable $e) {
             report($e);
+            EnvoiMail::noter($mail::TYPE_ENVOI, $email, $mail->objet(), $e, $mail->demande);
             return false;
         }
     }
@@ -2476,14 +2685,13 @@ public function show_formalite_retour(Formalite $formalite){
         
         public function typeEntreprise(Request $request){
             $usager = Usager::where('user_id', Auth::user()->id)->first();
-            $demande=Demande::where('usager_id', $usager->id)->first();
-            $typeDemande='';
-            if($demande){
-                $typeDemande=$demande->company_type;
+            if (!$usager) {
+                return redirect()->route('create.usager');
             }
-            
-            return view('demande.type', compact('usager', 'typeDemande'));
-            
+            // Un promoteur ne peut avoir qu'une seule entreprise individuelle
+            $aDejaUneEI = Demande::where('usager_id', $usager->id)->where('company_type', 'EI')->exists();
+
+            return view('demande.type', compact('usager', 'aDejaUneEI'));
         }
     
         public function processTypeEntreprise($type)

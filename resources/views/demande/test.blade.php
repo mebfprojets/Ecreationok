@@ -45,6 +45,9 @@
                     </div> <!-- container-fluid -->
                 
 @endsection
+
+{{-- Fenêtres modales : dans la section prévue par le gabarit (rien ne doit être écrit avant le <!DOCTYPE>) --}}
+@section('modal_parpage')
 <div id='updatepiecejointe'class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg ">
         <div class="modal-content">
@@ -405,6 +408,8 @@
     </div>
 </div>
 
+@endsection
+
 <!-- Pour script -->
 @section('additionnel_script')
 <script type="javascript/text" src="{{ asset('backend/loaddata.js') }}"></script>
@@ -519,6 +524,34 @@ $(document).on("click", ".statut", function(){
 });
 </script>
 <script nonce="{{ $cspNonce ?? '' }}">
+/*
+ * Étape 1 : les pièces obligatoires doivent avoir été déposées (champs .piece_* du formulaire, remplis par le serveur).
+ * Retourne true si tout est là ; sinon affiche la liste des pièces manquantes dans le formulaire et retourne false.
+ */
+function piecesEtape1Completes(form, pieces) {
+    var manquantes = [];
+    $.each(pieces, function (selecteur, libelle) {
+        if (!form.find(selecteur).val()) { manquantes.push(libelle); }
+    });
+    var alerte = form.find('[data-pieces-manquantes]');
+    if (!manquantes.length) {
+        alerte.addClass('d-none').empty();
+        return true;
+    }
+    var liste = $('<ul class="mb-2 mt-1"></ul>');
+    $.each(manquantes, function (i, libelle) { liste.append($('<li></li>').text(libelle)); });
+    alerte.empty()
+        .append($('<strong></strong>').text(manquantes.length > 1
+            ? 'Avant de continuer, déposez les ' + manquantes.length + ' pièces obligatoires suivantes :'
+            : 'Avant de continuer, déposez la pièce obligatoire suivante :'))
+        .append(liste)
+        .append($('<a class="btn btn-sm btn-danger"></a>').attr('href', alerte.data('lien-pieces')).text('Déposer les pièces'))
+        .removeClass('d-none');
+    alerte[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return false;
+}
+</script>
+<script nonce="{{ $cspNonce ?? '' }}">
 $( document ).ready(function() {
 var form = $(".form_individuel");
 form.validate({
@@ -535,43 +568,20 @@ form.children("div").steps({
     transitionEffect: "slideLeft",
     onStepChanging: function (event, currentIndex, newIndex)
     {
-        form.validate().settings.ignore = ":disabled,:hidden";
-        if( !$('.piece_declaration').val() || !$('.piece_cpc').val() || !$('.piece_identite').val() || !$('.piece_certificat').val()
-        || !$('.piece_photo').val() || !$('.piece_propriete').val()) {
-        //alert('completez');
-        $('.alerte_piece').show();
-        // console.log($('.piece_photo').val());
-        // alert('photo');
-        return form.invalid();
+        // Revenir à une étape précédente est toujours permis
+        if (newIndex < currentIndex) {
+            return true;
         }
-       else{
-        $('.alerte_piece').hide();
-        return form.valid();
-       }
-
-        //  if(!$('.piece_photo').val()) {
-        //     $('.alerte_piece').show();
-        //  console.log($('.piece_photo').val());
-        //  alert('photo');
-        //  }
-        //  else{
-        //  $('.alerte_piece').hide();
-        //  return form.valid();
-        // }
-
-
-        // if(!$('.piece_cpc').val()){
-        // alert('completez cpc');
-        // return form.invalid();
-        // }   
-        
-        // if(!$('.piece_photo').val()){
-        // $('.piece_photo').show();
-        // //alert('completez cpc');
-        // return form.invalid();
-        // }  
-        
-        //return form.valid();
+        form.validate().settings.ignore = ":disabled,:hidden";
+        var pieces = @json(collect(\App\Models\PieceJointe::piecesADeposer('ei'))->map(fn ($p) => $p[0]));
+        return piecesEtape1Completes(form, {
+            '.piece_declaration': pieces.declaration,
+            '.piece_certificat': pieces.certificat_de_residence,
+            '.piece_cpc': pieces.formulaire_dem_cpc,
+            '.piece_photo': pieces.photo_didentite,
+            '.piece_identite': pieces.piece_didentite,
+            '.piece_propriete': pieces.titre_de_propriete
+        }) && form.valid();
     },
     onFinishing: function (event, currentIndex)
     {
@@ -603,20 +613,20 @@ form.children("div").steps({
     transitionEffect: "slideLeft",
     onStepChanging: function (event, currentIndex, newIndex)
     {
-        form.validate().settings.ignore = ":disabled,:hidden";
-        if( !$('.piece_declaration').val() || !$('.piece_acte_depot').val() || !$('.piece_statut').val()
-        || !$('.piece_rccm').val() || !$('.piece_identite').val() || !$('.piece_propriete').val()) {
-        //alert('completez');
-        $('.alerte_piece_pm').show();
-        // console.log($('.piece_photo').val());
-        // alert('photo');
-        return form.invalid();
+        // Revenir à une étape précédente est toujours permis
+        if (newIndex < currentIndex) {
+            return true;
         }
-       else{
-        $('.alerte_piece').hide();
-        return form.valid();
-       }
-        //return form.valid();
+        form.validate().settings.ignore = ":disabled,:hidden";
+        var pieces = @json(collect(\App\Models\PieceJointe::piecesADeposer('es'))->map(fn ($p) => $p[0]));
+        return piecesEtape1Completes(form, {
+            '.piece_declaration': pieces.declaration,
+            '.piece_acte_depot': pieces.acte_de_depot,
+            '.piece_statut': pieces.statut,
+            '.piece_rccm': pieces.formulaire_rccm,
+            '.piece_identite': pieces.piece_didentite,
+            '.piece_propriete': pieces.titre_de_propriete
+        }) && form.valid();
     },
     onFinishing: function (event, currentIndex)
     {
@@ -859,11 +869,5 @@ $(document).ready(function()
             $('.chiffre_pp').hide();
         }
     }
-</script>
-<script nonce="{{ $cspNonce ?? '' }}">
-    // Ajouter la classe à vos inputs
-inputs.forEach(input => {
-    input.classList.add('uppercase-input');
-});
 </script>
 @endsection

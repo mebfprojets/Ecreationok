@@ -22,7 +22,6 @@
                     <th>Date Création</th>
                     <th>Date Paiement</th>
                     <th>Date Validation</th>                 
-                    <th>Actions</th> 
                     <th>Valider Par</th>                                      
                     <th>Objet Social</th>
                     <th>CEFORE</th>
@@ -40,7 +39,7 @@
                         $user= CompteUsager($demande->User_ayant_valide);
                         $hasUserValidate = !is_null($user);
                         @endphp
-                  <tr class="{{ $has_motif ? 'table-warning' : '' }}">
+                  <tr class="{{ $has_motif ? 'table-warning' : '' }}" data-href="{{ route('detail.demande', $demande->id) }}" tabindex="0" title="Ouvrir le détail de la demande">
                     <td>{{$i}}</td>
                     <td>{{$demande->numero_demande}}</td>
                     <td>{{$demande->legal_rep_name}}</td>
@@ -51,7 +50,6 @@
                     <td> @if($demande->Date_etat_validation)
                       {{date("d-m-Y à H:i", strtotime($demande->Date_etat_validation))}}
                     @else Aucune Date @endif</td>
-                    <td><a href="{{ route('detail.demande', $demande->id) }}" class="btn btn-sm btn-success" style="background:#3393FF" title="Afficher les détais"> <i class="fa fa-eye"></i></a></td>
                     <td>@if($hasUserValidate)
                         {{$user['prenom']}} {{$user['name']}}
                      
@@ -73,7 +71,6 @@
                     <th>Date Création</th>
                     <th>Date Paiement</th>
                     <th>Date Validation</th>                              
-                    <th>Actions</th>      
                     <th>Valider Par</th>              
                     <th>Objet Social</th>
                     <th>CEFORE</th>

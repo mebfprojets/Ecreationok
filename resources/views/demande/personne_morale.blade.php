@@ -42,95 +42,10 @@
                                                         </div>
                                                         </div>
                                                         <div class="col-12">
-                                                                <center><h5 class="font-size-14 mb-3">Informations du Promoteur Lié au Compte Utilisateur</h5></center>
-                                                                <div class="card">
-                                                                    <div class="card-body">
-                                                                        <div class="row">
-                                                                            <div class="col-md-6">
-                                                                                <div class="form-group">
-                                                                                    <label class="form-label"><strong>Nom</strong></label>
-                                                                                    <p class="form-control-static">{{ $usager->NomRaisonSociale ?? 'Non renseigné' }}</p>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <div class="form-group">
-                                                                                    <label class="form-label"><strong>Prénom</strong></label>
-                                                                                    <p class="form-control-static">{{ $usager->Prenom ?? 'Non renseigné' }}</p>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        
-                                                                        <div class="row">
-                                                                            <div class="col-md-4">
-                                                                                <div class="form-group">
-                                                                                    <label class="form-label"><strong>Date de Naissance</strong></label>
-                                                                                    <p class="form-control-static">{{ $usager->DateNaissance ?? 'Non renseigné' }}</p>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="col-md-4">
-                                                                                <div class="form-group">
-                                                                                    <label class="form-label"><strong>Lieu de Naissance</strong></label>
-                                                                                    <p class="form-control-static">{{ $usager->LieuNaissance ?? 'Non renseigné' }}</p>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="col-md-4">
-                                                                                <div class="form-group">
-                                                                                    <label class="form-label"><strong>N° Pièce Identité</strong></label>
-                                                                                    <p class="form-control-static">{{ $usager->CIN ?? 'Non renseigné' }}</p>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        
-                                                                        <div class="row">
-                                                                            <div class="col-md-4">
-                                                                                <div class="form-group">
-                                                                                    <label class="form-label"><strong>Mobile 1</strong></label>
-                                                                                    <p class="form-control-static">{{ $usager->Phone_No_ ?? 'Non renseigné' }}</p>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="col-md-4">
-                                                                                <div class="form-group">
-                                                                                    <label class="form-label"><strong>Mobile 2</strong></label>
-                                                                                    <p class="form-control-static">{{ $usager->Tel_Bureau ?? 'Non renseigné' }}</p>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="col-md-4">
-                                                                                <div class="form-group">
-                                                                                    <label class="form-label"><strong>Email</strong></label>
-                                                                                    <p class="form-control-static">{{ $usager->{'E-Mail'} ?? 'Non renseigné' }}</p>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        
-                                                                        <div class="row">
-                                                                            <div class="col-md-6">
-                                                                                <div class="form-group">
-                                                                                    <label class="form-label"><strong>Adresse</strong></label>
-                                                                                    <p class="form-control-static">
-                                                                                        {{ getvaleur('regions',$usager->Region_Code) ?? 'Non renseigné' }} - 
-                                                                                        {{ getvaleur('provinces',$usager->Province_Code) ?? 'Non renseigné' }} - 
-                                                                                        {{ getvaleur('commune_departements',$usager->Commun_Departement_Code) ?? 'Non renseigné' }} -
-                                                                                        {{ getvaleur('secteur_villages',$usager->Code_Secteur_Village) ?? 'Non renseigné' }}
-                                                                                    </p>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="col-md-3">
-                                                                                <div class="form-group">
-                                                                                    <label class="form-label"><strong>Créé le</strong></label>
-                                                                                    <p class="form-control-static">{{ $usager->created_at ? $usager->created_at->format('d/m/Y H:i') : 'Non renseigné' }}</p>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="col-md-3">
-                                                                                <div class="form-group">
-                                                                                    <label class="form-label"><strong>Modifié le</strong></label>
-                                                                                    <p class="form-control-static">{{ $usager->updated_at ? $usager->updated_at->format('d/m/Y H:i') : 'Non renseigné' }}</p>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div style="display: none">
+                                                            @include('demande.partials.promoteur', ['variante' => 'fiche'])
+                                                            <div class="alert alert-danger d-none text-start" role="alert" data-pieces-manquantes data-lien-pieces="{{ route('process.type.entreprise', in_array($type_dem ?? null, ['es', 'gie'], true) ? $type_dem : 'es') }}"></div>
+                                                        </div>
+                                                        <div style="display: none">
                                                             <center><div class="alert-warning alerte_piece_pm" style="color:red; display:none;">
                                                                 <p>Veuillez renseigner les pièces obligatoires</p>
                                                             </div>

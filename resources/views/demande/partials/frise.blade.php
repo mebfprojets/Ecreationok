@@ -1,7 +1,7 @@
 {{-- Frise de suivi d'une demande. Paramètre : $demande --}}
 @php
     $suivi = $demande->suivi();
-    $etapes = [1 => 'Dépôt', 2 => 'Paiement', 3 => 'Examen CEFORE', 4 => 'Validation & retrait'];
+    $etapes = [1 => 'Dépôt', 2 => 'Paiement', 3 => 'Examen CEFORE', 4 => 'Traitement', 5 => 'Retrait'];
 @endphp
 <ol class="ed-frise" aria-label="Suivi de la demande">
     @foreach ($etapes as $numero => $libelle)
@@ -9,7 +9,7 @@
             if ($numero < $suivi['etape']) {
                 $classe = 'fait';
             } elseif ($numero == $suivi['etape']) {
-                $classe = $suivi['erreur'] ? 'erreur' : ($numero == 4 ? 'fait' : 'encours');
+                $classe = $suivi['erreur'] ? 'erreur' : ($numero == count($etapes) ? 'fait' : 'encours');
             } else {
                 $classe = '';
             }

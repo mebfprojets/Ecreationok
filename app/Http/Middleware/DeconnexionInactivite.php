@@ -36,6 +36,8 @@ class DeconnexionInactivite
 
     private function deconnecter(Request $request, int $minutes)
     {
+        // Lu par l'écouteur de déconnexion (EventServiceProvider) pour préciser la raison dans l'historique
+        $request->attributes->set('deconnexion_inactivite', $minutes);
         Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

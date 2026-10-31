@@ -33,14 +33,14 @@
     </a>
 
     {{-- En-tête : identité de la demande et suivi --}}
-    <section class="ed-carte">
+    <section class="ed-carte ed-etat-{{ $suivi['couleur'] }}">
         <div class="ed-carte-entete">
             <div>
                 <h1 class="ed-titre h4">{{ $demandes->commercial_name ?: 'Demande sans nom commercial' }}</h1>
                 <div class="ed-meta mt-1">
                     <span><i class="fas fa-hashtag" aria-hidden="true"></i> {{ $demandes->numero_demande }}</span>
                     <span><i class="fas fa-building" aria-hidden="true"></i>
-                        {{ $demandes->company_type == 'EI' ? 'Entreprise individuelle' : 'Entreprise sociétaire' }}</span>
+                        {{ $demandes->request_type === 'G1' ? 'Groupement d’intérêt économique' : ($demandes->company_type == 'EI' ? 'Entreprise individuelle' : 'Entreprise sociétaire') }}</span>
                     <span><i class="fas fa-map-marker-alt" aria-hidden="true"></i> {{ \Illuminate\Support\Str::startsWith(mb_strtoupper((string) $cefore_code), 'CEFORE') ? $cefore_code : 'CEFORE '.$cefore_code }}</span>
                     <span><i class="far fa-calendar-alt" aria-hidden="true"></i>
                         Déposée le {{ optional($demandes->created_at)->format('d/m/Y à H:i') }}</span>
@@ -470,7 +470,7 @@
                     @foreach ($piecejointes as $piecejointe)
                         @php $image = in_array(strtolower((string) $piecejointe->file_extension), ['jpg', 'jpeg', 'png']); @endphp
                         <div class="ed-piece">
-                            <i class="fas {{ $image ? 'fa-file-image text-primary' : 'fa-file-pdf' }} icone" aria-hidden="true"></i>
+                            <i class="fas {{ $image ? 'fa-file-image text-success' : 'fa-file-pdf' }} icone" aria-hidden="true"></i>
                             <span class="nom">{{ $libellePiece($piecejointe->type_piece) }}</span>
                             <a href="{{ route('detaildocument_affiche', $piecejointe->id) }}" class="btn btn-outline-success btn-sm" title="Voir le document">
                                 <i class="fas fa-eye" aria-hidden="true"></i>

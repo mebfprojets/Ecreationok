@@ -23,6 +23,14 @@ abstract class NotificationDemande extends Mailable
         $this->usager = $usager;
     }
 
+    /** Objet de l'e-mail (aussi enregistré dans l'historique des e-mails). */
+    abstract public function objet(): string;
+
+    protected function nomEntreprise(): string
+    {
+        return $this->demande->commercial_name ?: ($this->demande->denomination_social ?: 'votre entreprise');
+    }
+
     /** Données communes aux gabarits HTML et texte. */
     protected function donnees(): array
     {
@@ -30,7 +38,7 @@ abstract class NotificationDemande extends Mailable
 
         return [
             'nomComplet' => trim(mb_convert_case(trim($this->usager->Prenom.' '.$this->usager->NomRaisonSociale), MB_CASE_TITLE)) ?: 'Madame, Monsieur',
-            'entreprise' => $this->demande->commercial_name ?: ($this->demande->denomination_social ?: 'votre entreprise'),
+            'entreprise' => $this->nomEntreprise(),
             'numero' => $this->demande->numero_demande,
             'cefore' => self::nomCefore($ville),
             'date' => now()->format('d/m/Y à H:i'),
