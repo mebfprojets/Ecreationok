@@ -1,6 +1,5 @@
 @extends('backend.adminlte.main')
 @section('title', 'Traitement de la demande')
-@section('demandes', 'menu-open')
 @section('content')
 @php
     $date = fn ($d, $format = 'd/m/Y') => $d ? \Carbon\Carbon::parse($d)->format($format) : null;

@@ -1,11 +1,11 @@
 @extends('backend.adminlte.main')
-@section('title', 'Demandes par statut de paiement')
-@section('demandes', 'menu-open')
-@section('dashboard', 'active')
+@php $aPayer = request('paye') === '0'; @endphp
+@section('title', $aPayer ? 'Demandes à payer' : 'Demandes par statut de paiement')
+@section($aPayer ? 'demande_a_payer' : 'dashboard', 'active')
 @section('content')
 <div class="card">
               <div class="card-header">
-               <strong><h3 class="card-title">Liste des Demandes</h3></strong>
+               <strong><h3 class="card-title">{{ $aPayer ? 'Demandes en attente de paiement' : 'Liste des demandes' }}</h3></strong>
               </div>              
               <!-- /.card-header -->
               <div class="card-body">

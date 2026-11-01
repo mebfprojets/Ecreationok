@@ -1,6 +1,5 @@
 @extends('backend.adminlte.main')
 @section('title', 'En attente des partenaires')
-@section('demandes', 'menu-open')
 @section('liste_partenaire', 'active')
 @section('content')
 <div class="card">

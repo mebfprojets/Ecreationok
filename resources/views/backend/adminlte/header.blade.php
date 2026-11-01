@@ -77,43 +77,55 @@
       <nav class="mt-2" aria-label="Menu principal">
         <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" data-accordion="false">
           @can('lister.demande', Auth::user())
+          @php
+              // Pastille du nombre de demandes (masquée à zéro) ; $compteursMenu : AppServiceProvider
+              $pastille = fn ($cle, $couleur, $libelle) => ($n = $compteursMenu[$cle] ?? 0)
+                  ? '<span class="nav-badge badge text-bg-'.$couleur.' me-3" title="'.e($n.' '.$libelle).'">'.number_format($n, 0, ',', ' ').'</span>' : '';
+          @endphp
           <li class="nav-item">
             <a href="{{ route('dashboard') }}" class="nav-link @yield('dashboard')">
               <i class="nav-icon fas fa-tachometer-alt" aria-hidden="true"></i>
               <p>Tableau de bord</p>
             </a>
           </li>
-          <li class="nav-item @yield('demandes')">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-folder-open" aria-hidden="true"></i>
-              <p>Demandes <i class="nav-arrow fas fa-angle-right" aria-hidden="true"></i></p>
+          <li class="nav-item">
+            <a href="{{ route('statistique') }}" class="nav-link @yield('statistique')">
+              <i class="nav-icon fas fa-chart-bar" aria-hidden="true"></i>
+              <p>Statistiques</p>
             </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="{{ route('list') }}?etat=0" class="nav-link @yield('demande_a_valider')">
-                  <i class="nav-icon fas fa-hourglass-half" aria-hidden="true"></i>
-                  <p>À valider</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ route('list') }}?etat=1" class="nav-link @yield('demande_valider')">
-                  <i class="nav-icon fas fa-check-circle" aria-hidden="true"></i>
-                  <p>Validées</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ route('list.rejet') }}" class="nav-link @yield('liste-rejetee')">
-                  <i class="nav-icon fas fa-times-circle" aria-hidden="true"></i>
-                  <p>Rejetées</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ route('list.en_attente_de_partenaire') }}" class="nav-link @yield('liste_partenaire')">
-                  <i class="nav-icon fas fa-handshake" aria-hidden="true"></i>
-                  <p>En attente des partenaires</p>
-                </a>
-              </li>
-            </ul>
+          </li>
+
+          {{-- Demandes : une entrée par étape du traitement (plus de sous-menu) --}}
+          <li class="nav-header">DEMANDES</li>
+          <li class="nav-item">
+            <a href="{{ route('liste.filtre') }}?paye=0" class="nav-link @yield('demande_a_payer')">
+              <i class="nav-icon fas fa-wallet" aria-hidden="true"></i>
+              <p>À payer {!! $pastille('a_payer', 'secondary', 'demande(s) en attente de paiement') !!}</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{{ route('list') }}?etat=0" class="nav-link @yield('demande_a_valider')">
+              <i class="nav-icon fas fa-hourglass-half" aria-hidden="true"></i>
+              <p>À valider {!! $pastille('a_valider', 'warning', 'demande(s) à valider') !!}</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{{ route('list') }}?etat=1" class="nav-link @yield('demande_valider')">
+              <i class="nav-icon fas fa-check-circle" aria-hidden="true"></i>
+              <p>Validées</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{{ route('list.rejet') }}" class="nav-link @yield('liste-rejetee')">
+              <i class="nav-icon fas fa-times-circle" aria-hidden="true"></i>
+              <p>Rejetées {!! $pastille('rejetees', 'danger', 'demande(s) rejetée(s), en attente de correction') !!}</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{{ route('list.en_attente_de_partenaire') }}" class="nav-link @yield('liste_partenaire')" title="Validées, en attente des partenaires (IFU, CNSS, CPC)">
+              <i class="nav-icon fas fa-handshake" aria-hidden="true"></i>
+              <p>Attente partenaires</p>
+            </a>
           </li>
           <li class="nav-item">
             <a href="{{ route('all.list') }}" class="nav-link @yield('all')">
@@ -121,6 +133,8 @@
               <p>Toutes les demandes</p>
             </a>
           </li>
+
+          <li class="nav-header">PROMOTEURS</li>
           <li class="nav-item">
             <a href="{{ route('promoteur.liste') }}" class="nav-link @yield('promoteur')">
               <i class="nav-icon fas fa-user-tie" aria-hidden="true"></i>
@@ -128,15 +142,9 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="{{ route('user.compte') }}" class="nav-link @yield('compte')">
+            <a href="{{ route('user.compte') }}" class="nav-link @yield('compte')" title="Comptes des promoteurs">
               <i class="nav-icon fas fa-id-card" aria-hidden="true"></i>
-              <p>Comptes des promoteurs</p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="{{ route('statistique') }}" class="nav-link @yield('statistique')">
-              <i class="nav-icon fas fa-chart-bar" aria-hidden="true"></i>
-              <p>Statistiques</p>
+              <p>Comptes</p>
             </a>
           </li>
           @endcan

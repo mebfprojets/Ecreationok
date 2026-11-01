@@ -1795,11 +1795,11 @@ public function show_formalite_retour(Formalite $formalite){
             {
             if(Auth::user()->organisation!="001000"){
                 $statut=$request->paye;
-                $demandes=Demande::where('paye', $statut)->where('organisation_code', Auth::user()->organisation)->get();
+                $demandes=Demande::where('paye', $statut)->where('organisation_code', Auth::user()->organisation)->orderBy('created_at', 'desc')->get();
                 }
             else{
                 $statut=$request->paye;
-                $demandes=Demande::where('paye', $statut)->get();
+                $demandes=Demande::where('paye', $statut)->orderBy('created_at', 'desc')->get();
                 }
             return view('backend.adminlte.liste_demande', compact('demandes'));
         }
