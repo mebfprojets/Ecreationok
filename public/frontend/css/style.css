@@ -2100,7 +2100,8 @@ ul.navbar-nav > li.header-get-a-quote:hover > a:after {
 }
 .accordion-group .card-body {
   padding: 15px 20px;
-  width: 500px;
+  /* Largeur fixe (500px) retirée : elle débordait de l'écran sur téléphone */
+  width: auto;
 }
 .accordion-group .card-body img {
   max-width: 100px;
@@ -3737,3 +3738,196 @@ a.carte-type:hover .carte-type-action { color: #0B4A12; }
 .carte-piece-erreur { margin-top: .6rem; padding: .5rem .7rem; border-radius: 8px; background: #fdecee; color: #9b0f1d; font-size: .85rem; }
 .carte-piece-erreur::before { content: "\f071"; font-family: "Font Awesome 5 Free"; font-weight: 900; margin-right: .4rem; }
 .carte-piece-complement { margin-top: .85rem; padding-top: .85rem; border-top: 1px solid #e3e9e5; }
+
+/* ==========================================================================
+   Page d'accueil : coût des formalités et statistiques de l'année
+   Couleurs du logo MEBF : vert #1B9925 / #13731C / #0B4A12, jaune #FCE400, rouge #C51425
+   ========================================================================== */
+.accueil-bloc { padding: 56px 0; }
+.accueil-entete { text-align: center; max-width: 720px; margin: 0 auto 2.25rem; }
+.accueil-surtitre { display: inline-block; padding: .25rem .8rem; border-radius: 999px; background: #eaf6eb; color: #13731C;
+                    font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.accueil-titre { margin: .65rem 0 .5rem; font-size: 1.9rem; font-weight: 800; color: #0B4A12; text-transform: none; }
+.accueil-intro { color: #5b6b60; margin: 0; }
+.accueil-maj { margin: 1.25rem 0 0; text-align: center; font-size: .8rem; opacity: .75; }
+
+/* Tarifs */
+.accueil-tarifs { background: #f6f9f7; }
+.carte-tarif { position: relative; height: 100%; padding: 1.5rem; background: #fff; border: 1px solid #e3e9e5; border-radius: 16px;
+               box-shadow: 0 6px 20px rgba(11, 74, 18, .06); transition: transform .2s, box-shadow .2s; }
+.carte-tarif::before { content: ''; position: absolute; top: 0; left: 1.5rem; right: 1.5rem; height: 4px; border-radius: 0 0 4px 4px; background: var(--accent); }
+.carte-tarif:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(11, 74, 18, .12); }
+.carte-tarif-vert  { --accent: #1B9925; --accent-pale: #eaf6eb; --accent-texte: #13731C; }
+.carte-tarif-jaune { --accent: #FCE400; --accent-pale: #fffbd6; --accent-texte: #6b5d00; }
+.carte-tarif-rouge { --accent: #C51425; --accent-pale: #fdecee; --accent-texte: #9b0f1d; }
+.carte-tarif-entete { display: flex; align-items: center; gap: .85rem; margin-bottom: .6rem; }
+.carte-tarif-icone { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px;
+                     border-radius: 12px; background: var(--accent-pale); color: var(--accent-texte); font-size: 1.25rem; }
+.carte-tarif-titre { margin: 0; font-size: 1.1rem; font-weight: 700; color: #0B4A12; text-transform: none; line-height: 1.3; }
+.carte-tarif-description { color: #5b6b60; font-size: .9rem; margin-bottom: 1rem; }
+.carte-tarif-option { padding: .9rem 1rem; border-radius: 12px; background: #f6f9f7; }
+.carte-tarif-option + .carte-tarif-option { margin-top: .6rem; }
+.carte-tarif-libelle { font-size: .75rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent-texte); }
+.carte-tarif-montant { font-size: 1.85rem; font-weight: 800; color: #0B4A12; line-height: 1.2; white-space: nowrap; }
+.carte-tarif-montant span { font-size: .95rem; font-weight: 700; color: #5b6b60; }
+.carte-tarif-formalites { display: flex; flex-wrap: wrap; gap: .35rem; margin: .55rem 0 0; padding: 0; list-style: none; }
+.carte-tarif-formalites li { display: inline-flex; align-items: center; gap: .3rem; padding: .2rem .55rem; border-radius: 999px;
+                             background: #fff; border: 1px solid #d5e0d8; font-size: .78rem; font-weight: 700; color: #13731C; cursor: help; text-transform: none; }
+.carte-tarif-formalites li i { font-size: .65rem; color: #1B9925; }
+.accueil-legende { display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem 1.5rem; margin: 1.75rem 0 0; font-size: .82rem; color: #5b6b60; }
+.accueil-legende div { display: flex; gap: .35rem; }
+.accueil-legende dt { font-weight: 700; color: #13731C; }
+.accueil-legende dd { margin: 0; }
+
+/* Statistiques */
+.accueil-statistiques { background: linear-gradient(160deg, #0B4A12 0%, #13731C 100%); color: #fff; }
+.accueil-statistiques .accueil-surtitre { background: rgba(252, 228, 0, .15); color: #FCE400; }
+.accueil-statistiques .accueil-titre { color: #fff; }
+.accueil-statistiques .accueil-intro { color: rgba(255, 255, 255, .8); }
+.chiffre-cle { height: 100%; padding: 1.25rem 1rem; text-align: center; border-radius: 16px;
+               background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .14); }
+.chiffre-cle-icone { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-bottom: .6rem;
+                     border-radius: 50%; background: rgba(252, 228, 0, .15); color: #FCE400; font-size: 1.1rem; }
+.chiffre-cle-valeur { font-size: 2.3rem; font-weight: 800; line-height: 1.1; color: #FCE400; font-variant-numeric: tabular-nums; }
+.chiffre-cle-libelle { margin-top: .35rem; font-weight: 700; font-size: .95rem; }
+.chiffre-cle-precision { margin-top: .15rem; font-size: .8rem; color: rgba(255, 255, 255, .7); }
+/* La hauteur de la barre (en %) se calcule sur cette zone, sans le nom du mois */
+@media (max-width: 575.98px) {
+  .accueil-titre { font-size: 1.5rem; }
+  .chiffre-cle-valeur { font-size: 1.8rem; }
+}
+
+/* Page d'accueil : démarches */
+.accueil-demarches { padding-top: 40px; }
+.carte-demarche { display: flex; flex-direction: column; align-items: center; height: 100%; padding: 1.5rem 1.25rem; text-align: center;
+                  background: #fff; border: 1px solid #e3e9e5; border-radius: 16px; box-shadow: 0 6px 20px rgba(11, 74, 18, .06);
+                  transition: transform .2s, box-shadow .2s, border-color .2s; }
+.carte-demarche:hover { transform: translateY(-4px); border-color: #b9dcc0; box-shadow: 0 14px 30px rgba(11, 74, 18, .12); }
+.carte-demarche-image { display: inline-flex; align-items: center; justify-content: center; width: 104px; height: 104px; margin-bottom: 1rem;
+                        border-radius: 50%; background: #eaf6eb; }
+.carte-demarche-image img { width: 72px; height: 72px; object-fit: contain; }
+.carte-demarche-titre { margin: 0; font-size: 1.15rem; font-weight: 800; color: #0B4A12; text-transform: none; }
+.carte-demarche-sous-titre { margin-top: .2rem; font-size: .78rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #1B9925; }
+.carte-demarche-texte { flex: 1 1 auto; margin: .85rem 0 1.1rem; font-size: .92rem; color: #5b6b60; }
+.carte-demarche-actions { display: flex; flex-direction: column; gap: .5rem; width: 100%; }
+.carte-demarche-actions .btn { white-space: normal; font-weight: 600; }
+.accueil-bloc .btn-success { background: #1B9925; border-color: #1B9925; }
+.accueil-bloc .btn-success:hover, .accueil-bloc .btn-success:focus { background: #13731C; border-color: #13731C; }
+.accueil-bloc .btn-outline-success { color: #13731C; border-color: #1B9925; }
+.accueil-bloc .btn-outline-success:hover, .accueil-bloc .btn-outline-success:focus { background: #1B9925; border-color: #1B9925; color: #fff; }
+
+/* Fenêtres « Avant de commencer » et « Pièces à fournir » */
+.modale-pieces .modal-content { border: 0; border-radius: 16px; overflow: hidden; }
+.modale-pieces .modal-header { gap: .9rem; align-items: center; padding: 1rem 1.25rem; background: linear-gradient(90deg, #eaf6eb, #fff 70%); border-bottom: 1px solid #e3e9e5; }
+.modale-pieces-icone { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px;
+                       border-radius: 12px; background: #13731C; color: #FCE400; font-size: 1.1rem; }
+.modale-pieces .modal-title { margin: 0; font-size: 1.15rem; font-weight: 800; color: #0B4A12; text-transform: none; }
+.modale-pieces-sous-titre { font-size: .8rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #1B9925; }
+.modale-pieces .modal-body { padding: 1.25rem; }
+.modale-pieces .modal-footer { background: #f6f9f7; border-top: 1px solid #e3e9e5; }
+.modale-pieces-rubrique { display: flex; align-items: center; gap: .55rem; margin: 0 0 .75rem; font-size: 1rem; font-weight: 700; color: #0B4A12; text-transform: none; }
+.modale-pieces-rubrique span { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%;
+                               background: #FCE400; color: #0B4A12; font-size: .78rem; font-weight: 800; }
+.liste-documents { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: .5rem; margin: 0 0 1.5rem; padding: 0; list-style: none; }
+.liste-documents a { display: flex; align-items: center; gap: .65rem; height: 100%; padding: .6rem .75rem; border: 1px solid #e3e9e5; border-radius: 10px;
+                     background: #fff; color: #1f2a22; font-size: .88rem; font-weight: 600; text-decoration: none; transition: border-color .15s, background .15s; }
+.liste-documents a:hover, .liste-documents a:focus { border-color: #1B9925; background: #f6faf7; color: #0B4A12; }
+.liste-documents-icone { font-size: 1.35rem; }
+.liste-documents-icone.format-pdf { color: #C51425; }
+.liste-documents-icone.format-doc, .liste-documents-icone.format-docx { color: #2b579a; }
+.liste-documents-format { padding: .1rem .4rem; border-radius: 4px; background: #f0f3f1; color: #5b6b60; font-size: .68rem; font-weight: 700; }
+.liste-documents-telecharger { color: #1B9925; }
+.liste-pieces { margin: 0; padding: 0; list-style: none; }
+.liste-pieces li { display: flex; gap: .65rem; padding: .6rem 0; border-bottom: 1px dashed #e3e9e5; font-size: .92rem; color: #1f2a22; }
+.liste-pieces li:last-child { border-bottom: 0; }
+.liste-pieces li > i { margin-top: .2rem; color: #1B9925; }
+.liste-pieces-precision { font-size: .82rem; color: #5b6b60; }
+.modale-pieces-note { margin: 1rem 0 0; padding: .6rem .8rem; border-radius: 10px; background: #fffbd6; color: #5c5000; font-size: .85rem; }
+.etapes-avant { counter-reset: etape; margin: 0; padding: 0; list-style: none; }
+.etapes-avant > li { counter-increment: etape; position: relative; padding: 0 0 1.25rem 3rem; }
+.etapes-avant > li::before { content: counter(etape); position: absolute; left: 0; top: 0; display: flex; align-items: center; justify-content: center;
+                             width: 32px; height: 32px; border-radius: 50%; background: #1B9925; color: #fff; font-weight: 800; }
+.etapes-avant > li:not(:last-child)::after { content: ''; position: absolute; left: 15px; top: 36px; bottom: 4px; width: 2px; background: #e3e9e5; }
+.etapes-avant h4 { margin: .3rem 0 .35rem; font-size: 1rem; font-weight: 700; color: #0B4A12; text-transform: none; }
+.etapes-avant p { margin-bottom: .5rem; font-size: .92rem; color: #3d4a41; }
+.etapes-avant ul { margin: 0; padding-left: 1.1rem; font-size: .9rem; color: #3d4a41; }
+
+/* Page d'accueil : bannière affichée en entier, dans ses proportions (image très large : 1080 × 151) */
+.accueil-banniere { background: #f6f9f7; border-bottom: 1px solid #e3e9e5; }
+.accueil-banniere-image { display: block; width: 100%; max-width: 1400px; height: auto; margin: 0 auto; }
+.accueil-banniere-action { padding: 1.25rem 16px 0; text-align: center; }
+.accueil-banniere-action .btn { background: #1B9925; border-color: #1B9925; font-weight: 700; }
+.accueil-banniere-action .btn:hover, .accueil-banniere-action .btn:focus { background: #13731C; border-color: #13731C; }
+
+/* Page d'accueil : types d'entreprise et aide */
+.accueil-types { padding-top: 24px; }
+.type-entreprise { --accent: #1B9925; --accent-pale: #eaf6eb; --accent-texte: #13731C;
+                   background: #fff; border: 1px solid #e3e9e5; border-left: 4px solid var(--accent); border-radius: 12px; overflow: hidden; }
+.type-entreprise + .type-entreprise { margin-top: .75rem; }
+.type-entreprise-jaune { --accent: #FCE400; --accent-pale: #fffbd6; --accent-texte: #6b5d00; }
+.type-entreprise-rouge { --accent: #C51425; --accent-pale: #fdecee; --accent-texte: #9b0f1d; }
+.type-entreprise-bouton { display: flex; align-items: center; gap: .85rem; width: 100%; padding: 1rem 1.15rem; border: 0; background: #fff;
+                          color: #0B4A12; font-size: 1.05rem; font-weight: 700; text-align: left; text-transform: none; transition: background .15s; }
+.type-entreprise-bouton:hover { background: #f6f9f7; }
+.type-entreprise-bouton:focus-visible { outline: 3px solid #FCE400; outline-offset: -3px; }
+.type-entreprise-bouton:not(.collapsed) { background: var(--accent-pale); }
+.type-entreprise-icone { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px;
+                         border-radius: 10px; background: var(--accent-pale); color: var(--accent-texte); }
+.type-entreprise-bouton:not(.collapsed) .type-entreprise-icone { background: #fff; }
+.type-entreprise-chevron { color: var(--accent-texte); transition: transform .2s; }
+.type-entreprise-bouton:not(.collapsed) .type-entreprise-chevron { transform: rotate(180deg); }
+.type-entreprise-corps { padding: .25rem 1.15rem 1.15rem 4.15rem; }
+.type-entreprise-resume { margin: .5rem 0 .75rem; color: #3d4a41; }
+.type-entreprise-points { margin: 0 0 .9rem; padding: 0; list-style: none; }
+.type-entreprise-points li { display: flex; gap: .6rem; padding: .3rem 0; font-size: .92rem; color: #3d4a41; text-transform: none; }
+.type-entreprise-points li > i { margin-top: .25rem; color: var(--accent-texte); }
+.type-entreprise-points strong { color: #1f2a22; }
+.type-entreprise-formes { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin-bottom: 1rem; }
+.type-entreprise-formes-titre { width: 100%; font-size: .75rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #6b7a70; }
+.type-entreprise-forme { padding: .25rem .65rem; border-radius: 999px; background: #f6f9f7; border: 1px solid #e3e9e5; font-size: .82rem; color: #3d4a41; }
+.type-entreprise-forme strong { color: #0B4A12; margin-right: .2rem; }
+.type-entreprise-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+@media (max-width: 575.98px) {
+  .type-entreprise-corps { padding-left: 1.15rem; }
+}
+.carte-aide { padding: 1.5rem; border-radius: 16px; background: linear-gradient(160deg, #0B4A12, #13731C); color: #fff; box-shadow: 0 10px 26px rgba(11, 74, 18, .18); }
+.carte-aide-icone { display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; margin-bottom: .8rem;
+                    border-radius: 50%; background: rgba(252, 228, 0, .15); color: #FCE400; font-size: 1.35rem; }
+.carte-aide-titre { margin: 0 0 .4rem; font-size: 1.3rem; font-weight: 800; color: #fff; text-transform: none; }
+.carte-aide-texte { color: rgba(255, 255, 255, .85); font-size: .92rem; }
+.carte-aide-contacts { margin: 0 0 1.1rem; padding: 0; list-style: none; }
+.carte-aide-contacts li + li { margin-top: .4rem; }
+.carte-aide-contacts a { display: flex; align-items: center; gap: .6rem; padding: .5rem .75rem; border-radius: 10px; background: rgba(255, 255, 255, .08);
+                         color: #fff; font-weight: 700; text-decoration: none; text-transform: none; transition: background .15s; }
+.carte-aide-contacts a:hover, .carte-aide-contacts a:focus { background: rgba(255, 255, 255, .16); color: #FCE400; }
+.carte-aide-contacts i { color: #FCE400; width: 1rem; }
+.accueil-bloc .btn-warning { background: #FCE400; border-color: #FCE400; color: #0B4A12; font-weight: 700; }
+.accueil-bloc .btn-warning:hover, .accueil-bloc .btn-warning:focus { background: #ecd500; border-color: #ecd500; color: #0B4A12; }
+
+/* ==========================================================================
+   Menu sur téléphone et tablette (barre repliée, moins de 992px)
+   Le thème fixe .navbar à 40px de haut : le menu ouvert débordait sans fond sur la bannière (liens blancs illisibles)
+   ========================================================================== */
+.navbar-toggler-libelle { display: none; }
+@media (max-width: 991.98px) {
+  .site-navigation .navbar { height: auto; min-height: 56px; flex-wrap: wrap; align-items: center; }
+  .site-navigation .navbar-toggler { display: inline-flex; align-items: center; gap: .45rem; margin: 8px 0; padding: 6px 12px 6px 8px;
+                                     border: 0; border-radius: 8px; background: #1B9925; color: #fff; }
+  .site-navigation .navbar-toggler:focus-visible { outline: 3px solid #FCE400; outline-offset: 2px; }
+  .site-navigation .navbar-toggler-icon { width: 1.4em; height: 1.4em; }
+  .navbar-toggler-libelle { display: inline; font-size: .9rem; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
+  .bouton-connexion-mobile { margin-left: auto; padding: 8px 14px; border-radius: 8px; background: #FCE400; color: #0B4A12;
+                             font-size: .85rem; font-weight: 700; text-decoration: none; text-transform: uppercase; }
+  .bouton-connexion-mobile:hover, .bouton-connexion-mobile:focus { background: #ecd500; color: #0B4A12; }
+  .site-navigation .navbar-collapse { width: 100%; background: #23282d; padding: .25rem 0 .75rem; }
+  .site-navigation .navbar-nav { width: 100%; }
+  .site-navigation .navbar-nav > li { padding: 0; }
+  .site-navigation .navbar-nav .nav-link { display: block; padding: .75rem .25rem; color: #fff; border-top: 1px solid rgba(255, 255, 255, .1); }
+  .site-navigation .navbar-nav .nav-link:hover, .site-navigation .navbar-nav .nav-link:focus { color: #FCE400; }
+  /* « Mon compte » : dans la liste, et non plus superposé à droite */
+  .site-navigation #contenu { position: static; }
+  .site-navigation #contenu .dropdown-menu { position: static !important; transform: none !important; margin: 0 0 .5rem; border: 0; border-radius: 8px; background: #2f353b; }
+  .site-navigation #contenu .dropdown-menu a { display: block; padding: .6rem 1rem; color: #fff; }
+  .site-navigation #contenu .dropdown-menu a:hover, .site-navigation #contenu .dropdown-menu a:focus { background: rgba(255, 255, 255, .08); color: #FCE400; }
+  .site-navigation #contenu .dropdown-menu .text-muted { color: rgba(255, 255, 255, .65) !important; }
+}

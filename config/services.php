@@ -38,6 +38,10 @@ return [
         'mot_de_passe' => env('FNRCCM_MOT_DE_PASSE'),
         // Vérification du certificat HTTPS : ne la désactiver qu'en dépannage (voir curl.cainfo dans php.ini)
         'verifier_ssl' => env('FNRCCM_VERIFIER_SSL', true),
+        // Accès du partenaire à notre API /api/fnrccm (middleware AccesPartenaireFnrccm) :
+        // clé à transmettre dans l'en-tête X-Api-Key et/ou adresses IP autorisées, séparées par des virgules
+        'api_cle' => env('FNRCCM_API_CLE'),
+        'api_ips' => array_values(array_filter(array_map('trim', explode(',', (string) env('FNRCCM_API_IPS', ''))))),
     ],
 
 ];

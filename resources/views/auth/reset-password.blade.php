@@ -19,13 +19,13 @@
                 <div class="champ">
                     <label class="form-label" for="reset_password">Nouveau mot de passe</label>
                     <input id="reset_password" class="form-control" type="password" name="password" placeholder="8 caractères minimum"
-                           minlength="8" required autocomplete="new-password">
+                           minlength="8" required autocomplete="off">
                 </div>
 
                 <div class="champ">
                     <label class="form-label" for="reset_password_confirmation">Confirmer le mot de passe</label>
                     <input id="reset_password_confirmation" class="form-control" type="password" name="password_confirmation"
-                           placeholder="Saisissez à nouveau le mot de passe" minlength="8" required autocomplete="new-password">
+                           placeholder="Saisissez à nouveau le mot de passe" minlength="8" required autocomplete="off">
                 </div>
 
                 <div class="text-end">

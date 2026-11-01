@@ -60,7 +60,7 @@
                 <a href="#modal-forget-password" class="lien-vert small" data-bs-toggle="modal" data-bs-dismiss="modal">Mot de passe oublié ?</a>
               </div>
               <input id="login_password" class="form-control" type="password" name="password"
-                     placeholder="Votre mot de passe" required autocomplete="current-password">
+                     placeholder="Votre mot de passe" required autocomplete="off">
             </div>
 
             <div class="form-check champ">
@@ -232,7 +232,7 @@
             <div class="champ">
               <label class="form-label" for="password_cc">Mot de passe</label>
               <input id="password_cc" class="form-control" type="password" name="password" placeholder="8 caractères minimum"
-                     required autocomplete="new-password" aria-describedby="mot_de_passe" data-csp-input="verifier_password">
+                     required autocomplete="off" aria-describedby="mot_de_passe" data-csp-input="verifier_password">
               <div id="mot_de_passe" class="message-champ text-danger" role="alert" style="display:none">
                 <i class="fas fa-exclamation-circle me-1" aria-hidden="true"></i>
                 Le mot de passe doit contenir au moins 8 caractères.
@@ -242,7 +242,7 @@
             <div class="champ">
               <label class="form-label" for="password_confirmation_cc">Confirmer le mot de passe</label>
               <input id="password_confirmation_cc" class="form-control" type="password" name="password_confirmation" placeholder="Saisissez à nouveau le mot de passe"
-                     required autocomplete="new-password" aria-describedby="mots_de_passe_differents" data-csp-input="verifier_password">
+                     required autocomplete="off" aria-describedby="mots_de_passe_differents" data-csp-input="verifier_password">
               <div id="mots_de_passe_differents" class="message-champ text-danger" role="alert" style="display:none">
                 <i class="fas fa-exclamation-circle me-1" aria-hidden="true"></i>
                 Les deux mots de passe ne sont pas identiques.

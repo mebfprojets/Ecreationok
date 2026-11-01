@@ -51,41 +51,43 @@ class DemandeController extends Controller
 
     public function index()
     {
-        $PP=Demande::where('company_type', "EI")->where('paye',1)->get();
-        $PM=Demande::where('company_type', "ES")->where('paye',1)->get();
-        $nbr_pp= count($PP);
-        $nbr_pm= count($PM);
-        $total= $nbr_pp+$nbr_pm;
-        //Nombre de demande du mois
-        $nbr_mois = Demande::whereYear('created_at', now()->year)
-                ->whereMonth('created_at', now()->month)
-                ->where('paye', 1)
-                ->count();
-
-       //dd($nbr_mois);
-
-        
-        if(Auth::user()){
-        $usager= Usager::where('user_id',Auth::user()->id)->first();
-        //dd($usager);
-        if($usager!=null){
-        $demandes=Demande::where('usager_id', $usager->id)->orderby('created_at','desc')->get();
-        $c=count($demandes);
-        return view('index', compact('nbr_pp','nbr_pm','total','c','nbr_mois'));
-        }
-        else
-        {
-            $c=0;
-            return view('index', compact('nbr_pp','nbr_pm','total','c','nbr_mois'));
-        }
+        return view('index', ['statistiques' => $this->statistiquesAccueil()]);
     }
-    else{
-        return view('index', compact('nbr_pp','nbr_pm','total','nbr_mois'));
-        
-    }
-        //$demandes=Demande::where('usager_id', $usager->id)->orderby('created_at','desc')->get();
-        //$c=count($demandes);
-       
+
+    /**
+     * Chiffres de l'année en cours affichés sur la page d'accueil : demandes payées, par type et pour le mois en cours.
+     * Une requête groupée (et non le chargement de toutes les demandes), gardée 10 minutes en cache.
+     */
+    private function statistiquesAccueil(): array
+    {
+        $annee = now()->year;
+
+        return \Illuminate\Support\Facades\Cache::remember('accueil.statistiques.'.$annee, now()->addMinutes(10), function () use ($annee) {
+            $parMois = Demande::where('paye', 1)
+                ->where('created_at', '>=', $annee.'-01-01T00:00:00')   // format ISO : indépendant de la langue de SQL Server
+                ->where('created_at', '<', ($annee + 1).'-01-01T00:00:00')
+                ->groupBy(DB::raw('MONTH(created_at)'))
+                ->get([
+                    DB::raw('MONTH(created_at) AS mois'),
+                    DB::raw('COUNT(*) AS total'),
+                    DB::raw("SUM(CASE WHEN company_type = 'EI' THEN 1 ELSE 0 END) AS individuelles"),
+                    DB::raw('SUM(CASE WHEN etat = 1 THEN 1 ELSE 0 END) AS validees'),
+                ])->keyBy('mois');
+
+            $total = (int) $parMois->sum('total');
+            $individuelles = (int) $parMois->sum('individuelles');
+
+            return [
+                'annee' => $annee,
+                'total' => $total,
+                'individuelles' => $individuelles,
+                'societaires' => $total - $individuelles,   // sociétés et GIE
+                'validees' => (int) $parMois->sum('validees'),
+                'mois_en_cours' => (int) optional($parMois->get(now()->month))->total,
+                'nom_mois' => now()->locale('fr')->isoFormat('MMMM'),
+                'mis_a_jour' => now(),
+            ];
+        });
     }
 
     /**

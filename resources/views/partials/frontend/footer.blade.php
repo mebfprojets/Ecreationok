@@ -7,7 +7,8 @@
             <h3 class="widget-title">MEBF</h3>
             <img loading="lazy" width="100px" class="footer-logo" src="{{asset('frontend/images/MEBF-CEFORE.JPG')}}" alt="Constra">
             <p>132, Avenue de Lyon, 11 BP 379 OUAGADOUGOU 11,</p>
-              <p>BURKINA FASO Tel: 25 39 80 60 Fax: 25 39 80 62 Email: info@me.bf</p>
+              {{-- Adresse e-mail encodée en entités HTML, comme dans l'en-tête (ANSSI Vul-009 : pas d'adresse en clair pour les robots) --}}
+              <p>BURKINA FASO Tel: 25 39 80 60 Fax: 25 39 80 62 Email: &#105;&#110;&#102;&#111;&#64;&#109;&#101;&#46;&#98;&#102;</p>
             <div class="footer-social" style="margin-bottom:-50px; ">
               <ul>
                 <li><a href="https://www.facebook.com/ME.BurkinaFaso" target="_blank" aria-label="Facebook"><i
@@ -230,137 +231,7 @@
       </div>
   </div>
 </div>
-  <div id="modal-piece_pp" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <!-- <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button> -->
-                <h4 class="modal-title"><i class="gi gi-pen"></i>Pièces Personne Physique</h4>
-            </div>
-            <div class="modal-body">
-
-                <p>•	<a href="https://www.me.bf/wp-content/uploads/2025/10/DECLARATION-SUR-LHONNEUR-vf-21-10-2025.docx" style="color: blue">Télécharger ici la fiche de déclaration sur l'honneur</a></p>
-                <p>•	<a href="https://www.me.bf/wp-content/uploads/2023/05/Fiche-Carte-Professionnelle-de-Commercant_CPC-SCANNE.pdf" style="color: blue">Télécharger ici le formulaire de demande de carte professionnelle de commerçant (CPC)</a></p>
-                <!-- <p>•	<a href="http://me.bf/fr/file/2893/download?token=P7jVe3E4" style="color: blue">Télécharger ici la fiche de demande de localisation</a></p> -->
-                <p>•	<a href="https://www.me.bf/wp-content/uploads/2024/11/FICHE-DE-VISITE.pdf" style="color: blue">Télécharger ici la fiche de visite</a></p>
-                <p>•	1 photocopie légalisée de la pièce d’identité ou du  passeport du promoteur;</p>
-                <p>•	1 extrait de casier judiciaire (Bulletin N°3) de moins de 3 mois du promoteur. Les personnes ne pouvant pas établir leurs casiers judiciaires à Ouagadougou disposent de 75 jours pour l’apporter au CEFORE afin de compléter leur dossier;</p>
-                <p>•	1 copie de l’acte de mariage (s’il y a lieu) ;</p>
-                <p>•	1 certificat de résidence de l’année en cours (payement de la taxe de résidence au domaine, et établissement du certificat de résidence à la mairie ou au commissariat de police) ;</p>
-                <p>•	L’un des documents suivants au nom du créateur d’entreprise :
-1 Contrat de bail à usage commercial enregistré, un titre foncier, un Permis Urbain d’Habiter, une attestation d’attribution de parcelle, une facture d’eau ou d’électricité;
-</p>
-                <p>•	2 photos d’identité du promoteur.</p>
-
-                <!-- <h4 class="sub-header">1.1 | Cliquer sur «S'inscrire» </h4>
-                <p>•	Une copie légalisée de la CNIB du promoteur </p>
-                <!-- <h4 class="sub-header">1.2 | Account</h4>
-                <p>•	<a href="http://me.bf/fr/file/2967/download?token=kziektSF" style="color: blue">Une fiche de déclaration sur l'honneur</a></p>
-                <!-- <h4 class="sub-header">1.3 | Service</h4> 
-                <p>•	Un extrait de casier judiciaire (Bulletin N°3) de moins de 3 mois du promoteur</p>
-               <!-- <h4 class="sub-header">1.4 | Payments</h4>
-                <p>•	Une copie de l’acte de mariage et une photocopie du document d’identité du (de la) conjoint(e)   (s’il y a lieu)</p>
-                <p>•	L’un des documents suivants au nom du créateur d’entreprise :
-                      <u><li>-Un contrat de bail à usage commercial enregistré, </li></u>
-                      -un titre foncier, 
-                      -un Permis Urbain d’Habiter, 
-                      -une attestation d’attribution de parcelle, 
-                      -une facture d’eau ou d’électricité récente
-                </p>
-                <p>•	<a href="http://me.bf/fr/file/2893/download?token=P7jVe3E4" style="color: blue">Une fiche de localisation</a></p>
-                <p>•	Deux photos d’identité du promoteur</p>
-                <p>•	<a href="http://me.bf/fr/file/2968/download?token=pI__AZKv" style="color: blue">Un formulaire de demande de la carte professionnelle de commerçant timbré avec un sticker sécurisé de 500 F CFA</a></p> -->
-                
-              </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal">Fermer</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div id="modal-piece_pm" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <!-- <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button> -->
-                <h4 class="modal-title"><i class="gi gi-pen"></i>Pièces Personne Morale</h4>
-            </div>
-            <div class="modal-body">
-                <p>•	<a href="https://www.me.bf/wp-content/uploads/2025/10/DECLARATION-SUR-LHONNEUR-vf-21-10-2025.docx" style="color: blue">Télécharger ici la déclaration sur l'honneur</a></p>
-                <p>•	<a href="https://www.me.bf/wp-content/uploads/2023/05/Fiche-Carte-Professionnelle-de-Commercant_CPC-SCANNE.pdf" style="color: blue">Télécharger ici le formulaire de demande de carte professionnelle de commerçant (CPC)</a></p>
-                <!-- <p>•	<a href="http://me.bf/fr/file/2893/download?token=P7jVe3E4" style="color: blue">Télécharger ici la fiche de demande de localisation</a></p> -->
-                <p>•	<a href="https://www.me.bf/wp-content/uploads/2025/09/model-M1-VF.doc" style="color: blue">Télécharger ici le formulaire RCCM</a></p>
-                <p>•	<a href="https://www.me.bf/wp-content/uploads/2026/03/Acte-de-depot.doc" style="color: blue">Télécharger ici le modèle d'acte de dépôt</a></p>
-                <p>•	<a href="https://www.me.bf/wp-content/uploads/2024/11/FICHE-DE-VISITE.pdf" style="color: blue">Télécharger ici la fiche de visite</a></p>
-                <p>•	<a href="https://www.me.bf/wp-content/uploads/2023/09/Telecharger-ici-le-modele-de-contrat-dapport-de-bien-en-nature.docx" style="color: blue">Télécharger ici le contrat d'apport de bien</a></p>
-                <p>•	<a href="https://www.me.bf/wp-content/uploads/2023/09/Modele-de-statuts-dune-SARL-unipersonnelle.docx" style="color: blue">Télécharger ici un exemplaire original des statuts de la société unipersonnel</a></p>
-                <p>•	<a href="https://www.me.bf/wp-content/uploads/2023/09/Modele-de-statuts-dune-SARL-pluripersonnelle.docx" style="color: blue">Télécharger ici un exemplaire original des statuts de la société pluripersonnel</a></p>
-                <p>•	<a href="https://www.me.bf/wp-content/uploads/2023/09/Modele-de-declaration-de-souscription-et-de-versement-des-fonds.docx" style="color: blue">Télécharger ici un exemplaire de déclaration de versement de fonds</a></p>
-                <p>•	<a href="https://www.me.bf/wp-content/uploads/2023/09/Modele-de-proces-verbal-constitutif.docx" style="color: blue">Télécharger ici un exemplaire de Procès Verbal (PV)</a></p>
-                <p>•	<a href="https://www.me.bf/wp-content/uploads/2023/09/Modele-de-declaration-de-regularite-et-de-conformite.docx" style="color: blue">Télécharger ici un exemplaire de déclaration de régularité et de conformité</a></p>
-                
-                <p>•	Une photocopie de la pièce d’identité ou du passeport du ou des dirigeants de la société;</p>
-                <p>•	Un extrait de casier judiciaire (Bulletin N°3) de moins de 3 mois du ou des dirigeants;</p>
-                <!-- <p>•	Un exemplaire du Procès-Verbal de l’assemblée générale constitutive</p> -->
-                <!-- <p>•	Un exemplaire de la déclaration de souscription et de versement du capital (DSV) et/ou la DRC à savoir la déclaration de régularité et de conformité</p> -->
-                <p>•	Une attestation de dépôt de capital en banque au nom de la société (cas d’apport en numéraire);</p>
-                <!-- <p>•	Un contrat d’apport de biens en nature annexé des reçus des biens apportés (cas d’apport de biens en nature)</p> -->
-                <p>•	Un rapport d’évaluation des biens apportés si leur estimation dépasse 5 millions;</p>
-                <p>•	L’un des documents suivants au nom au nom de la société :
-                  <ul>-Un contrat de bail à usage commercial enregistré</ul>
-                  <ul>-Un titre foncier</ul>
-                  <ul>-Un Permis Urbain d’Habiter</ul>
-                  <ul>-Une attestation d’attribution de parcelle</ul>
-                  <ul>-Une facture d’eau ou d’électricité récente.</ul>
-                </p>
-                
-
-
-
-
-                <!-- <h4 class="sub-header">1.1 | Cliquer sur «S'inscrire» </h4> -->
-                <!-- <p>•	Une photocopie de la pièce d’identité ou du passeport du ou des dirigeants de la société</p> -->
-                <!-- <h4 class="sub-header">1.2 | Account</h4> -->
-                <!-- <p>•	Une fiche de déclaration sur l’honneur dûment remplie et signée par le ou les dirigeants <a href="http://me.bf/fr/file/2967/download?token=kziektSF" style="color: blue">Télécharger</a></p> -->
-                <!-- <h4 class="sub-header">1.3 | Service</h4> -->
-                <!-- <p>•	Un extrait de casier judiciaire (Bulletin N°3) de moins de 3 mois du ou des dirigeants</p> -->
-               <!-- <h4 class="sub-header">1.4 | Payments</h4>-->
-                <!-- <p>•	Un exemplaire original des statuts de la société </p> -->
-                <!-- <p>•	Un exemplaire du Procès-Verbal de l’assemblée générale constitutive</p> -->
-                <!-- <p>•	Un exemplaire de la déclaration de souscription et de versement du capital (DSV) et/ou la DRC à savoir la déclaration de régularité et de conformité</p> -->
-                
-              </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal">Fermer</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div id="modal-infos" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <!-- <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button> -->
-                <h4 class="modal-title"><i class="gi gi-pen"></i>Avant de commencer</h4>
-            </div>
-            <div class="modal-body">
-                <!-- <h4 class="sub-header">1.1 | Cliquer sur «S'inscrire» </h4> -->
-                <p>Avant de créer votre entreprise, vous devez d'abord vérifier la disponibilité du nom commercial.
-                  Vous pouvez aussi réserver le nom commercial et où la dénomination sociale choisie pour votre entreprise
-                  ,contre rémise d'une Attestation de Disponibilité et de Réservation qui sera jointe aux statuts pour la numérisation.
-                </p>
-                <!-- <h4 class="sub-header">1.2 | Account</h4> -->
-                
-                <p>•	Un exemplaire du Procès-Verbal de l’assemblée générale constitutive ;</p>
-                <p>•	Un exemplaire de la déclaration de souscription et de versement du capital (DSV) et/ou la DRC à savoir la déclaration de régularité et de conformité.</p>
-                
-              </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal">Fermer</button>
-            </div>
-        </div>
-    </div>
-</div>
+  {{-- Fenêtres « Pièces à fournir » et « Avant de commencer » : partials/frontend/modales_pieces (page d'accueil) --}}
 
   <!-- Javascript Files
   ================================================== -->
@@ -393,7 +264,8 @@
   <script src="{{asset('frontend/js/app.js')}}"></script> -->
   {{-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> --}}
   {{-- <script src="{{asset('backend/libs/jquery/jquery.min.js')}}"></script> --}}
-  <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js" integrity="sha384-FZQ08l5R7r04XTTouN8gcfgfYy+ZpoFzZrYKyl3HxnTUw+JHVFGaw+rqQ7Y/TkhU" crossorigin="anonymous"></script>
+  {{-- jQuery Validation 1.21.0, hébergé localement (la 1.15.0 du CDN Microsoft avait des failles connues : CVE-2021-21252, CVE-2022-31147) --}}
+  <script src="{{ asset('vendor/jquery-validation-1.21.0/jquery.validate.min.js') }}"></script>
   {{-- <script src=https://cdnjs.cloudflare.com/ajax/libs/formvalidation/0.6.2-dev/js/formValidation.min.js></script> --}}
 
 

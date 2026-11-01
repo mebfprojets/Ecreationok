@@ -9,6 +9,7 @@ Une version = un dossier. Pour mettre à jour : télécharger la nouvelle versio
 | bootstrap-5.3.8 | bootstrap@5.3.8 (bootstrap.bundle.min.js, avec Popper) | espace agents |
 | jquery-3.7.1 | jquery@3.7.1 | espace agents |
 | jquery-ui-1.14.1 | jquery-ui@1.14.1 | site public |
+| jquery-validation-1.21.0 | jquery-validation@1.21.0 (jquery.validate.min.js, empreinte vérifiée avec celle publiée par cdnjs) | site public (formulaire de demande) |
 | fontawesome-free-5.15.4 | @fortawesome/fontawesome-free@5.15.4 | espace agents et site public |
 | datatables-2.3.8 | datatables.net(-bs5)@2.3.8, datatables.net-responsive(-bs5)@3.0.8, datatables.net-buttons(-bs5)@3.2.6 | espace agents |
 | jszip-3.10.2 | jszip@3.10.2 (export Excel des tableaux) | espace agents |

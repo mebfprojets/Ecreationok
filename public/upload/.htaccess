@@ -1,4 +1,0 @@
-<FilesMatch "(?i)\.(php\d?|phtml|phar|pht|shtml|cgi|pl|asp|aspx|jsp|exe|bat|cmd|sh|htaccess)$">
-    Require all denied
-</FilesMatch>
-Options -Indexes -ExecCGI

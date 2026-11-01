@@ -258,9 +258,15 @@ FACEBOOK: https://www.facebook.com/themefisher
         <div class="row">
           <div class="col-lg-12">
               <nav class="navbar navbar-expand-lg navbar-dark p-0">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Ouvrir le menu">
+                    <span class="navbar-toggler-icon"></span><span class="navbar-toggler-libelle">Menu</span>
                 </button>
+                {{-- Téléphone et tablette : connexion accessible sans ouvrir le menu --}}
+                @guest
+                  <a href="#modal-login" class="bouton-connexion-mobile d-lg-none" data-bs-toggle="modal">
+                    <i class="fas fa-sign-in-alt me-1" aria-hidden="true"></i>Se connecter
+                  </a>
+                @endguest
                 
                 <div id="navbar-collapse" class="collapse navbar-collapse contenant">
                     <ul class="nav navbar-nav mr-auto">                     

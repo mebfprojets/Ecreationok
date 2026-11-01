@@ -18,7 +18,10 @@ use App\Http\Controllers\DemandeController;
 // Route::post('/callback', [DemandeController::class,'reponse_paiement'])
 // ->withoutMiddleware('throttle')
 // ->name('callback');
-Route::get('/fnrccm', [DemandeController::class,'fnrccm'])->name('fnrccm');
+// Consultation d'un paiement par le FNRCCM : réservée au partenaire (clé X-Api-Key et/ou IP autorisée), 60 appels par minute
+Route::get('/fnrccm', [DemandeController::class,'fnrccm'])
+    ->middleware([\App\Http\Middleware\AccesPartenaireFnrccm::class, 'throttle:60,1'])
+    ->name('fnrccm');
 // Ajout BARRO
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
