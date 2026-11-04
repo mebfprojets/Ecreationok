@@ -6,20 +6,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use App\Models\EnvoiMail;
-use App\Models\ResetPassword;
 use App\Models\User;
+use App\Support\ReinitialisationMotDePasse;
 
 /**
- * Mot de passe oublié : envoi d'un lien de réinitialisation puis saisie du nouveau mot de passe.
- * Le jeton n'est conservé en base que sous forme d'empreinte (SHA-256) et expire au bout de DUREE_MINUTES.
+ * Mot de passe oublié : envoi d'un lien de réinitialisation (App\Support\ReinitialisationMotDePasse)
+ * puis saisie du nouveau mot de passe.
  */
 class AccountController extends Controller
 {
-    public const DUREE_MINUTES = 60;
-    private const DELAI_RENVOI_SECONDES = 60;
+    public const DUREE_MINUTES = ReinitialisationMotDePasse::DUREE_MINUTES;
 
     public function showResetPasswordForm($token) {
         return view('auth.forgetPasswordLink', ['token' => $token]);
@@ -46,32 +43,10 @@ class AccountController extends Controller
             return $reponse();
         }
 
-        // Un seul envoi par minute et par adresse
-        $dernier = DB::table('password_resets')->where('email', $email)->max('created_at');
-        if ($dernier && Carbon::parse($dernier)->addSeconds(self::DELAI_RENVOI_SECONDES)->isFuture()) {
-            return $reponse();
-        }
-
-        $token = Str::random(64);
-        DB::table('password_resets')->where('email', $email)->delete();
-        ResetPassword::create([
-            'email' => $email,
-            'token' => hash('sha256', $token),
-            'created_at' => date('d-m-Y H:i:s'),
-        ]);
-
-        $objet = 'Réinitialisation de votre mot de passe e-Création';
-        try {
-            Mail::send(['html' => 'auth.forgetPassword', 'text' => 'emails.texte.mot_de_passe'], ['token' => $token, 'dureeMinutes' => self::DUREE_MINUTES], function ($message) use ($email, $objet) {
-                $message->to($email)->subject($objet);
-            });
-        } catch (\Throwable $e) {
-            report($e);
-            EnvoiMail::noter('mot_de_passe', $email, $objet, $e);
-            DB::table('password_resets')->where('email', $email)->delete();
+        // Un seul envoi par minute et par adresse (un envoi trop rapproché répond le même message)
+        if (ReinitialisationMotDePasse::envoyer($user) === ReinitialisationMotDePasse::ECHEC) {
             return back()->with('error', 'L’e-mail de réinitialisation n’a pas pu être envoyé. Réessayez dans quelques minutes.');
         }
-        EnvoiMail::noter('mot_de_passe', $email, $objet);
 
         return $reponse();
     }

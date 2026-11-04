@@ -223,6 +223,18 @@
             if (e.key === 'Enter' && e.target === this) { ouvrirLigne(e, this); }
         });
 
+        // Agents : la fenêtre de réinitialisation reprend le compte du bouton cliqué (adresse du formulaire, nom, e-mail)
+        $('#modal-reinitialisation').on('show.bs.modal', function (e) {
+            var $bouton = $(e.relatedTarget);
+            $(this).find('[data-form-reinitialisation]').attr('action', $bouton.data('action'));
+            $(this).find('[data-reinit-nom]').text($bouton.data('nom'));
+            $(this).find('[data-reinit-email]').text($bouton.data('email'));
+        });
+        $('[data-form-reinitialisation]').on('submit', function () {
+            $(this).find('[type="submit"]').prop('disabled', true)
+                .html('<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Envoi…');
+        });
+
         // Calendrier des dates d'établissement des pièces : même format que le site public (jj/mm/aaaa)
         if ($.fn.datepicker) {
             $('.date_piecejointe').datepicker({ autoclose: true, endDate: new Date(), format: 'dd/mm/yyyy', weekStart: 1 });

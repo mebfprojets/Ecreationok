@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EnvoiMail;
 use App\Models\Organisation;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Valeur;
+use App\Support\ReinitialisationMotDePasse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -34,7 +36,35 @@ class UserController extends Controller
             return $this->refuserAcces();
         }
         $users= User::with("roles")->where('isadmin','!=',null)->orderBy('updated_at', 'desc')->get();
-        return view('users.index', compact("users"));
+        // Dernier lien de réinitialisation envoyé à chaque agent (historique des e-mails)
+        $derniersLiens = EnvoiMail::where('type', 'mot_de_passe')->where('statut', 'envoye')
+            ->whereIn('destinataire', $users->pluck('email')->filter()->map(fn ($e) => mb_strtolower(trim($e))))
+            ->groupBy('destinataire')->selectRaw('destinataire, MAX(created_at) AS dernier')->pluck('dernier', 'destinataire')
+            ->map(fn ($date) => \Carbon\Carbon::parse($date));
+        $organisations = DB::table('organisations')->pluck('Ville', 'CodeOrganisation');
+        return view('users.index', compact("users", "derniersLiens", "organisations"));
+    }
+
+    /** Administrateurs : envoie à un agent un lien pour choisir un nouveau mot de passe (valable 60 minutes). */
+    public function envoyerReinitialisation(User $user)
+    {
+        if (!Auth::user()->can('user.create')) {
+            return $this->refuserAcces();
+        }
+        $nom = trim($user->prenom.' '.$user->name);
+        if (!filter_var((string) $user->email, FILTER_VALIDATE_EMAIL)) {
+            return back()->with('error', 'Le compte de '.$nom.' n’a pas d’adresse e-mail valide : corrigez-la avant d’envoyer le lien.');
+        }
+
+        switch (ReinitialisationMotDePasse::envoyer($user, Auth::user())) {
+            case ReinitialisationMotDePasse::ENVOYE:
+                return back()->with('success', 'Un lien de réinitialisation a été envoyé à '.$nom.' ('.$user->email.'). '
+                    .'Il est valable '.ReinitialisationMotDePasse::DUREE_MINUTES.' minutes ; son mot de passe actuel reste valable d’ici là.');
+            case ReinitialisationMotDePasse::TROP_RECENT:
+                return back()->with('error', 'Un lien vient déjà d’être envoyé à '.$user->email.'. Patientez une minute avant d’en envoyer un autre.');
+            default:
+                return back()->with('error', 'L’e-mail de réinitialisation n’a pas pu être envoyé à '.$user->email.'. Réessayez dans quelques minutes.');
+        }
     }
     public function compte()
     {

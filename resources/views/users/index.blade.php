@@ -1,273 +1,83 @@
 @extends("backend.adminlte.main")
 @section('title', 'Agents')
 @section('administration', 'menu-open')
-@section('administration-user', 'active') 
+@section('administration-user', 'active')
 
 @section('content')
-<div class="card">                           
-              <!-- /.card-header -->
-              <div class="card-body">
+<div class="card">
+  <div class="card-header d-flex flex-wrap align-items-center gap-2">
+    <h3 class="card-title flex-grow-1"><i class="fas fa-users me-2 text-secondary" aria-hidden="true"></i>Comptes des agents</h3>
+    @can('user.create', Auth::user())
+      <a href="{{ route('user.create') }}" class="btn btn-sm btn-success"><i class="fas fa-user-plus me-1" aria-hidden="true"></i>Nouvel agent</a>
+    @endcan
+  </div>
+  <div class="card-body">
+    <table id="example1" class="table table-bordered table-striped table-sm align-middle w-100">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Prénom(s)</th>
+          <th>E-mail</th>
+          <th>Téléphone</th>
+          <th>CEFORE</th>
+          <th>Dernier lien envoyé</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach ($users as $user)
+          @php $dernierLien = $derniersLiens[mb_strtolower(trim((string) $user->email))] ?? null; @endphp
+          <tr>
+            <td class="fw-semibold">{{ $user->name }}</td>
+            <td>{{ $user->prenom }}</td>
+            <td class="text-break">{{ $user->email }}</td>
+            <td class="text-nowrap">{{ $user->telephone }}</td>
+            <td class="text-nowrap">{{ $user->organisation === '001000' ? 'Siège' : ($organisations[$user->organisation] ?? $user->organisation) }}</td>
+            <td class="text-nowrap small" data-order="{{ optional($dernierLien)->timestamp ?? 0 }}">
+              {{ $dernierLien ? $dernierLien->format('d/m/Y à H:i') : '—' }}
+            </td>
+            <td class="text-end text-nowrap">
               @can('user.create', Auth::user())
-            <a href="{{ route('user.create') }}" class="btn btn-success col-md-2 float-end mt-2"><span><i class="fa fa-plus"></i></span>User</a>
-            @endcan<br><br>
-                <table id="example1" class="table table-bordered table-striped">
-                  <thead>
-                  <tr style="background-color:#0b9e44; color:white">
-                  
-                    <th>N°</th>
-                    <th>Nom</th>
-                    <th>Prenom</th>
-                    <th>Email</th>
-                    <th>Tel</th>
-                    <th >Action</th>
-                
-                  </tr>
-                  </thead>
-                  <tbody>
-                        @php
-                        $i=0;
-                            @endphp
-                        @foreach($users as $user)
-                        @php
-                        $i++;
-                        @endphp
-                  <tr>
-                    <td>{{$i}}</td>
-                    <td>{{$user->name}}</td>
-                    <td>{{$user->prenom}}</td>
-                    <td>{{$user->email}}</td>
-                    <td>{{ $user->telephone}}</td>                    
-                    <td class="text-center">
-                         @can('user.update',Auth::user())
+                <a href="{{ route('user.edit', $user) }}" class="btn btn-sm btn-outline-secondary" title="Modifier le compte">
+                  <i class="fas fa-edit" aria-hidden="true"></i><span class="visually-hidden">Modifier</span>
+                </a>
+                <button type="button" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#modal-reinitialisation"
+                        data-action="{{ route('user.reinitialisation', $user) }}" data-nom="{{ trim($user->prenom.' '.$user->name) }}" data-email="{{ $user->email }}"
+                        title="Envoyer un lien de réinitialisation du mot de passe">
+                  <i class="fas fa-key me-1" aria-hidden="true"></i>Réinitialiser
+                </button>
+              @endcan
+            </td>
+          </tr>
+        @endforeach
+      </tbody>
+    </table>
+  </div>
+</div>
 
-                            <a href="#" class="btn btn-sm btn-success" style="background:#3393FF" title="Afficher les détais"> <i class="fa fa-eye"></i></a>
-                            <a href="{{ route('user.edit',$user) }}" data-bs-toggle="tooltip" title="Edit" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></a>
-
-                         @endcan 
-                    </td>                
-                    
-                  </tr>
-            @endforeach
-                  </tbody>
-                  <tfoot>                  
-                  <tr>
-                    <th>N°</th>
-                    <th>Nom</th>
-                    <th>Prenom</th>
-                    <th>Email</th>
-                    <th>Tel</th>
-                    <th >Action</th>                
-                  </tr>
-                  </tfoot>
-                </table>
-              </div>
-              <!-- /.card-body -->
+{{-- Confirmation avant l'envoi du lien de réinitialisation (formulaire complété par espace-agents.js) --}}
+@can('user.create', Auth::user())
+  <div class="modal fade" id="modal-reinitialisation" tabindex="-1" aria-labelledby="modal-reinitialisation-titre" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <form class="modal-content" method="POST" action="#" data-form-reinitialisation>
+        @csrf
+        <div class="modal-header">
+          <h3 class="modal-title h5" id="modal-reinitialisation-titre"><i class="fas fa-key me-2 text-warning" aria-hidden="true"></i>Réinitialiser le compte</h3>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-2">Un e-mail va être envoyé à <strong data-reinit-nom></strong> (<span class="text-break" data-reinit-email></span>) avec un lien pour choisir un nouveau mot de passe.</p>
+          <ul class="small text-muted mb-0">
+            <li>Le lien est valable {{ \App\Support\ReinitialisationMotDePasse::DUREE_MINUTES }} minutes et ne sert qu’une fois.</li>
+            <li>Le mot de passe actuel reste valable tant que l’agent n’en a pas choisi un nouveau.</li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-warning"><i class="fas fa-paper-plane me-1" aria-hidden="true"></i>Envoyer le lien</button>
+        </div>
+      </form>
     </div>
-
+  </div>
+@endcan
 @endsection
-@section('modalSection')
-
-<div id="modal-user-reinitialise" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <!-- Modal Header -->
-                <div class="modal-header text-center">
-                    <h2 class="modal-title"><i class="fa fa-pencil"></i> Confirmation</h2>
-                </div>
-                <!-- END Modal Header -->
-
-                <!-- Modal Body -->
-                <div class="modal-body form-bordered">
-
-                            <div>
-                                <p>Voulez-vous vraiment Reinitialiser?</p>
-                            </div>
-                            <input type="hidden" name="id_table" id="id_table">
-                            <div class="text-end">
-                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-sm btn-primary" data-csp-click="recu_id">OUI</button>
-                            </div>
-
-                </div>
-                <!-- END Modal Body -->
-            </div>
-        </div>
-</div>
-<!-- Voir details users -->
-<div id="modal-voir-detail" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <!-- Modal Header -->
-                <div class="modal-header text-center">
-                    <h2 class="modal-title"><i class="fa fa-pencil"></i>Details de l'utilisateur</h2>
-                </div>
-                <!-- END Modal Header -->
-
-                <!-- Modal Body -->
-                <div class="modal-body form-bordered">
-                        <div class="row">
-                            <label class="col-md-3 control-label">NOM</label> <div class="col-md-8"><span id="nom_user"></span></div>
-                        </div>
-
-                        <div class="row">
-                            <label class="col-md-3 control-label">PRENOM</label> <div class="col-md-8"> <span  id="prenom_user"></span></div>
-                        </div>
-
-                        <div class="row">
-                                <label class="col-md-3 control-label">EMAIL</label> <div class="col-md-8"> <span  id="email_user"></span></div>
-                        </div>
-                        <div class="row">
-                                <label class="col-md-3 control-label">TELEPHONE</label> <div class="col-md-8"> <span  id="telephone_user"></span></div>
-                        </div>
-
-                        <div class="row">
-                                <label class="col-md-3 control-label">Login</label> <div class="col-md-8"> <span  id="login_user"></span></div>
-                        </div>
-                            <div class="text-end">
-                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                            </div>
-
-                </div>
-                <!-- END Modal Body -->
-            </div>
-        </div>
-</div>
-{{-- Modal de confirmation de reinitialisation de mot de passe user --}}
-<div id="modal-confirm-delete" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <!-- Modal Header -->
-                <div class="modal-header text-center">
-                    <h2 class="modal-title"><i class="fa fa-pencil"></i> Confirmation</h2>
-                </div>
-                <!-- END Modal Header -->
-
-                <!-- Modal Body -->
-                <div class="modal-body">
-                           <input type="hidden" name="id_table" id="id_table">
-                            <p>Voulez-vous vraiment Supprimer l'utilisateur</p>
-                        <div class="form-group form-actions">
-                            <div class="text-end">
-                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Fermer</button>
-                                <button type="submit" class="btn btn-sm btn-primary" data-csp-click="supp_id">OUI</button>
-                            </div>
-                        </div>
-
-                </div>
-                <!-- END Modal Body -->
-            </div>
-        </div>
-</div>
-{{-- modal de confiramation de suppression  d'un utilisateur --}}
-<div id="modal-confirm-delete" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <!-- Modal Header -->
-                <div class="modal-header text-center">
-                    <h2 class="modal-title"><i class="fa fa-pencil"></i> Confirmation</h2>
-                </div>
-                <!-- END Modal Header -->
-
-                <!-- Modal Body -->
-                <div class="modal-body">
-
-                            <div>
-                            </div>
-                            <p>Voulez-vous vraiment Supprimer l'utilisateur ???</p>
-                        <div class="form-group form-actions">
-                            <div class="col-12 text-end">
-                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Fermer</button>
-                                <button type="submit" class="btn btn-sm btn-primary">OUI</button>
-                            </div>
-                        </div>
-
-                </div>
-                <!-- END Modal Body -->
-            </div>
-        </div>
-    </div>
-    {{-- cette fonction javascript permet de definir l'action du formulaire dynamiquement. l'action route user reinitialise dans le formulaire dont id est reini_user --}}
-    <script nonce="{{ $cspNonce ?? '' }}">
-
-    function detailUser(id){
-                var id=id;
-
-                $.ajax({
-                    url: url,
-                    type:'GET',
-                    dataType:'json',
-                    data: {id: id} ,
-                    error:function(){alert('error');},
-                    success:function(data){
-                       $("#nom_user").text(data.nomUser);
-                       $("#prenom_user").text(data.prenomUser);
-                       $("#email_user").text(data.emailUser);
-                       $("#telephone_user").text(data.telephone);
-                       $("#login_user").text(data.login);
-                    }
-                });
-        }
-        function idstatus (id){
-            var id= id;
-
-            $.ajax({
-                url: url,
-                type:'GET',
-                data: {id: id} ,
-                error:function(){alert('error');},
-                success:function(){
-                }
-
-           });
-        }
-        function delConfirm (id){
-            //alert(id);
-            $(function(){
-                //alert(id);
-                document.getElementById("id_table").setAttribute("value", id);
-            });
-
-        }
-
-        function recu_id(){
-            //var id= document.getElementById('id_table').value;
-            $(function(){
-                var id= $("#id_table").val();
-
-               //alert(id);
-                $.ajax({
-                    url: url,
-                    type:'GET',
-                    data: {id: id} ,
-                    error:function(){alert('error');},
-                    success:function(){
-                        $('#modal-user-reinitialise').hide();
-                        location.reload();
-
-                    }
-                });
-            });
-        }
-
-        function supp_id(){
-            $(function(){
-                var id= $("#id_table").val();
-
-               //alert(id);
-                $.ajax({
-                    url: url,
-                    type:'GET',
-                    data: {id: id} ,
-                    error:function(){alert('error');},
-                    success:function(){
-                        $('#modal-confirm-delete').hide();
-                        location.reload();
-
-                    }
-                });
-            });
-        }
-    </script>
-@endsection
-
-

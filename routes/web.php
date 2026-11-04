@@ -107,6 +107,8 @@ Route::get('promoteur/liste', [UsagerController::class, 'promoteur'])->name('pro
 // Données des deux listes, chargées page par page par le tableau (DataTables côté serveur)
 Route::get('promoteur/liste/donnees', [UsagerController::class, 'promoteur_donnees'])->name('promoteur.liste.donnees');
 Route::get('/user/compte/donnees', [UserController::class, 'compte_donnees'])->name('user.compte.donnees');
+// Administrateurs : envoyer à un agent un lien de réinitialisation de son mot de passe
+Route::post('/user/{user}/reinitialisation', [UserController::class, 'envoyerReinitialisation'])->name('user.reinitialisation')->middleware('throttle:10,1');
 Route::resource('user', UserController::class);
 Route::resource('permissions', PermissionController::class);
 Route::resource("role",RoleController::class);
