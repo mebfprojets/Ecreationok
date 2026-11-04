@@ -25,6 +25,12 @@
     $nbRejets = $historiques->filter(function ($h) { return $h->motif !== 'Envoyer Pour Traitement'; })->count();
     // Libellés lisibles des pièces jointes (communs avec l'espace agents)
     $libellePiece = fn ($type) => \App\Models\PieceJointe::libelleType($type);
+    // La signature a sa propre rubrique (affichée en clair) ; les autres pièces restent dans la grille
+    $estSignature = fn ($piece) => mb_strtolower((string) $piece->type_piece) === 'signature';
+    $pieceSignature = $piecejointes->first($estSignature);
+    $piecesAffichees = $piecejointes->reject($estSignature)->values();
+    // Rejet mentionnant la signature (pièce cochée « À corriger » par l'agent, ou motif saisi)
+    $signatureACorriger = $rejetee && str_contains(mb_strtolower((string) $demandes->motif), 'signature');
 @endphp
 
 <div class="ed-page">
@@ -108,7 +114,16 @@
                             <a href="#section-pieces" class="btn btn-outline-danger btn-sm">
                                 <i class="fas fa-paperclip me-1" aria-hidden="true"></i> Pièces jointes
                             </a>
+                            <a href="#modal-reprise-signature" class="btn {{ $signatureACorriger ? 'btn-danger' : 'btn-outline-danger' }} btn-sm" data-bs-toggle="modal">
+                                <i class="fas fa-signature me-1" aria-hidden="true"></i> Signature
+                            </a>
                         </div>
+                        @if ($signatureACorriger)
+                            <div class="alert alert-danger py-2 mt-2 mb-0 small">
+                                <i class="fas fa-signature me-1" aria-hidden="true"></i>
+                                Le CEFORE demande de reprendre votre signature : cliquez sur « Signature » ci-dessus et signez de nouveau.
+                            </div>
+                        @endif
                     </li>
                     <li>Enregistrez chaque correction (bouton « Enregistrer » de la rubrique concernée).</li>
                     <li>
@@ -452,22 +467,57 @@
         </section>
     </form>
 
+    {{-- Signature : affichée en clair ; reprise possible tant que la demande est rejetée --}}
+    <section class="ed-carte {{ $signatureACorriger ? 'ed-signature-a-corriger' : '' }}" id="section-signature">
+        <div class="ed-carte-entete">
+            <h2><i class="fas fa-signature me-1 text-success" aria-hidden="true"></i> Signature</h2>
+            @if ($signatureACorriger)
+                <span class="ed-badge danger"><i class="fas fa-exclamation-circle" aria-hidden="true"></i> À reprendre</span>
+            @elseif ($pieceSignature)
+                <span class="ed-meta">Enregistrée le {{ optional($pieceSignature->updated_at ?? $pieceSignature->created_at)->format('d/m/Y à H:i') }}</span>
+            @endif
+        </div>
+        <div class="ed-carte-corps">
+            <div class="ed-signature">
+                <div class="ed-signature-cadre">
+                    @if ($pieceSignature && !is_file((string) $pieceSignature->url) && !\Illuminate\Support\Facades\Storage::exists((string) $pieceSignature->url))
+                        <span class="ed-vide text-center">Le fichier de votre signature est introuvable.@if ($rejetee) Reprenez votre signature.@endif</span>
+                    @elseif ($pieceSignature)
+                        <img src="{{ route('piecejointe.voir', $pieceSignature->id) }}?v={{ optional($pieceSignature->updated_at)->timestamp }}"
+                             alt="Signature de {{ trim($usager->Prenom.' '.$usager->NomRaisonSociale) }}" class="ed-signature-image">
+                    @else
+                        <span class="ed-vide">Aucune signature enregistrée pour cette demande.</span>
+                    @endif
+                </div>
+                <div class="ed-signature-legende">
+                    <div class="fw-semibold">{{ trim(mb_strtoupper((string) $usager->NomRaisonSociale).' '.$usager->Prenom) }}</div>
+                    <div class="ed-meta">Signature apposée lors du dépôt de la demande</div>
+                    @if ($rejetee)
+                        <a href="#modal-reprise-signature" class="btn {{ $signatureACorriger ? 'btn-danger' : 'btn-outline-danger' }} btn-sm mt-3" data-bs-toggle="modal">
+                            <i class="fas fa-pen-nib me-1" aria-hidden="true"></i> Reprendre ma signature
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </section>
+
     {{-- Pièces jointes --}}
     <section class="ed-carte" id="section-pieces">
         <div class="ed-carte-entete">
             <h2><i class="fas fa-paperclip me-1 text-success" aria-hidden="true"></i> Pièces jointes</h2>
-            <span class="ed-meta">{{ $piecejointes->count() }} document{{ $piecejointes->count() > 1 ? 's' : '' }}</span>
+            <span class="ed-meta">{{ $piecesAffichees->count() }} document{{ $piecesAffichees->count() > 1 ? 's' : '' }}</span>
         </div>
         <div class="ed-carte-corps">
             @if ($rejetee)
                 <p class="text-muted small mb-3"><i class="fas fa-info-circle me-1" aria-hidden="true"></i>
                     Pour remplacer un document, cliquez sur <i class="fas fa-pen" aria-hidden="true"></i> à côté de la pièce concernée.</p>
             @endif
-            @if ($piecejointes->isEmpty())
+            @if ($piecesAffichees->isEmpty())
                 <p class="ed-vide mb-0">Aucune pièce jointe pour cette demande.</p>
             @else
                 <div class="ed-pieces">
-                    @foreach ($piecejointes as $piecejointe)
+                    @foreach ($piecesAffichees as $piecejointe)
                         @php $image = in_array(strtolower((string) $piecejointe->file_extension), ['jpg', 'jpeg', 'png']); @endphp
                         <div class="ed-piece">
                             <i class="fas {{ $image ? 'fa-file-image text-success' : 'fa-file-pdf' }} icone" aria-hidden="true"></i>
@@ -518,4 +568,40 @@
         </div>
     </section>
 </div>
+@endsection
+
+{{-- Reprise de la signature (demande rejetée) : module de signature déjà chargé par le pied de page (jQuery UI) --}}
+@section('modal_parpage')
+  @if ($rejetee)
+    <div class="modal fade" id="modal-reprise-signature" tabindex="-1" aria-labelledby="modal-reprise-signature-titre" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" method="POST" action="{{ route('demande.signature', $demandes->id) }}" data-reprise-signature>
+          @csrf
+          <div class="modal-header">
+            <h3 class="modal-title h5" id="modal-reprise-signature-titre"><i class="fas fa-signature me-2 text-success" aria-hidden="true"></i>Reprendre ma signature</h3>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+          </div>
+          <div class="modal-body">
+            <p class="small text-muted mb-2">Signez dans le cadre ci-dessous avec la souris ou le doigt, comme sur papier. Votre nouvelle signature remplacera l’ancienne pour cette demande.</p>
+            <div class="zone-signature" data-zone-signature aria-label="Cadre de signature"></div>
+            <input type="hidden" name="signature" data-champ-signature>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-effacer-signature><i class="fas fa-eraser me-1" aria-hidden="true"></i>Effacer</button>
+              <span class="small text-muted" data-etat-signature>Le cadre est vide.</span>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-success" data-enregistrer-signature disabled><i class="fas fa-save me-1" aria-hidden="true"></i>Enregistrer la signature</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  @endif
+@endsection
+
+@section('additionnel_script')
+  @if ($rejetee)
+    <script src="{{ asset_version('js/reprise-signature.js') }}"></script>
+  @endif
 @endsection

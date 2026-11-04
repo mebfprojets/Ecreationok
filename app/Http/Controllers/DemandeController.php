@@ -295,53 +295,29 @@ class DemandeController extends Controller
                 .'Vérifiez le type de demande choisi ou contactez le CEFORE.');
         }
 
-       // $num=$request->type_request.
-        //Pour la signature
-            //$path = 'C:\wamp64/www/Zip Ecreation/Ecreation_sanou/storage/app/public/files/Signature/';
-            $path=storage_path('app/public/files/'.$usager->id.'/');
-            if(!is_dir($path)){
-                mkdir($path, 0755, true);
-            }
-         //$request->signed->store('public','upload');
-        // $path = Storage::putFile('photos', new File('public/upload/'));
-        // $path = $request->file('signed')->store('upload', 'public');
-         // La signature doit être une vraie image PNG ou JPEG : l'extension du fichier ne doit jamais venir du navigateur
-         // (sinon « data:image/php;base64,... » créerait un fichier signature.php).
-         if (!preg_match('#^data:image/(png|jpe?g);base64,([A-Za-z0-9+/=\s]+)$#', (string) $request->signed, $signature)) {
-             throw new DemandeRefuseeException('La signature n’a pas été reçue correctement. Signez à nouveau dans le cadre prévu, puis réessayez.');
-         }
-         $image_base64 = base64_decode($signature[2], true);
-         $infosImage = $image_base64 === false ? false : @getimagesizefromstring($image_base64);
-         if (!$infosImage || !in_array($infosImage[2], [IMAGETYPE_PNG, IMAGETYPE_JPEG], true)) {
-             throw new DemandeRefuseeException('La signature n’a pas été reçue correctement. Signez à nouveau dans le cadre prévu, puis réessayez.');
-         }
-         $image_type = $infosImage[2] === IMAGETYPE_PNG ? 'png' : 'jpeg';
-         //$file =$path.$usager->id.'.'.$image_type;
-         $file =$path.'signature'.'.'.$image_type;
-
-        // $file =$path.$image_type;
-        //$file ='public/files/'.$usager->id.'-'.$usager->NomRaisonSociale.'.'.$usager->Prenom; 
-        file_put_contents($file,$image_base64);
-
-            $url_local=$usager->id.'/signature'.'.'.$image_type;
-            //$docName = $type_doc;
-            $type_doc="Signature";
-           // $file = $request->file('piece_jointe_1')->storeAs('public/casier', $docName.'.'.$guessExtension);
-            $piecejointe_enrs= PieceJointe::where('usager_id',$usager->id)->where('demande_id',null)->where('type_piece', $type_doc)->get();
-           // dd(count($piecejointe_enrs));
-        if(count($piecejointe_enrs)==0)
-        {
-            $date= new \Datetime();
-            $pj= PieceJointe::create([
-                'usager_id'=>$usager->id,
-                'type_piece'=> $type_doc,
-                'url'=> $file,
-                'numero'=> '',
-                'date_etablissement'=> $date,
+        // Signature dessinée dans le formulaire : un fichier par signature (un promoteur peut avoir plusieurs demandes)
+        $signature = $this->enregistrerSignature($request->signed, $usager);
+        $path = dirname($signature['chemin']).DIRECTORY_SEPARATOR;
+        $type_doc = "Signature";
+        $piecejointe_enrs = PieceJointe::where('usager_id', $usager->id)->where('demande_id', null)->where('type_piece', $type_doc)->get();
+        if (count($piecejointe_enrs) == 0) {
+            PieceJointe::create([
+                'usager_id' => $usager->id,
+                'type_piece' => $type_doc,
+                'url' => $signature['chemin'],
+                'numero' => '',
+                'date_etablissement' => new \Datetime(),
                 'lieu_etablissement' => 'test',
-                'categorie_piece'=> 'Signature',
-                'url_local'=>$url_local,
-                'file_extension'=>$image_type
+                'categorie_piece' => 'Signature',
+                'url_local' => $signature['url_local'],
+                'file_extension' => $signature['type'],
+            ]);
+        } else {
+            // Signature d'une tentative précédente non aboutie : remplacée par celle-ci
+            PieceJointe::whereIn('id', $piecejointe_enrs->pluck('id'))->update([
+                'url' => $signature['chemin'],
+                'url_local' => $signature['url_local'],
+                'file_extension' => $signature['type'],
             ]);
         }
         
@@ -1672,6 +1648,68 @@ public function show_formalite_retour(Formalite $formalite){
         $this->autoriserDemande(Demande::find($formalite->demande_id));
 
         return $this->afficherFichier($formalite->url);
+    }
+
+    /**
+     * Enregistre une signature dessinée (data URL PNG ou JPEG) dans storage/app/public/files/{usager}/,
+     * sous un nom propre à chaque signature. Lève DemandeRefuseeException si l'image n'est pas valide.
+     * L'extension ne vient jamais du navigateur (sinon « data:image/php;base64,... » créerait un fichier .php).
+     */
+    private function enregistrerSignature(?string $dataUrl, Usager $usager): array
+    {
+        $refus = 'La signature n’a pas été reçue correctement. Signez à nouveau dans le cadre prévu, puis réessayez.';
+        if (!preg_match('#^data:image/(png|jpe?g);base64,([A-Za-z0-9+/=\s]+)$#', (string) $dataUrl, $morceaux)) {
+            throw new DemandeRefuseeException($refus);
+        }
+        $binaire = base64_decode($morceaux[2], true);
+        $infosImage = $binaire === false ? false : @getimagesizefromstring($binaire);
+        if (!$infosImage || !in_array($infosImage[2], [IMAGETYPE_PNG, IMAGETYPE_JPEG], true)) {
+            throw new DemandeRefuseeException($refus);
+        }
+        $type = $infosImage[2] === IMAGETYPE_PNG ? 'png' : 'jpeg';
+        $dossier = storage_path('app/public/files/'.$usager->id.'/');
+        if (!is_dir($dossier)) {
+            mkdir($dossier, 0755, true);
+        }
+        $nom = 'signature-'.now()->format('YmdHis').'-'.\Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(6)).'.'.$type;
+        file_put_contents($dossier.$nom, $binaire);
+
+        return ['chemin' => $dossier.$nom, 'url_local' => $usager->id.'/'.$nom, 'type' => $type];
+    }
+
+    /** Demande rejetée : le promoteur signe de nouveau ; la nouvelle signature remplace celle de la demande. */
+    public function reprendreSignature(Request $request, $id)
+    {
+        $demande = Demande::findOrFail($id);
+        $this->autoriserDemande($demande);
+        if (!$demande->estRejetee()) {
+            return redirect()->back()->with('error', 'La signature ne peut être reprise que si la demande a été rejetée par le CEFORE.');
+        }
+        $request->validate(['signature' => 'required|string|max:2000000'], [
+            'signature.required' => 'Signez dans le cadre avant d’enregistrer.',
+            'signature.max' => 'La signature est trop volumineuse. Effacez-la et signez de nouveau.',
+        ]);
+        $usager = Usager::findOrFail($demande->usager_id);
+        try {
+            $signature = $this->enregistrerSignature($request->signature, $usager);
+        } catch (DemandeRefuseeException $e) {
+            return redirect()->to(route('demande.detail', $demande->id).'#section-signature')->with('error', $e->getMessage());
+        }
+
+        $piece = PieceJointe::where('demande_id', $demande->id)->where('type_piece', 'Signature')->first();
+        $donnees = ['url' => $signature['chemin'], 'url_local' => $signature['url_local'], 'file_extension' => $signature['type']];
+        if ($piece) {
+            $piece->update($donnees);
+        } else {
+            PieceJointe::create($donnees + [
+                'usager_id' => $usager->id, 'demande_id' => $demande->id, 'type_piece' => 'Signature', 'categorie_piece' => 'Signature',
+                'numero' => '', 'date_etablissement' => new \Datetime(), 'lieu_etablissement' => 'ECREATION',
+            ]);
+        }
+        ActivitePromoteur::noter('signature_reprise', $demande);
+
+        return redirect()->to(route('demande.detail', $demande->id).'#section-signature')
+            ->with('success', 'Votre nouvelle signature a été enregistrée. Une fois toutes les corrections faites, renvoyez la demande pour traitement.');
     }
 
     private function afficherFichier(?string $chemin)

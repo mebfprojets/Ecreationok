@@ -130,6 +130,18 @@
     .ed-piece .icone { font-size: 1.4rem; color: var(--mebf-rouge); }
     .ed-piece .nom { flex: 1; font-weight: 600; font-size: .9rem; color: #1f2a22; }
 
+    /* Signature (affichée en clair) et reprise */
+    .ed-signature { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.5rem; }
+    .ed-signature-cadre { flex: 0 1 460px; display: flex; align-items: center; justify-content: center; min-height: 140px; padding: .75rem;
+                          background: #fff; border: 1px dashed #c8d1cb; border-radius: 10px;
+                          background-image: linear-gradient(to top, transparent 34px, #e3e9e5 34px, #e3e9e5 35px, transparent 35px); }
+    .ed-signature-image { max-width: 100%; max-height: 180px; object-fit: contain; }
+    .ed-signature-legende { flex: 1 1 200px; }
+    .ed-signature-a-corriger { border-color: #f3c2c8; border-left: 5px solid var(--mebf-rouge); }
+    .ed-signature-a-corriger .ed-carte-entete { background: linear-gradient(90deg, var(--mebf-rouge-pale), #fff 70%); }
+    .zone-signature { width: 100%; height: 200px; border: 2px dashed #b9dcc0; border-radius: 10px; background: #fff; touch-action: none; overflow: hidden; }
+    .zone-signature canvas { display: block; }
+
     /* Paiement */
     .ed-page-etroite { max-width: 900px; }
     .ed-montant .libelle { font-size: .8rem; text-transform: uppercase; letter-spacing: .03em; color: #6b7a70; font-weight: 700; }

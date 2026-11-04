@@ -54,6 +54,8 @@ Route::post('/inscription/code', [InscriptionController::class, 'envoyerCode'])-
 // Demande update
 Route::put('demande/update/{id}', [DemandeController::class, 'update_demande'])->name('demande.update');
 Route::post('demande/update/promoteur/{id}', [DemandeController::class, 'update_rejet'])->name('update.promoteur');
+// Demande rejetée : nouvelle signature
+Route::post('demande/{id}/signature', [DemandeController::class, 'reprendreSignature'])->name('demande.signature')->middleware('throttle:10,1');
 
 // Usager update
 Route::put('usager/update/{id}', [DemandeController::class, 'update_usager'])->name('usager.update');

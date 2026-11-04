@@ -25,6 +25,7 @@ class ActivitePromoteur extends Model
         'demande_modifiee' => ['Informations de l’entreprise modifiées', 'fa-building text-primary'],
         'dirigeant_modifie' => ['Informations du dirigeant modifiées', 'fa-user-edit text-primary'],
         'piece_remplacee' => ['Pièce jointe remplacée', 'fa-file-upload text-primary'],
+        'signature_reprise' => ['Signature reprise', 'fa-signature text-primary'],
     ];
 
     /** Enregistre une action ; ne bloque jamais l'action elle-même si l'écriture échoue. */
