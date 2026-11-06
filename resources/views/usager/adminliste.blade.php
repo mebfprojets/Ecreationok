@@ -2,11 +2,12 @@
 @section('title', 'Promoteurs')
 @section('promoteur', 'active')
 @section('content')
+@include('backend.adminlte.partials.filtre_periode', ['libelleDate' => 'Date d’enregistrement du promoteur'])
 <div class="card">
   <div class="card-body">
     {{-- Plus de 14 000 promoteurs : le serveur envoie une page à la fois (route promoteur.liste.donnees) --}}
     <table id="tableau-promoteurs" class="table table-bordered table-striped align-middle w-100"
-           data-ajax-url="{{ route('promoteur.liste.donnees') }}" data-tri="3,desc" data-non-triables="5,6">
+           data-ajax-url="{{ route('promoteur.liste.donnees', array_filter(['du' => $periode['du'], 'au' => $periode['au']])) }}" data-tri="3,desc" data-non-triables="5,6">
       <thead>
         <tr>
           <th>Nom et prénom(s)</th>

@@ -66,14 +66,15 @@ class UserController extends Controller
                 return back()->with('error', 'L’e-mail de réinitialisation n’a pas pu être envoyé à '.$user->email.'. Réessayez dans quelques minutes.');
         }
     }
-    public function compte()
+    public function compte(Request $request)
     {
         // Comptes des promoteurs (données personnelles) : agents chargés des demandes uniquement
         if (!Auth::user()->can('lister.demande')) {
             return $this->refuserAcces();
         }
-        // Le tableau est rempli page par page par compte_donnees() (plus de 15 000 comptes)
-        return view('users.compte');
+        // Le tableau est rempli page par page par compte_donnees() (plus de 15 000 comptes), avec la même période
+        $periode = $this->periodeTableau($request);
+        return view('users.compte', compact('periode'));
     }
 
     /** Comptes des promoteurs au format DataTables (traitement côté serveur), limités au CEFORE de l'agent. */
@@ -86,7 +87,7 @@ class UserController extends Controller
         $siege = $this->estAgentSiege(Auth::user());
         $organisation = Auth::user()->organisation;
 
-        $base = User::query()->whereNull('users.isadmin')
+        $base = $this->dansPeriode(User::query(), $this->periodeTableau($request), 'users.created_at')->whereNull('users.isadmin')
             ->leftJoin('usagers as us', 'us.user_id', '=', 'users.id')
             ->when(!$siege, fn ($q) => $q->whereExists(fn ($e) => $e->select(DB::raw(1))->from('demandes as d')
                 ->whereColumn('d.usager_id', 'us.id')->where('d.organisation_code', $organisation)));

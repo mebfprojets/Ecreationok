@@ -1127,38 +1127,6 @@ public function laodpiecejointe(Request $request){
             return $requete;
         }
 
-        /**
-         * Période choisie sur le tableau de bord (?du=AAAA-MM-JJ&au=AAAA-MM-JJ, bornes incluses ; sans date : toute la période).
-         * Une date invalide est ignorée et signalée, plutôt que de renvoyer vers la page (ce qui bouclerait sur un lien erroné).
-         */
-        private function periodeTableau(Request $request): array
-        {
-            $lire = function ($valeur) {
-                $date = is_string($valeur) ? \DateTime::createFromFormat('!Y-m-d', $valeur) : false;
-                return $date && $date->format('Y-m-d') === $valeur ? $valeur : null;
-            };
-            $du = $lire($request->query('du'));
-            $au = $lire($request->query('au'));
-            $erreur = ($request->filled('du') && !$du) || ($request->filled('au') && !$au)
-                ? 'Une date de la période n’est pas valide : elle a été ignorée.' : null;
-            if ($du && $au && $du > $au) {
-                [$du, $au] = [$au, $du];
-            }
-            $format = fn ($date) => \Carbon\Carbon::parse($date)->format('d/m/Y');
-            $libelle = $du && $au ? ($du === $au ? 'Le '.$format($du) : 'Du '.$format($du).' au '.$format($au))
-                : ($du ? 'Depuis le '.$format($du) : ($au ? 'Jusqu’au '.$format($au) : 'Toute la période'));
-
-            return ['du' => $du, 'au' => $au, 'active' => $du || $au, 'libelle' => $libelle, 'erreur' => $erreur];
-        }
-
-        /** Limite une requête à la période (format ISO avec « T » : interprété de la même façon quelle que soit la langue de SQL Server). */
-        private function dansPeriode($requete, ?array $periode, string $colonne = 'created_at')
-        {
-            return $requete
-                ->when($periode['du'] ?? null, fn ($q, $du) => $q->where($colonne, '>=', $du.'T00:00:00'))
-                ->when($periode['au'] ?? null, fn ($q, $au) => $q->where($colonne, '<', \Carbon\Carbon::parse($au)->addDay()->format('Y-m-d').'T00:00:00'));
-        }
-
         /** Compteurs des cases du tableau de bord, calculés en base (COUNT) et non en chargeant les demandes ; limités aux demandes créées sur la période. */
         private function compteursDemandes(?array $periode = null): array
         {
@@ -1271,12 +1239,13 @@ public function laodpiecejointe(Request $request){
                 compact('actions', 'siege', 'parCefore', 'totaux', 'nomsCefore', 'statsAgents', 'periode')));
         }
 
-        public function all(){
+        public function all(Request $request){
             if (!Auth::user()->can('lister.demande')) {
                 return $this->refuserAcces();
             }
-            // Le tableau est rempli page par page par all_donnees() : plus de chargement de toutes les demandes d'un coup
-            return view('backend.adminlte.all', $this->compteursDemandes());
+            // Le tableau est rempli page par page par all_donnees() (avec la même période) : plus de chargement de toutes les demandes d'un coup
+            $periode = $this->periodeTableau($request);
+            return view('backend.adminlte.all', $this->compteursDemandes($periode) + compact('periode'));
         }
 
         /** Données de « Toutes les demandes » au format attendu par DataTables (traitement côté serveur). */
@@ -1288,7 +1257,7 @@ public function laodpiecejointe(Request $request){
             $colonnes = [0 => 'numero_demande', 1 => 'legal_rep_name', 2 => 'paye', 3 => 'commercial_name', 4 => 'denomination_social',
                 5 => 'sigle', 6 => 'created_at', 7 => 'primary_activity', 9 => 'organisation_code', 10 => 'date_paiement'];
 
-            $base = $this->demandesVisibles()->whereNotNull('etat');
+            $base = $this->dansPeriode($this->demandesVisibles(), $this->periodeTableau($request))->whereNotNull('etat');
             $total = (clone $base)->count();
 
             $recherche = trim((string) data_get($request->input('search'), 'value', ''));
@@ -1337,79 +1306,158 @@ public function laodpiecejointe(Request $request){
             ]);
         }
 
+        /**
+         * À valider (?etat=0) ou validées (?etat=1). Le tableau est rempli page par page par liste_demande_donnees()
+         * (plus de 17 000 demandes validées), avec la même période.
+         */
         public function liste_demande(Request $request){
-            if (Auth::user()->can('lister.demande'))
-            {
-            if(Auth::user()->organisation!="001000"){
-                $etat=$request->etat;
-            if($etat==0){
-                $dem="demande_a_valider";
-                $demandes=Demande::where('paye', 1)->where('etat', 0)->where('organisation_code',Auth::user()->organisation)->orderby('date_paiement','desc')->get();
-            return view('backend.adminlte.liste', compact('demandes','dem'));
+            if (!Auth::user()->can('lister.demande')) {
+                return $this->refuserAcces();
             }
-            else{
-                $dem="demande_valider";
-                $demandes=Demande::where('paye', 1)->where('etat', 1)->where('organisation_code',Auth::user()->organisation)->orderby('date_paiement','desc')->get();
-            return view('backend.adminlte.liste', compact('demandes','dem'));
-
-            }
-            }
-            else{
-                $etat=$request->etat;
-                if($etat==0){
-                    $dem="demande_a_valider";
-                    $demandes=Demande::where('paye', 1)->where('etat', 0)->orderby('date_paiement','desc')->get();
-                return view('backend.adminlte.liste', compact('demandes','dem'));
-                }
-                else{
-                    $dem="demande_valider";
-                    $demandes=Demande::where('paye', 1)->where('etat', 1)->orderby('date_paiement','desc')->get();
-                return view('backend.adminlte.liste', compact('demandes','dem'));
-
-                }
-            }
-        }
-        else{
-            flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
-            return redirect()->back();
-        }
+            $periode = $this->periodeTableau($request);
+            $etat = $request->etat == 0 ? 0 : 1;
+            $dem = $etat === 0 ? 'demande_a_valider' : 'demande_valider';
+            return view('backend.adminlte.liste', compact('dem', 'periode', 'etat'));
         }
 
-        public function liste_en_attente_de_partenaire(){
-            if (Auth::user()->can('lister.demande'))
-            {
-            // Compteurs calculés en base et limités au CEFORE de l'agent (le siège voit tout)
-            $demandes=$this->demandesVisibles()->whereNotNull('RCCM')->orderBy('created_at','desc')->get();
-            $rccm=$this->demandesVisibles()->whereNull('RCCM')->where('etat', 1)->count();
-            $ifu=$this->demandesVisibles()->whereNull('IFU')->where('etat', 1)->count();
-            $cnss=$this->demandesVisibles()->whereNull('CNSS')->where('etat', 1)->count();
-            $cpc=$this->demandesVisibles()->whereNull('CPC')->where('etat', 1)->count();
-            $dem="demande_en_attente_partenaire";
-            return view('backend.adminlte.enattentedepartenaire', compact('demandes','dem','rccm','ifu','cnss','cpc'));
-            
-        }
-        else{
-            flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
-            return redirect()->back();
-        }
-
-        }
-
-        public function liste_demande_rejet(){
-            if (Auth::user()->can('lister.demande'))
-            {
-            if(Auth::user()->organisation!="001000"){
-                $demandes=Demande::where('etat', 2)->where('organisation_code',Auth::user()->organisation)->orderby('created_at','desc')->get();
-                }
-            else{
-                $demandes=Demande::where('etat', 2)->orderby('created_at','desc')->get();
-                }
-            return view('backend.adminlte.liste_rejet', compact('demandes'));
-             }
-            else{
-                flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
-                return redirect()->back();
+        /** Données des listes « À valider » / « Validées » au format DataTables (traitement côté serveur), limitées au CEFORE de l'agent. */
+        public function liste_demande_donnees(Request $request)
+        {
+            if (!Auth::user()->can('lister.demande')) {
+                abort(403);
             }
+            $p = $this->parametresTableau($request, [1 => 'numero_demande', 2 => 'legal_rep_name', 4 => 'commercial_name', 5 => 'created_at',
+                6 => 'date_paiement', 7 => 'Date_etat_validation', 10 => 'organisation_code'], 'date_paiement');
+
+            $base = $this->dansPeriode($this->demandesVisibles(), $this->periodeTableau($request))
+                ->where('paye', 1)->where('etat', $request->etat == 0 ? 0 : 1);
+            $total = (clone $base)->count();
+            if ($p['motif']) {
+                $base->where(function ($q) use ($p) {
+                    foreach (['numero_demande', 'legal_rep_name', 'commercial_name', 'organisation_code'] as $champ) {
+                        $q->orWhere($champ, 'like', $p['motif']);
+                    }
+                    // Nom de l'agent qui a validé
+                    $q->orWhereIn('User_ayant_valide', User::query()->select('id')->where(fn ($u) => $u->where('name', 'like', $p['motif'])
+                        ->orWhere('prenom', 'like', $p['motif'])->orWhere(DB::raw("CONCAT(prenom, ' ', name)"), 'like', $p['motif'])));
+                });
+            }
+            $filtre = (clone $base)->count();
+
+            $demandes = $base->orderBy($p['tri'], $p['sens'])->orderBy('id', 'desc')->skip($p['debut'])->take($p['longueur'])
+                ->get(['id', 'numero_demande', 'legal_rep_name', 'paye', 'commercial_name', 'created_at', 'date_paiement',
+                    'Date_etat_validation', 'User_ayant_valide', 'objet_social', 'organisation_code', 'motif']);
+            // Agents validateurs de la page : une seule requête (au lieu d'une par ligne)
+            $validateurs = User::whereIn('id', $demandes->pluck('User_ayant_valide')->filter()->unique())->get(['id', 'name', 'prenom'])->keyBy('id');
+            $date = fn ($v) => $v ? date('d-m-Y à H:i', strtotime($v)) : null;
+
+            $lignes = $demandes->values()->map(function ($d, $i) use ($p, $validateurs, $date) {
+                $validateur = $validateurs->get($d->User_ayant_valide);
+                return [
+                    $p['debut'] + $i + 1,
+                    e($d->numero_demande),
+                    e($d->legal_rep_name),
+                    $d->paye == 1 ? 'Payé' : ($d->paye == 2 ? 'Attente validation du paiement' : 'Non payé'),
+                    e($d->commercial_name),
+                    $date($d->created_at) ?? '—',
+                    $date($d->date_paiement) ?? '—',
+                    $date($d->Date_etat_validation) ?? 'Aucune date',
+                    $validateur ? e(trim($validateur->prenom.' '.$validateur->name)) : '<span class="text-muted">Aucun compte associé</span>',
+                    e(\Illuminate\Support\Str::limit((string) $d->objet_social, 120)),
+                    e($d->organisation_code),
+                    // Demande déjà rejetée une fois (motif renseigné) : ligne surlignée ; la ligne entière ouvre le détail
+                    'DT_RowClass' => $d->motif !== null ? 'table-warning' : '',
+                    'DT_RowAttr' => ['data-href' => route('detail.demande', $d->id), 'tabindex' => 0, 'title' => 'Ouvrir le détail de la demande'],
+                ];
+            });
+
+            return response()->json([
+                'draw' => (int) $request->input('draw'),
+                'recordsTotal' => $total,
+                'recordsFiltered' => $filtre,
+                'data' => $lignes,
+            ]);
+        }
+
+        public function liste_en_attente_de_partenaire(Request $request){
+            if (!Auth::user()->can('lister.demande')) {
+                return $this->refuserAcces();
+            }
+            // Compteurs calculés en base, limités au CEFORE de l'agent (le siège voit tout) et à la période choisie ;
+            // le tableau est rempli page par page par liste_partenaires_donnees() (plus de 15 000 demandes)
+            $periode = $this->periodeTableau($request);
+            $demandes = fn () => $this->dansPeriode($this->demandesVisibles(), $periode);
+            $rccm = $demandes()->whereNull('RCCM')->where('etat', 1)->count();
+            $ifu = $demandes()->whereNull('IFU')->where('etat', 1)->count();
+            $cnss = $demandes()->whereNull('CNSS')->where('etat', 1)->count();
+            $cpc = $demandes()->whereNull('CPC')->where('etat', 1)->count();
+            $dem = "demande_en_attente_partenaire";
+            return view('backend.adminlte.enattentedepartenaire', compact('dem', 'rccm', 'ifu', 'cnss', 'cpc', 'periode'));
+        }
+
+        /** Données de la liste « Attente partenaires » (demandes ayant leur RCCM) au format DataTables (traitement côté serveur). */
+        public function liste_partenaires_donnees(Request $request)
+        {
+            if (!Auth::user()->can('lister.demande')) {
+                abort(403);
+            }
+            $p = $this->parametresTableau($request, [1 => 'commercial_name', 2 => 'RCCM', 3 => 'IFU', 4 => 'CNSS', 5 => 'CPC', 6 => 'numero_demande',
+                7 => 'legal_rep_name', 8 => 'denomination_social', 9 => 'sigle', 11 => 'organisation_code', 12 => 'date_paiement'], 'created_at');
+
+            $base = $this->dansPeriode($this->demandesVisibles(), $this->periodeTableau($request))->whereNotNull('RCCM');
+            $total = (clone $base)->count();
+            if ($p['motif']) {
+                $base->where(function ($q) use ($p) {
+                    foreach (['commercial_name', 'RCCM', 'IFU', 'CNSS', 'CPC', 'numero_demande', 'legal_rep_name', 'denomination_social', 'sigle', 'organisation_code'] as $champ) {
+                        $q->orWhere($champ, 'like', $p['motif']);
+                    }
+                });
+            }
+            $filtre = (clone $base)->count();
+
+            $demandes = $base->orderBy($p['tri'], $p['sens'])->orderBy('id', 'desc')->skip($p['debut'])->take($p['longueur'])
+                ->get(['id', 'commercial_name', 'RCCM', 'DateRCCM', 'IFU', 'DateIFU', 'CNSS', 'DateCNSS', 'CPC', 'DateCPC', 'avecCPC',
+                    'numero_demande', 'legal_rep_name', 'denomination_social', 'sigle', 'objet_social', 'organisation_code', 'date_paiement']);
+            $attente = fn ($texte) => '<span class="badge text-bg-warning">'.$texte.'</span>';
+            $reference = fn ($numero, $date) => e(trim($numero.($date ? ' du '.$date : '')));
+
+            $lignes = $demandes->values()->map(function ($d, $i) use ($p, $attente, $reference) {
+                return [
+                    $p['debut'] + $i + 1,
+                    e($d->commercial_name),
+                    $reference($d->RCCM, $d->DateRCCM),
+                    $d->IFU ? $reference($d->IFU, $d->DateIFU) : $attente('En attente de l’IFU'),
+                    $d->CNSS ? $reference($d->CNSS, $d->DateCNSS) : $attente('En attente de la CNSS'),
+                    (string) $d->avecCPC === '1'
+                        ? ($d->CPC ? $reference($d->CPC, $d->DateCPC) : $attente('En attente de la CPC'))
+                        : '<span class="text-muted">Pas de CPC demandée</span>',
+                    e($d->numero_demande),
+                    e($d->legal_rep_name),
+                    e($d->denomination_social),
+                    e($d->sigle),
+                    e(\Illuminate\Support\Str::limit((string) $d->objet_social, 120)),
+                    e($d->organisation_code),
+                    $d->date_paiement ? e(format_date($d->date_paiement)) : '—',
+                    // La ligne entière ouvre le détail de la demande
+                    'DT_RowAttr' => ['data-href' => route('detail.demande', $d->id), 'tabindex' => 0, 'title' => 'Ouvrir le détail de la demande'],
+                ];
+            });
+
+            return response()->json([
+                'draw' => (int) $request->input('draw'),
+                'recordsTotal' => $total,
+                'recordsFiltered' => $filtre,
+                'data' => $lignes,
+            ]);
+        }
+
+        public function liste_demande_rejet(Request $request){
+            if (!Auth::user()->can('lister.demande')) {
+                return $this->refuserAcces();
+            }
+            $periode = $this->periodeTableau($request);
+            $demandes = $this->dansPeriode($this->demandesVisibles(), $periode)->where('etat', 2)->orderBy('created_at', 'desc')->get();
+            return view('backend.adminlte.liste_rejet', compact('demandes', 'periode'));
         }
 
         /** Page de traitement d'une demande par un agent (informations, pièces, historique, décision). */
@@ -1828,23 +1876,15 @@ public function show_formalite_retour(Formalite $formalite){
         }
     }
 
+        /** Demandes par statut de paiement (?paye=0 : à payer), limitées au CEFORE de l'agent et à la période choisie (date de dépôt). */
         public function liste_filtre(Request $request){
-            if (Auth::user()->can('lister.demande'))
-            {
-            if(Auth::user()->organisation!="001000"){
-                $statut=$request->paye;
-                $demandes=Demande::where('paye', $statut)->where('organisation_code', Auth::user()->organisation)->orderBy('created_at', 'desc')->get();
-                }
-            else{
-                $statut=$request->paye;
-                $demandes=Demande::where('paye', $statut)->orderBy('created_at', 'desc')->get();
-                }
-            return view('backend.adminlte.liste_demande', compact('demandes'));
-        }
-        else{
-            flash("Vous n'avez pas le droit d'acceder à cette resource. Veillez contacter l'administrateur!!!")->error();
-            return redirect()->back();
-        }
+            if (!Auth::user()->can('lister.demande')) {
+                return $this->refuserAcces();
+            }
+            $periode = $this->periodeTableau($request);
+            $demandes = $this->dansPeriode($this->demandesVisibles(), $periode)
+                ->where('paye', $request->paye)->orderBy('created_at', 'desc')->get();
+            return view('backend.adminlte.liste_demande', compact('demandes', 'periode'));
         }
 
         public function update_rejet(Request $request, $id){

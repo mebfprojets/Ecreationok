@@ -2,6 +2,7 @@
 @section('title', 'En attente des partenaires')
 @section('liste_partenaire', 'active')
 @section('content')
+@include('backend.adminlte.partials.filtre_periode', ['libelleDate' => 'Date de dépôt'])
 <div class="card">
 
 <div class="row">
@@ -57,72 +58,33 @@
           <!-- ./col -->
         </div>
                           
-              <!-- /.card-header -->
               <div class="card-body">
-                <table id="example1" class="table table-bordered table-striped">
-                  <thead style="background-color:#0b9e44; color:white">
+                {{-- Rempli page par page par DemandeController::liste_partenaires_donnees (recherche et tri côté serveur, même période) --}}
+                <table id="tableau-partenaires" class="table table-bordered table-striped w-100"
+                       data-ajax-url="{{ route('list.partenaires.donnees', array_filter(['du' => $periode['du'], 'au' => $periode['au']])) }}"
+                       data-tri="12,desc" data-non-triables="0,10">
+                  <thead>
                   <tr>
                     <th>N°</th>
-                    <th>Nom Commercial</th>
-                    <th>Ref RCCM</th>
-                    <th>Ref IFU</th>
-                    <th>Ref CNSS</th>
-                    <th>Ref CPC</th>
-                    <th>Numero Demande</th>
-                    <th>Promoteur</th>                
-                    <th>Dénomination Sociale</th>                
+                    <th>Nom commercial</th>
+                    <th>Réf. RCCM</th>
+                    <th>Réf. IFU</th>
+                    <th>Réf. CNSS</th>
+                    <th>Réf. CPC</th>
+                    <th>Numéro demande</th>
+                    <th>Promoteur</th>
+                    <th>Dénomination sociale</th>
                     <th>Sigle</th>
-                    <th>Objet Social</th>
+                    <th>Objet social</th>
                     <th>CEFORE</th>
-                    <th>Date Paiement</th>                    
+                    <th>Date paiement</th>
                   </tr>
                   </thead>
-                  <tbody>
-                  @php
-                    $i=0; 
-                  @endphp
-                   @foreach ($demandes as $demande)
-                        @php
-                        $i++;
-                        @endphp
-                  <tr data-href="{{ route('detail.demande', $demande->id) }}" tabindex="0" title="Ouvrir le détail de la demande">
-                    <td>{{$i}}</td>
-                    <td>{{$demande->commercial_name}}</td>
-                    <td style="width:250px;"> {{($demande->RCCM)}} du {{($demande->DateRCCM)}}</td>
-                    <td>@if($demande->IFU) {{($demande->DateIFU)}} {{($demande->IFU)}}  @else En Attente de IFU  @endif</td>
-                    <td>@if($demande->CNSS) {{($demande->CNSS)}} {{($demande->DateCNSS)}}  @else En Attente de CNSS  @endif</td>
-                    <td>@if($demande->avecCPC==1) {{($demande->CPC)}} {{($demande->DateCPC)}}  @elseif($demande->avecCPC==1 && $demande->CPC==null) En Attente de CPC @else Pas de Prestation CPC  @endif</td>
-                    <td>{{$demande->numero_demande}}</td>
-                    <td>{{$demande->legal_rep_name}}</td>
-                    <td>{{$demande->denomination_social}}</td>
-                    <td>{{$demande->sigle}}</td>
-                    <td>{{$demande->objet_social}}</td>
-                    <td>{{$demande->organisation_code}}</td>
-                    <td>{{ $demande->date_paiement ? format_date($demande->date_paiement) : "—" }}</td>
-                    
-                  </tr>
-                  @endforeach
-                  </tbody>
-                  <tfoot>
-                  <tr>
-                  <th>N°</th>
-                    <th>Nom Commercial</th>
-                    <th>Ref RCCM</th>
-                    <th>Ref IFU</th>
-                    <th>Ref CNSS</th>
-                    <th>Ref CPC</th>
-                    <th>Numero Demande</th>
-                    <th>Promoteur</th>                
-                    <th>Dénomination Sociale</th>                
-                    <th>Sigle</th>
-                    <th>Objet Social</th>
-                    <th>CEFORE</th>
-                    <th>Date Paiement</th>
-                  </tr>
-                  </tfoot>
                 </table>
+                <p class="small text-muted mt-2 mb-0"><i class="fas fa-info-circle me-1" aria-hidden="true"></i>
+                  La recherche porte aussi sur les numéros RCCM, IFU, CNSS et CPC.
+                  Les exports (Excel, PDF…) portent sur les lignes affichées : choisissez « 100 lignes par page » ou une période avant d’exporter.</p>
               </div>
-              <!-- /.card-body -->
 </div>
             <!-- /.card -->
 @endsection

@@ -2,6 +2,7 @@
 @section('title', 'Demandes rejetées')
 @section('liste-rejetee', 'active')
 @section('content')
+@include('backend.adminlte.partials.filtre_periode', ['libelleDate' => 'Date de dépôt'])
 <div class="card">
               <div class="card-header">
                 <strong><h3 class="card-title">Liste des Demandes Rejétées</h3></strong>

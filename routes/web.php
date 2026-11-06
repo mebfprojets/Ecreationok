@@ -114,10 +114,14 @@ Route::resource('permissions', PermissionController::class);
 Route::resource("role",RoleController::class);
 
 Route::get('/backend/liste', [DemandeController::class, 'liste_demande'])->name("list");
+// Données des listes « À valider » / « Validées », chargées page par page par le tableau (DataTables côté serveur)
+Route::get('/backend/liste/donnees', [DemandeController::class, 'liste_demande_donnees'])->name("list.donnees");
 Route::get('/backend/liste/all', [DemandeController::class, 'all'])->name("all.list");
 // Données de « Toutes les demandes », chargées page par page par le tableau (DataTables côté serveur)
 Route::get('/backend/liste/all/donnees', [DemandeController::class, 'all_donnees'])->name("all.list.donnees");
 Route::get('/backend/liste/attentedepqrtenaire', [DemandeController::class, 'liste_en_attente_de_partenaire'])->name("list.en_attente_de_partenaire");
+// Données de « Attente partenaires », chargées page par page par le tableau (DataTables côté serveur)
+Route::get('/backend/liste/attentedepqrtenaire/donnees', [DemandeController::class, 'liste_partenaires_donnees'])->name("list.partenaires.donnees");
 Route::post('/backend/ajouter/formalite', [DemandeController::class, 'add_formalite_retour'])->name("add_formalite_retour");
 Route::post('/backend/update/formalite', [DemandeController::class, 'update_formalite_retour'])->name("update_formalite_retour");
 Route::get('/backend/show/formalite/{formalite}', [DemandeController::class, 'show_formalite_retour'])->name("show_formalite_retour");

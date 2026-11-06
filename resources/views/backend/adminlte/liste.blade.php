@@ -2,83 +2,35 @@
 @section('title'){{ $dem === 'demande_a_valider' ? 'Demandes à valider' : 'Demandes validées' }}@endsection
 @section($dem, 'active')
 @section('content')
+@include('backend.adminlte.partials.filtre_periode', ['libelleDate' => 'Date de dépôt'])
 <div class="card">
-              <div class="card-header">
-               <strong><h3 class="card-title">
-                Liste des Demandes
-              </h3></strong>
-              </div>              
-              <!-- /.card-header -->
-              <div class="card-body">
-                <table id="example1" class="table table-bordered table-striped">
-                  <thead style="background-color:#0b9e44; color:white">
-                  <tr>
-                    <th>N°</th>
-                    <th>Numero Demande</th>
-                    <th>Promoteur</th>
-                    <th>Statut</th>
-                    <th>Nom Commercial</th>
-                    <th>Date Création</th>
-                    <th>Date Paiement</th>
-                    <th>Date Validation</th>                 
-                    <th>Valider Par</th>                                      
-                    <th>Objet Social</th>
-                    <th>CEFORE</th>
-                    
-                  </tr>
-                  </thead>
-                  <tbody>
-                  @php
-                    $i=0; 
-                  @endphp
-                   @foreach ($demandes as $demande)
-                        @php
-                        $i++;
-                        $has_motif= !is_null($demande->motif);
-                        $user= CompteUsager($demande->User_ayant_valide);
-                        $hasUserValidate = !is_null($user);
-                        @endphp
-                  <tr class="{{ $has_motif ? 'table-warning' : '' }}" data-href="{{ route('detail.demande', $demande->id) }}" tabindex="0" title="Ouvrir le détail de la demande">
-                    <td>{{$i}}</td>
-                    <td>{{$demande->numero_demande}}</td>
-                    <td>{{$demande->legal_rep_name}}</td>
-                    <td>@if($demande->paye==1) Payé @elseif($demande->paye==2) Attente Validation du Paiement @else Non Payé @endif</td>
-                    <td>{{$demande->commercial_name}}</td>
-                    <td>{{date("d-m-Y à H:i", strtotime($demande->created_at))}}</td>
-                    <td>{{date("d-m-Y à H:i", strtotime($demande->date_paiement))}}</td>
-                    <td> @if($demande->Date_etat_validation)
-                      {{date("d-m-Y à H:i", strtotime($demande->Date_etat_validation))}}
-                    @else Aucune Date @endif</td>
-                    <td>@if($hasUserValidate)
-                        {{$user['prenom']}} {{$user['name']}}
-                     
-                      @else <span class="text-muted">Aucun compte associé</span>
-                      @endif
-                    </td>
-                    <td>{{$demande->objet_social}}</td>
-                    <td>{{$demande->organisation_code}}</td>
-                  </tr>
-                  @endforeach
-                  </tbody>
-                  <tfoot>
-                  <tr>
-                    <th>N°</th>
-                    <th>Numero Demande</th>
-                    <th>Promoteur</th>
-                    <th>Statut</th>
-                    <th>Nom Commercial</th> 
-                    <th>Date Création</th>
-                    <th>Date Paiement</th>
-                    <th>Date Validation</th>                              
-                    <th>Valider Par</th>              
-                    <th>Objet Social</th>
-                    <th>CEFORE</th>
-                    
-                  </tr>
-                  </tfoot>
-                </table>
-              </div>
-              <!-- /.card-body -->
+  <div class="card-header">
+    <h3 class="card-title">{{ $dem === 'demande_a_valider' ? 'Demandes à valider' : 'Demandes validées' }}</h3>
+  </div>
+  <div class="card-body">
+    {{-- Rempli page par page par DemandeController::liste_demande_donnees (recherche et tri côté serveur, même période) --}}
+    <table id="tableau-liste-demandes" class="table table-bordered table-striped w-100"
+           data-ajax-url="{{ route('list.donnees', ['etat' => $etat] + array_filter(['du' => $periode['du'], 'au' => $periode['au']])) }}"
+           data-tri="6,desc" data-non-triables="0,3,8,9">
+      <thead>
+        <tr>
+          <th>N°</th>
+          <th>Numéro demande</th>
+          <th>Promoteur</th>
+          <th>Statut</th>
+          <th>Nom commercial</th>
+          <th>Date création</th>
+          <th>Date paiement</th>
+          <th>Date validation</th>
+          <th>Validée par</th>
+          <th>Objet social</th>
+          <th>CEFORE</th>
+        </tr>
+      </thead>
+    </table>
+    <p class="small text-muted mt-2 mb-0"><i class="fas fa-info-circle me-1" aria-hidden="true"></i>
+      Les lignes surlignées ont déjà été rejetées une fois. La recherche porte aussi sur le nom de l’agent qui a validé.
+      Les exports (Excel, PDF…) portent sur les lignes affichées : choisissez « 100 lignes par page » ou une période avant d’exporter.</p>
+  </div>
 </div>
-            <!-- /.card -->
 @endsection

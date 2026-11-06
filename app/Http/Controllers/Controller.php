@@ -83,6 +83,38 @@ class Controller extends BaseController
     }
 
     /**
+     * Période choisie sur une liste ou le tableau de bord (?du=AAAA-MM-JJ&au=AAAA-MM-JJ, bornes incluses ; sans date : toute la période).
+     * Une date invalide est ignorée et signalée, plutôt que de renvoyer vers la page (ce qui bouclerait sur un lien erroné).
+     */
+    protected function periodeTableau(\Illuminate\Http\Request $request): array
+    {
+        $lire = function ($valeur) {
+            $date = is_string($valeur) ? \DateTime::createFromFormat('!Y-m-d', $valeur) : false;
+            return $date && $date->format('Y-m-d') === $valeur ? $valeur : null;
+        };
+        $du = $lire($request->query('du'));
+        $au = $lire($request->query('au'));
+        $erreur = ($request->filled('du') && !$du) || ($request->filled('au') && !$au)
+            ? 'Une date de la période n’est pas valide : elle a été ignorée.' : null;
+        if ($du && $au && $du > $au) {
+            [$du, $au] = [$au, $du];
+        }
+        $format = fn ($date) => \Carbon\Carbon::parse($date)->format('d/m/Y');
+        $libelle = $du && $au ? ($du === $au ? 'Le '.$format($du) : 'Du '.$format($du).' au '.$format($au))
+            : ($du ? 'Depuis le '.$format($du) : ($au ? 'Jusqu’au '.$format($au) : 'Toute la période'));
+
+        return ['du' => $du, 'au' => $au, 'active' => $du || $au, 'libelle' => $libelle, 'erreur' => $erreur];
+    }
+
+    /** Limite une requête à la période (format ISO avec « T » : interprété de la même façon quelle que soit la langue de SQL Server). */
+    protected function dansPeriode($requete, ?array $periode, string $colonne = 'created_at')
+    {
+        return $requete
+            ->when($periode['du'] ?? null, fn ($q, $du) => $q->where($colonne, '>=', $du.'T00:00:00'))
+            ->when($periode['au'] ?? null, fn ($q, $au) => $q->where($colonne, '<', \Carbon\Carbon::parse($au)->addDay()->format('Y-m-d').'T00:00:00'));
+    }
+
+    /**
      * Paramètres envoyés par un tableau DataTables chargé page par page (serverSide) :
      * début, nombre de lignes (100 au plus), motif LIKE de la recherche (échappé pour SQL Server) ou null, colonne et sens du tri.
      */

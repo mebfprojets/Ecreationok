@@ -2,6 +2,7 @@
 @section('title', 'Toutes les demandes')
 @section('all', 'active')
 @section('content')
+@include('backend.adminlte.partials.filtre_periode', ['libelleDate' => 'Date de dépôt'])
     <!-- Main content -->
 
     <section class="content">
@@ -65,7 +66,7 @@
     <div class="card">
       <div class="card-body">
         {{-- Tableau rempli page par page par le serveur (route all.list.donnees) : recherche et tri portent sur toutes les demandes --}}
-        <table id="tableau-toutes-demandes" class="table table-bordered table-striped w-100" data-ajax-url="{{ route('all.list.donnees') }}" data-tri="6,desc" data-non-triables="8">
+        <table id="tableau-toutes-demandes" class="table table-bordered table-striped w-100" data-ajax-url="{{ route('all.list.donnees', array_filter(['du' => $periode['du'], 'au' => $periode['au']])) }}" data-tri="6,desc" data-non-triables="8">
           <thead>
             <tr>
               <th>N° demande</th>

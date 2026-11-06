@@ -2,11 +2,12 @@
 @section('title', 'Comptes des promoteurs')
 @section('compte', 'active')
 @section('content')
+@include('backend.adminlte.partials.filtre_periode', ['libelleDate' => 'Date de création du compte'])
 <div class="card">
   <div class="card-body">
     {{-- Plus de 15 000 comptes : le serveur envoie une page à la fois (route user.compte.donnees) --}}
     <table id="tableau-comptes" class="table table-bordered table-striped align-middle w-100"
-           data-ajax-url="{{ route('user.compte.donnees') }}" data-tri="2,desc" data-non-triables="3,4">
+           data-ajax-url="{{ route('user.compte.donnees', array_filter(['du' => $periode['du'], 'au' => $periode['au']])) }}" data-tri="2,desc" data-non-triables="3,4">
       <thead>
         <tr>
           <th>Titulaire du compte</th>

@@ -294,14 +294,15 @@ class UsagerController extends Controller
         ]);
     }
 
-    public function promoteur()
+    public function promoteur(Request $request)
     {
         // Données personnelles des promoteurs : agents chargés des demandes uniquement
         if (!Auth::user()->can('lister.demande')) {
             return $this->refuserAcces();
         }
-        // Le tableau est rempli page par page par promoteur_donnees() (plus de 14 000 promoteurs)
-        return view('usager.adminliste');
+        // Le tableau est rempli page par page par promoteur_donnees() (plus de 14 000 promoteurs), avec la même période
+        $periode = $this->periodeTableau($request);
+        return view('usager.adminliste', compact('periode'));
     }
 
     /** Liste des promoteurs au format DataTables (traitement côté serveur), limitée au CEFORE de l'agent. */
@@ -315,7 +316,8 @@ class UsagerController extends Controller
         $siege = $this->estAgentSiege(Auth::user());
         $organisation = Auth::user()->organisation;
 
-        $base = Usager::query()->leftJoin('users as u', 'u.id', '=', 'usagers.user_id')
+        $base = $this->dansPeriode(Usager::query(), $this->periodeTableau($request), 'usagers.created_at')
+            ->leftJoin('users as u', 'u.id', '=', 'usagers.user_id')
             ->when(!$siege, fn ($q) => $q->whereExists(fn ($e) => $e->select(DB::raw(1))->from('demandes as d')
                 ->whereColumn('d.usager_id', 'usagers.id')->where('d.organisation_code', $organisation)));
         $total = (clone $base)->count();
