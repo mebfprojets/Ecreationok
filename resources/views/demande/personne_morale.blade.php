@@ -465,7 +465,7 @@
                                                      <fieldset>
                                                         <legend><span class="legend-fieldest">Dirigeant Principal</span></legend>
                                                         <!-- <div class="row">                                                        
-                                                        <a href="#addusager" id="addusager" data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" > Ajouter usager </a>
+                                                        <a href="#addusager" data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" > Ajouter usager </a>
                                                         </div> -->
                                                         <div class="row">
                                                             <div class="row">                                                                                                                
@@ -501,7 +501,7 @@
                                                      <fieldset>
                                                         <legend><span class="legend-fieldest">Associé (s)</span></legend>
                                                         <!-- <div class="row">                                                        
-                                                        <a href="#addusager" id="addusager" data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" > Ajouter usager </a>
+                                                        <a href="#addusager" data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" > Ajouter usager </a>
                                                         </div> -->
                                                         <div class="row field_wrapper">
                                                             <div class="row">                                                                                                                
@@ -534,7 +534,7 @@
                                                             <div class="col-lg-2">
                                                                 <div class="mb-" style="margin-top: 30px;"> 
                                                                 <a href="#" data-csp-click="__aucune"  class="btn btn-md btn-success add-line"> <i class="fas fa-plus"></i> </a>
-                                                                <a href="#addusager" id="addusager" data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" >Créé Dirigeant</a>
+                                                                <a href="#addusager" data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" >Créé Dirigeant</a>
                                                                 </div>
                                                             </div>
                                                          </div>

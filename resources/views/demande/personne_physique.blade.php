@@ -399,7 +399,7 @@
                                                      <fieldset>
                                                         <legend><span class="legend-fieldest">Personne(s) Pouvant engager la responsabilité de l'entreprise</span></legend>
                                                         <!-- <div class="row">                                                        
-                                                        <a href="#addusager" id="addusager" data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" > Ajouter usager </a>
+                                                        <a href="#addusager" data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" > Ajouter usager </a>
                                                         </div> -->
                                                         <div class="row">                                                        
                                                         <div class="col-md-6  ">
@@ -424,7 +424,7 @@
                                                             </div>
                                                             <div class="col-lg-2 ">
                                                                 <div class="mb-4" style="margin-top: 30px;">                                                                                                                              
-                                                                <a href="#addusager" id="addusager" data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" >Créer Dirigeant</a>                                                                        
+                                                                <a href="#addusager" data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" >Créer Dirigeant</a>                                                                        
                                                                 <!-- <a href="#updatepiecejointe" id="certificat_de_residence_edit" data-bs-toggle="modal" class="btn btn-md btn-success add-line"  onclick="editpiecejointe('certificat_de_residence')"> <i class="fas fa-plus"></i> </a> -->
                                                                 </div>
                                                             </div>                                                      

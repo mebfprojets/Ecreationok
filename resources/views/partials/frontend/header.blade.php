@@ -209,9 +209,6 @@ FACEBOOK: https://www.facebook.com/themefisher
                           <p class="info-box-subtitle"><a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#105;&#110;&#102;&#111;&#64;&#109;&#101;&#46;&#98;&#102;">&#105;&#110;&#102;&#111;&#64;&#109;&#101;&#46;&#98;&#102;</a></p>
                       </div>
                     </div>
-                  </li>                  
-                  <li class="header-get-a-quote">
-                    <a class="btn btn-primary" data-bs-toggle="modal" href="#modal-verifier-nomCommercial">Vérifier un nom commerical</a>
                   </li>
                 </ul><!-- Ul end -->
             </div><!-- header right end -->
@@ -223,32 +220,6 @@ FACEBOOK: https://www.facebook.com/themefisher
           </h3>
           </center> -->
       </div><!-- Row end -->
-
-      <div class="page-container">
-        <!-- Message d'avertissement en ligne -->
-        @if(config('app.maintenance_banner'))
-<div class="alerte-maintenance" role="alert">
-  <div class="container">
-    <i class="fas fa-tools"></i>
-    <strong>Maintenance en cours :</strong>
-    des perturbations peuvent survenir. Merci de votre compréhension.
-  </div>
-</div>
-<style>
-  .alerte-maintenance {
-      background: #fff3cd;
-      color: #664d03;
-      border-bottom: 2px solid #ffc107;
-      padding: 12px 0;
-      text-align: center;
-      font-size: 16px;
-  }
-  .alerte-maintenance i {
-      margin-right: 8px;
-  }
-</style>
-@endif
-
 
     </div><!-- Container end -->
   </div>

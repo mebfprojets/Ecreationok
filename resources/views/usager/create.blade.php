@@ -117,7 +117,7 @@
                                                                 <div class="mb-"> 
                                                                     <a href="#" data-csp-click="__aucune"  class="btn btn-md btn-success add_button2"> <i class="fas fa-plus"></i> </a>
                                                                 </div>
-                                                                <a href="#addusager" style="margin-left: 45px; margin-top:-34px;" id="addusager" data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" > Créé Conjoint </a>
+                                                                <a href="#addusager" style="margin-left: 45px; margin-top:-34px;" data-bs-toggle="modal" class="btn btn-md btn-success titre_de_propriete_edit" > Créer un conjoint </a>
 
                                                             </div> 
                                                                                                  
@@ -311,63 +311,19 @@
                                                                 </div> -->
                                                             </div>                              
                                                         </div>
-                                                     </fieldset> <br>  
-                                                     <div class="panel-footer text-center">
-                        <input type="reset" class="btn btn-md btn-danger"  value="Annuler">
-                        <a href="#modal-confirm" data-bs-toggle="modal" data-bs-dismiss="modal"  class="btn btn-md btn-success"  value="Enregister mes données">Valider</a>
-            </div>     
-            </div>
-        </div>
-    </div>
-
-    
-            
-</form>
-    
-
-
-        <form id='form_usager_personne_morale' role="form" action="{{ route('store.usager') }}" method="post" class="form-horizontal form-bordered" style="display: none">
-            @csrf
-    <div class="block-style">
-                <div class="panel-heading">
-                    <p> Informations sur la personne morale </legend>
-                </div> 
-                <div class="row">
-           
-                    <div class="col-md-5">
-                        <div class="form-group">
-                            <label class="control-label" for="nom_usager">Nom Raison Sociale <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <input type="text" id="nom" name="nom_usagedr" class="form-control" style="width: 100%;" value="{{old('nom')}}" data-csp-change="__majuscules" placeholder="Entrez votre nom" title="Ce champ est obligatoire" required >
-                                @if ($errors->has('nom'))
-                                        <span class="help-block">
-                                            <strong>{{ $errors->first('nom_usager') }}</strong>
-                                        </span>
-                                @endif
+                                                     </fieldset>
+                                                     <div class="actions-parcours actions-fiche-usager">
+                                                        <p class="mb-0 text-muted small">Les champs marqués <span class="text-danger">(*)</span> sont obligatoires.</p>
+                                                        <div class="d-flex flex-wrap gap-2">
+                                                            <button type="reset" class="btn btn-outline-secondary"><i class="fas fa-eraser me-1" aria-hidden="true"></i>Effacer</button>
+                                                            <a href="#modal-confirm" data-bs-toggle="modal" class="btn btn-success"><i class="fas fa-check me-1" aria-hidden="true"></i>Valider mes informations</a>
+                                                        </div>
+                                                     </div>
                             </div>
-                    </div>
-               
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="control-label" for="val_username">Numéro IFU (s) <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <input type="text" id="numero_ifu" name="numero_ifu" class="form-control" value="{{old('numero_ifu')}}"placeholder="Entrez le numéro IFU.." required="Ce champ est obligatoire" data-csp-change="__majuscule_initiale">
-                                </div>
-                        </div>
-                  
-                    </div>
-                
-                </div>
-    </div> 
-        <div class="panel-footer text-center">
-            <input type="reset" class="btn btn-sm btn-warning"  value="Annuler">
-            <input type="reset" class="btn btn-sm btn-warning"  value="Annuler">
-            <!-- <button type="submit"   class="btn btn-sm btn-success"  value="Enregister mes données"></button> -->
         </div>
-    
-    </div>     
-</div>     
+    </form>
+</div>
+</div>
 @endsection
 @section('modal_parpage')
 <div class="modal fade modal-front" id="modal-confirm" tabindex="-1" role="dialog" aria-labelledby="modal-login-label" aria-hidden="true">
@@ -375,29 +331,20 @@
       <div class="modal-content">
         
         <div class="modal-header">
- 
-        <center><h3 class="modal-title text-center" id="modal-login-label">  Confirmer les données correctes <i class="fa fa-key"></i></h3></center>
-
-          <button type="button" class="close" data-bs-dismiss="modal">
-            <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
-          </button>
+          <h5 class="modal-title" id="modal-login-label">Confirmer vos informations</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
         </div>
-        
         <div class="modal-body">
-          <div class="row">
-              <div class="col-md-12">
-                <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Annuler <i class="fa fa-unlock"></i></button>
-                <button type="button" class="btn btn-success" data-csp-click="soumettre" data-csp-click-args='["form_usager_personne_physique"]' >Valider </i></button>
-              </div>
-          </div>
-          
-                
+          <p class="mb-0">Vérifiez que vos informations sont exactes : elles figureront sur les documents de votre entreprise.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Corriger</button>
+          <button type="button" class="btn btn-success" data-csp-click="soumettre" data-csp-click-args='["form_usager_personne_physique"]'><i class="fas fa-check me-1" aria-hidden="true"></i>Confirmer et enregistrer</button>
         </div>
         
       </div>
     </div>
   </div>
-@endsection
 <div id='addusager'class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg ">
         <div class="modal-content">
@@ -530,16 +477,16 @@
                 
             </div>
             <span class="upload_image"> </span>
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                <button type="button" data-bs-dismiss="modal" class="btn btn-outline-secondary">Fermer</button>
+                <button type="submit" class="btn btn-success">Enregistrer</button>
             </div>
-            <div class="panel-footer text-center">
-                <input type="button" data-bs-dismiss="modal"  class="btn btn-sm btn-warning"  value="Fermer">
-                <input   type="submit"   class="btn btn-sm btn-success"  value="Enregister">
-            </div>
-            
         </form>
+            </div>
         </div>
     </div>
 </div>
+@endsection
 @section('additionnel_script')
 <script nonce="{{ $cspNonce ?? '' }}">
     function afficherDecoupage(){

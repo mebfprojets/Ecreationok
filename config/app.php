@@ -14,7 +14,6 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
-    'maintenance_banner' => env('MAINTENANCE_BANNER', false),
     /*
     |--------------------------------------------------------------------------
     | Application Environment

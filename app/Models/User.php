@@ -19,11 +19,17 @@ class User extends Authenticatable
     use TwoFactorAuthenticatable;
 
     /**
+     * Format des dates envoyées à SQL Server (langue française) : date ET heure.
+     * Une ancienne redéfinition de getDateFormat() renvoyait 'Y-d-m' : created_at, updated_at et
+     * email_verified_at étaient enregistrés à 00:00:00 (heure perdue). Ne pas la remettre.
+     */
+    protected $dateFormat = 'd-m-Y H:i:s';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var string[]
      */
-    protected $dateFormat = 'd-m-Y H:i:s';
     protected $fillable = [
         'name',
         'email',
@@ -63,11 +69,8 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
-    public function getDateFormat(){
-        return 'Y-d-m';
-        }
-        public function roles()
-        {
-            return $this->belongsToMany(Role::class);
-        }
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
 }

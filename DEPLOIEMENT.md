@@ -70,6 +70,14 @@ git status --short
 composer install --no-dev --optimize-autoloader
 ```
 
+Si une commande `php artisan` échoue ensuite avec `Class "Facade\Ignition\IgnitionServiceProvider" not found`,
+le cache des paquets cite encore un paquet de développement : supprimer les deux fichiers générés puis le reconstruire.
+
+```bat
+del bootstrap\cache\packages.php bootstrap\cache\services.php
+php artisan package:discover
+```
+
 ### 2.5 Fichier `.env`
 
 Comparer avec `.env.example` et ajouter les clés manquantes (voir § 3.2). Ne jamais commiter le `.env`.
@@ -118,8 +126,10 @@ php artisan up
 
    Le contrôle des ports (sans `-SansPorts`) se lance depuis un réseau extérieur (4G, autre fournisseur).
 
-2. Site public : accueil, page Contacts, inscription (code reçu par e-mail), connexion, mot de passe oublié,
-   formulaire de demande jusqu'à l'étape 2.
+2. Site public : accueil (ni bandeau de maintenance ni bouton « Vérifier un nom commercial » dans l'en-tête), page Contacts,
+   inscription (code reçu par e-mail ; dans la base, `created_at` et `email_verified_at` du nouveau compte ont une heure, pas `00:00:00`),
+   connexion, mot de passe oublié, formulaire « Enregistrement du promoteur » (pied de page en bas de l'écran, fenêtre de confirmation),
+   formulaire de demande jusqu'à l'étape 2 (bouton « Ajouter usager »).
 3. Espace agents : tableau de bord, une liste avec un filtre de période, détail d'une demande (aperçu des pièces,
    rubrique « Activité du promoteur » avec ses onglets Parcours, Connexions et E-mails), validation et rejet d'une demande de test (l'e-mail doit partir).
 4. Journal des erreurs : `storage\logs\laravel.log` ne doit pas contenir de nouvelle erreur.
@@ -139,6 +149,15 @@ Contenu : corrections ANSSI, espace agents AdminLTE 4 / Bootstrap 5.3, tableau d
 décisions par agent), listes paginées côté serveur avec filtre de période, page de traitement des demandes,
 historique des e-mails et activité des promoteurs, reprise de signature, réinitialisation des comptes agents,
 refonte des pages publiques (accueil, parcours de demande, Contacts).
+
+Compléments du 8 novembre 2026 :
+
+- Bandeau « Maintenance en cours » retiré de l'en-tête public, avec le réglage `maintenance_banner` de `config/app.php`.
+- Bouton « Vérifier un nom commercial » retiré de l'en-tête (la vérification reste dans la carte « Avant de commencer » de l'accueil).
+- Formulaire « Enregistrement du promoteur » (`/create/usager`) : pied de formulaire refait, fenêtre de confirmation revue,
+  ancien formulaire « personne morale » caché supprimé. La page s'affichait en mode dégradé (pied de page étiré, grande zone vide).
+- Formulaire de demande : les boutons « Ajouter usager » / « Créer Dirigeant » ouvrent de nouveau la fenêtre de création d'usager.
+- Table `users` : `created_at`, `updated_at` et `email_verified_at` sont de nouveau enregistrés avec l'heure (voir § 3.3).
 
 ### 3.1 Migrations attendues (5)
 
@@ -165,6 +184,7 @@ refonte des pages publiques (accueil, parcours de demande, Contacts).
 | `MAIL_*` | serveur SMTP de production | pas d'e-mail de décision, de code d'inscription ni de réinitialisation |
 | `SESSION_INACTIVITE_AGENTS` | `30` (minutes) | valeur par défaut : 30 |
 | `AUTH_REMEMBER_MINUTES` | `10080` (7 jours) | valeur par défaut : 7 jours |
+| `MAINTENANCE_BANNER` | à supprimer | sans effet : le bandeau n'existe plus |
 
 `CSP_MODE=enforce` a été testé sur l'ensemble des pages en local. Si une page devait se bloquer en production,
 passer temporairement `CSP_MODE=report`, puis `php artisan config:cache`, et signaler la page.
@@ -180,6 +200,10 @@ passer temporairement `CSP_MODE=report`, puis `php artisan config:cache`, et sig
 - **`public\upload` : sauvegarder ce dossier avant le `git pull`.** Les 224 images de signatures qu'il contenait
   (accessibles sans connexion, ANSSI Vul-009) sont retirées du dépôt : le `git pull` les supprime du serveur.
   Elles restent récupérables dans l'historique git.
+- **Dates de la table `users`** : les colonnes sont déjà de type `datetime`, mais le modèle `User` n'envoyait que la date
+  (redéfinition de `getDateFormat()` en `'Y-d-m'`, supprimée) : tous les comptes existants sont à `00:00:00`.
+  **Aucune migration** : la correction est dans le code et s'applique dès le `git pull`. Les nouveaux comptes et les
+  mises à jour gardent l'heure ; les heures déjà perdues ne sont pas récupérables (les dates restent justes).
 - Dépendances : `composer.lock` contient des mises à jour mineures, donc `composer install` est nécessaire (§ 2.4).
 - Pages publiques retirées : les anciennes vues Jetstream et les modèles inutilisés ont été supprimés.
   Les adresses `/admin` et `/dash` n'existent plus (ANSSI Vul-004).

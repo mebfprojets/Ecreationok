@@ -74,7 +74,7 @@
 
     <div class="row g-3 g-lg-4">
       @foreach ([
-          ['fa-file-signature', $s['total'], 'Demandes de création', 'dont '.$nombre($s['validees']).' validées par les CEFORE'],
+          ['fa-file-signature', $s['total'], 'Demandes de création', 'enregistrées depuis le 1er janvier'],
           ['fa-user-tie', $s['individuelles'], 'Entreprises individuelles', $part($s['individuelles']).' % des demandes'],
           ['fa-building', $s['societaires'], 'Sociétés et GIE', $part($s['societaires']).' % des demandes'],
           ['fa-calendar-check', $s['mois_en_cours'], 'En '.$s['nom_mois'], 'mois en cours, au '.now()->format('d/m')],
