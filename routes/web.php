@@ -40,6 +40,8 @@ Route::get('/detail/demande/{id}', [DemandeController::class,'detail'])->name('d
 //Route::get('/', [DemandeController::class,'test'])->name('test');
 // Route::get('/', [DemandeController::class,'test'])->name('test');
 Route::get('/', [DemandeController::class,'index'])->name('index');
+// Contacts : siège, assistance et représentations CEFORE/CEFAC (config/representations.php)
+Route::view('/contacts', 'contacts')->name('contacts');
 
 Route::post('/paiement/orange/index', [DemandeController::class, 'orange'])->name('orange.index');
 Route::post('/paiement/orange/store', [DemandeController::class, 'orange_paiement'])->name('orange.store');

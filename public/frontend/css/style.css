@@ -3931,3 +3931,41 @@ a.carte-type:hover .carte-type-action { color: #0B4A12; }
   .site-navigation #contenu .dropdown-menu a:hover, .site-navigation #contenu .dropdown-menu a:focus { background: rgba(255, 255, 255, .08); color: #FCE400; }
   .site-navigation #contenu .dropdown-menu .text-muted { color: rgba(255, 255, 255, .65) !important; }
 }
+
+/* Menu : accès à l'espace agents (Tableau de bord), dans la hauteur de la barre */
+ul.navbar-nav > li > a.lien-espace-agents { display: inline-flex; align-items: center; gap: .45rem; color: #FCE400; font-weight: 700; }
+ul.navbar-nav > li > a.lien-espace-agents i { float: none; margin: 0; padding: 0; background: none; color: #FCE400; }
+ul.navbar-nav > li:hover > a.lien-espace-agents, ul.navbar-nav > li > a.lien-espace-agents:focus { color: #fff !important; }
+ul.navbar-nav > li:hover > a.lien-espace-agents i { color: #fff; }
+@media (min-width: 992px) {
+  /* Souligné jaune, comme un onglet : le lien déborde de 15px sous la barre (marge du thème), le trait est donc placé 15px plus haut */
+  ul.navbar-nav > li > a.lien-espace-agents { background: linear-gradient(#FCE400, #FCE400) no-repeat left bottom 15px / 100% 3px; }
+  ul.navbar-nav > li:hover > a.lien-espace-agents { background-image: linear-gradient(#fff, #fff); }
+}
+
+/* Page Contacts */
+.titre-section-contacts { margin: 0; font-size: 1.25rem; font-weight: 800; color: #0B4A12; text-transform: none; }
+.recherche-contacts { position: relative; min-width: 260px; }
+.recherche-contacts i { position: absolute; left: .8rem; top: 50%; transform: translateY(-50%); color: #6b7a70; }
+.recherche-contacts .form-control { padding-left: 2.2rem; border-radius: 999px; border-color: #c8d1cb; }
+.recherche-contacts .form-control:focus { border-color: #1B9925; box-shadow: 0 0 0 .2rem rgba(27, 153, 37, .2); }
+.carte-contact { display: flex; gap: 1rem; padding: 1.1rem 1.2rem; background: #fff; border: 1px solid #e3e9e5; border-left: 4px solid #1B9925;
+                 border-radius: 12px; box-shadow: 0 4px 14px rgba(11, 74, 18, .05); }
+.carte-contact-siege { border-left-color: #13731C; background: linear-gradient(135deg, #eaf6eb, #fff 60%); }
+.carte-contact-assistance { border-left-color: #FCE400; background: linear-gradient(135deg, #fffbd6, #fff 60%); }
+.carte-contact-icone { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px;
+                       border-radius: 12px; background: #13731C; color: #FCE400; font-size: 1.2rem; }
+.carte-contact-surtitre { font-size: .72rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #1B9925; }
+.carte-contact-titre { margin: .15rem 0 .5rem; font-size: 1.15rem; font-weight: 800; color: #0B4A12; text-transform: none; }
+.carte-contact-ville { display: flex; align-items: center; gap: .45rem; margin: 0 0 .4rem; font-size: 1.05rem; font-weight: 800; color: #0B4A12; text-transform: none; }
+.carte-contact-ville i { color: #C51425; font-size: .9rem; }
+.carte-contact-adresse { margin: 0 0 .6rem; font-size: .9rem; color: #3d4a41; }
+.carte-contact-adresse i { color: #1B9925; margin-right: .35rem; }
+.carte-contact-telephones { display: flex; flex-wrap: wrap; gap: .35rem; margin: 0; padding: 0; list-style: none; }
+.carte-contact-telephones a { display: inline-flex; align-items: center; gap: .4rem; padding: .3rem .7rem; border-radius: 999px; background: #eaf6eb;
+                              color: #0B4A12; font-size: .85rem; font-weight: 700; text-decoration: none; white-space: nowrap; text-transform: none; }
+.carte-contact-telephones a:hover, .carte-contact-telephones a:focus { background: #1B9925; color: #fff; }
+.carte-contact-telephones i { font-size: .75rem; }
+@media (max-width: 991.98px) {
+  .site-navigation .navbar-nav .nav-link.lien-espace-agents i { margin-right: .5rem; }
+}

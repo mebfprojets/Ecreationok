@@ -270,25 +270,23 @@ FACEBOOK: https://www.facebook.com/themefisher
                 
                 <div id="navbar-collapse" class="collapse navbar-collapse contenant">
                     <ul class="nav navbar-nav mr-auto">                     
-                      <li class="nav-item"><a class="nav-link" href="{{ route('index') }}">Accueil</a></li>
+                      <li class="nav-item {{ request()->routeIs('index') ? 'active' : '' }}"><a class="nav-link" href="{{ route('index') }}">Accueil</a></li>
                       @auth
                         @if (Auth::user()->isadmin != null)
                           {{-- Agents : accès direct à l'espace agents (tableau de bord, ou administration pour un compte sans accès aux demandes) --}}
                           @php $lienEspaceAgents = Auth::user()->can('lister.demande') || !Auth::user()->can('user.create') ? route('dashboard') : route('user.index'); @endphp
                           <li class="nav-item">
-                            <a class="nav-link fw-bold px-3" href="{{ $lienEspaceAgents }}" style="background:#0b9e44; border-radius:4px;" title="Espace agents">
-                              <i class="fas fa-tachometer-alt me-1" aria-hidden="true"></i>Tableau de bord
+                            <a class="nav-link lien-espace-agents" href="{{ $lienEspaceAgents }}" title="Espace agents">
+                              <i class="fas fa-tachometer-alt" aria-hidden="true"></i>Tableau de bord
                             </a>
                           </li>
                         @endif
-                        <li class="nav-item"><a class="nav-link" href="{{ route('create.usager') }}">Créer une demande</a></li>
+                        <li class="nav-item {{ request()->routeIs('create.usager') ? 'active' : '' }}"><a class="nav-link" href="{{ route('create.usager') }}">Créer une demande</a></li>
                         @if(nbr_demande()>0)
-                        <li class="nav-item"><a class="nav-link" href="{{route('demande.liste')}}">Mes demandes</a></li>
+                        <li class="nav-item {{ request()->routeIs('demande.liste', 'demande.detail') ? 'active' : '' }}"><a class="nav-link" href="{{route('demande.liste')}}">Mes demandes</a></li>
                         @endif
                       @endauth
-                      <li class="nav-item"><a class="nav-link" target="_blank" href="http://me.bf/fr/annonces-legales">Annonces Légales</a></li>
-                      
-                      <li class="nav-item"><a class="nav-link" href="#">Contacts</a></li>
+                      <li class="nav-item {{ request()->routeIs('contacts') ? 'active' : '' }}"><a class="nav-link" href="{{ route('contacts') }}">Contacts</a></li>
         @guest
           <li id="contenu" class="nav-item dropdown pull-right">
             <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">MON COMPTE</a>

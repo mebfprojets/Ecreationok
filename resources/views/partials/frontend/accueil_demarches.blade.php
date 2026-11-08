@@ -1,4 +1,4 @@
-{{-- Page d'accueil : les démarches (avant de commencer, personne physique, personne morale, annonces légales) --}}
+{{-- Page d'accueil : les démarches (avant de commencer, personne physique, personne morale) --}}
 @php
     // [image, titre, sous-titre, texte, actions : [libellé, icône, lien, type (modale / externe), principal ?]]
     $demarches = [
@@ -14,9 +14,6 @@
             'Pour créer une société (SARL, SA, SAS…) seul ou avec des associés.',
             [['Pièces à fournir', 'fa-clipboard-list', '#modal-piece_pm', 'modale', true],
              ['Formulaire de renseignement', 'fa-file-pdf', 'https://www.me.bf/wp-content/uploads/2024/01/Formalite-personne-morale.pdf', 'externe', false]]],
-        ['Video.png', 'Annonces légales', 'Pour vous',
-            'Le site de la MEBF est reconnu comme support officiel d’annonces légales.',
-            [['Consulter les annonces', 'fa-newspaper', 'http://me.bf/fr/annonces-legales', 'externe', true]]],
     ];
 @endphp
 <section class="accueil-bloc accueil-demarches" aria-labelledby="titre-demarches">
@@ -27,7 +24,7 @@
     </div>
     <div class="row g-4">
       @foreach ($demarches as [$image, $titre, $sousTitre, $texte, $actions])
-        <div class="col-sm-6 col-lg-3">
+        <div class="col-md-4">
           <article class="carte-demarche">
             <span class="carte-demarche-image"><img src="{{ asset('frontend/images/'.$image) }}" alt="" width="72" height="72" loading="lazy"></span>
             <h3 class="carte-demarche-titre">{{ $titre }}</h3>
