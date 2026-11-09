@@ -28,7 +28,7 @@
         </tr>
     </table>
 
-    @include('emails.partials.bouton', ['lien' => $lien, 'libelle' => 'Suivre ma demande'])
+    @include('emails.partials.bouton', ['lien' => $lien, 'libelle' => 'Suivre ma demande', 'boutonSeul' => true])
 
     <p style="margin:22px 0 0; font-size:13px; color:#6b7570;">
         Vous pouvez suivre votre demande à tout moment dans l’espace « Mes demandes » de la plateforme.

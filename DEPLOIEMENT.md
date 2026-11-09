@@ -127,7 +127,7 @@ php artisan up
    Le contrôle des ports (sans `-SansPorts`) se lance depuis un réseau extérieur (4G, autre fournisseur).
 
 2. Site public : accueil (ni bandeau de maintenance ni bouton « Vérifier un nom commercial » dans l'en-tête), page Contacts,
-   inscription (code reçu par e-mail ; dans la base, `created_at` et `email_verified_at` du nouveau compte ont une heure, pas `00:00:00`),
+   inscription (code reçu sur une adresse extérieure, Gmail par exemple, hors indésirables et avec le logo CEFORE ; `envois_mail` indique `envoye` ; dans la base, `created_at` et `email_verified_at` du nouveau compte ont une heure, pas `00:00:00`),
    connexion, mot de passe oublié, formulaire « Enregistrement du promoteur » (pied de page en bas de l'écran, fenêtre de confirmation),
    formulaire de demande (bouton « Ajouter usager ») **enregistré jusqu'au bout avec une demande de test** : la page suivante s'affiche
    et le fichier `signature.png` est créé dans `storage\app\public\files\<id du promoteur>\`.
@@ -135,7 +135,8 @@ php artisan up
 3. Espace agents : tableau de bord, une liste avec un filtre de période, liste « Validées » (colonnes « N° RCCM » et « Date immatriculation »,
    recherche par numéro RCCM), détail d'une demande (carte « Immatriculation » si un numéro est attribué, aperçu des pièces,
    rubrique « Activité du promoteur » avec ses onglets Parcours, Connexions et E-mails), plein écran d'une pièce (« Suivante », case « À corriger »),
-   motif de correction après avoir coché d'autres pièces et rouvert la fenêtre, validation et rejet d'une demande de test (l'e-mail doit partir).
+   motif de correction après avoir coché d'autres pièces et rouvert la fenêtre, validation et rejet d'une demande de test (l'e-mail doit partir,
+   sans identifiant de demande visible, et son bouton doit ouvrir la demande).
 4. Journal des erreurs : `storage\logs\laravel.log` ne doit pas contenir de nouvelle erreur.
 
 ### 2.10 En cas de problème
@@ -180,6 +181,18 @@ Correctifs du 9 novembre 2026 (aucune migration, aucune clé de `.env` à ajoute
     (« En attente » pour un numéro manquant). La carte n'apparaît que si au moins un numéro est attribué.
   - Liste « Validées » : colonnes « N° RCCM » et « Date immatriculation », triables ; la recherche porte aussi sur le numéro RCCM.
 - Espace promoteur, détail d'une demande, carte « Mes formalités » : dates des numéros au format jj/mm/aaaa (au lieu de `2026-10-14`).
+- E-mails de l'application (code d'inscription, validation, rejet, mot de passe) : logo CEFORE (`public/frontend/images/CEFORE.jpg`, nom en majuscules)
+  à la place du logo MEBF dans l'en-tête (`resources/views/emails/layout.blade.php`). Le gabarit étant compilé, `php artisan view:cache` (§ 2.7) le prend en compte.
+- E-mails de validation et de correction : l'identifiant de la demande n'y apparaît plus. Il ne reste que le bouton (plus de lien en clair en dessous),
+  qui pointe vers la nouvelle route `/ma-demande/<jeton chiffré>` puis redirige vers la demande (voir § 3.3). L'e-mail de mot de passe garde son lien de secours.
+
+Envoi des e-mails par Microsoft 365 (9 novembre 2026, aucune migration, **clés de `.env` à ajouter**, voir § 3.2 et § 3.3) :
+
+- Nouveau mode d'envoi `MAIL_MAILER=graph` par l'API Microsoft Graph, avec la boîte `cefore@me.bf` : tous les e-mails de l'application passent par lui
+  sans autre changement (codes d'inscription, décisions, mots de passe).
+- Motif : le compte MailerSend est au plan gratuit et refusait les envois (`450 … 429 Too many requests`), ce qui bloquait les créations de compte.
+- L'authentification se fait par l'application Entra (identifiant + secret client) : elle n'est pas concernée par la double authentification des comptes.
+- Fichiers concernés : `app/Support/TransportMicrosoftGraph.php` (nouveau), `app/Providers/AppServiceProvider.php`, `config/mail.php`, `config/services.php`, `.env.example`.
 
 ### 3.1 Migrations attendues (5)
 
@@ -203,7 +216,11 @@ Correctifs du 9 novembre 2026 (aucune migration, aucune clé de `.env` à ajoute
 | `FNRCCM_URL`, `FNRCCM_UTILISATEUR`, `FNRCCM_MOT_DE_PASSE` | identifiants de l'API du Fichier national RCCM | « Vérifier un nom commercial » répond « momentanément indisponible » |
 | `FNRCCM_VERIFIER_SSL` | `true` | — |
 | `FNRCCM_API_CLE` et/ou `FNRCCM_API_IPS` | clé longue et aléatoire (transmise au FNRCCM, en-tête `X-Api-Key`) et/ou adresses IP du FNRCCM | **le FNRCCM ne peut plus consulter `/api/fnrccm` (erreur 403)** |
-| `MAIL_*` | serveur SMTP de production | pas d'e-mail de décision, de code d'inscription ni de réinitialisation |
+| `MAIL_MAILER` | `graph` | avec `smtp`, les e-mails repartent par MailerSend et son quota |
+| `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME` | `cefore@me.bf`, `CEFORE` | l'adresse doit être une vraie boîte Microsoft 365, sinon aucun e-mail ne part |
+| `MS_TENANT_ID`, `MS_CLIENT_ID` | « ID de l'annuaire (locataire) » et « ID d'application (client) » de l'application Entra | pas d'e-mail de décision, de code d'inscription ni de réinitialisation |
+| `MS_CLIENT_SECRET` | **valeur** du secret client (pas son ID), uniquement dans le `.env` | idem (`invalid_client` dans `envois_mail`) |
+| `LOG_CHANNEL` | `daily` | `laravel.log` grossit sans limite (2 Go constatés) |
 | `SESSION_INACTIVITE_AGENTS` | `30` (minutes) | valeur par défaut : 30 |
 | `AUTH_REMEMBER_MINUTES` | `10080` (7 jours) | valeur par défaut : 7 jours |
 | `MAINTENANCE_BANNER` | à supprimer | sans effet : le bandeau n'existe plus |
@@ -231,6 +248,36 @@ passer temporairement `CSP_MODE=report`, puis `php artisan config:cache`, et sig
 - **Signature : un seul fichier par promoteur.** Le nom étant fixe, une nouvelle demande ou une reprise de signature remplace le fichier `signature.png`
   précédent, et toutes les demandes du promoteur qui pointent vers ce fichier affichent la dernière signature.
   Les fichiers déjà créés sous l'ancien nom (`signature-<date>-<aléatoire>.png`) restent valables : leur chemin est enregistré en base.
+- **Microsoft Graph, certificats** : le serveur doit pouvoir vérifier les certificats de Microsoft. Si `envois_mail` indique `cURL error 60`,
+  renseigner `curl.cainfo = "<chemin d'un fichier de certificats>"` dans le `php.ini` chargé par Apache, puis redémarrer Apache.
+  Ne pas désactiver la vérification SSL : le secret client passe par cette connexion.
+- **Microsoft Graph, erreurs** : le message est dans la colonne `erreur` de `envois_mail`.
+
+  | Erreur | Cause probable |
+  |---|---|
+  | `invalid_client` ou `AADSTS7000215` | secret incorrect (ID copié à la place de la valeur) ou expiré |
+  | `ErrorAccessDenied` | `Mail.Send` ou le consentement administrateur absent, ou boîte exclue de la restriction ci-dessous |
+  | `MailboxNotEnabledForRESTAPI` ou utilisateur introuvable | `MAIL_FROM_ADDRESS` n'est pas une vraie boîte avec licence |
+
+- **Microsoft Graph, à faire par l'administrateur Microsoft 365** : la permission `Mail.Send` de type Application permet d'envoyer au nom de **n'importe quelle boîte `@me.bf`**.
+  La limiter à `cefore@me.bf` (RBAC for Applications ou Application Access Policy).
+- **Microsoft Graph, expiration du secret** : tous les e-mails s'arrêtent à la date de fin du secret client. Noter cette date et renouveler le secret avant
+  (nouvelle valeur dans `MS_CLIENT_SECRET`, puis `php artisan config:cache`).
+- **Microsoft Graph, retour arrière** : remettre `MAIL_MAILER=smtp` puis `php artisan config:cache`. Les réglages SMTP de MailerSend restent utilisables, dans la limite de son quota.
+- **E-mails non partis pendant le blocage du quota** : ils ne sont pas renvoyés automatiquement. Les promoteurs en inscription n'ont qu'à cliquer sur « Renvoyer le code » ;
+  les décisions concernées se retrouvent avec `SELECT created_at, type, destinataire, demande_id FROM envois_mail WHERE statut = 'echec' ORDER BY id DESC;`.
+- **Journal de 2 Go** : `storage\logs\laravel.log` peut être vidé sans risque pour l'application (on perd l'historique des anciennes erreurs). Garder d'abord les erreurs récentes,
+  depuis le dossier de l'application :
+
+  ```powershell
+  Get-Content storage\logs\laravel.log -Tail 20000 | Where-Object { $_ -match '^\[\d{4}-\d{2}-\d{2} ' } | Set-Content storage\logs\extrait-erreurs.txt -Encoding utf8
+  Clear-Content storage\logs\laravel.log
+  ```
+
+  L'extrait peut contenir des adresses e-mail : le supprimer une fois lu. Avec `LOG_CHANNEL=daily`, il y a ensuite un fichier par jour et seuls les 14 derniers jours sont conservés.
+- **Boutons des e-mails de demande** : le jeton est chiffré avec `APP_KEY`. Si cette clé change, les boutons des e-mails déjà envoyés mènent à « Mes demandes » au lieu de la demande.
+  Les liens des anciens e-mails (`/detail/demande/<id>`) restent valables. Après le clic, la barre d'adresse affiche l'identifiant, comme partout dans l'application ;
+  l'accès reste contrôlé sur la page de détail.
 - Dépendances : `composer.lock` contient des mises à jour mineures, donc `composer install` est nécessaire (§ 2.4).
 - Pages publiques retirées : les anciennes vues Jetstream et les modèles inutilisés ont été supprimés.
   Les adresses `/admin` et `/dash` n'existent plus (ANSSI Vul-004).

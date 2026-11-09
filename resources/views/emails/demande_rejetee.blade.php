@@ -35,5 +35,5 @@
         <li>Cliquez sur <strong>« Renvoyer pour traitement »</strong> : votre conseiller sera prévenu.</li>
     </ol>
 
-    @include('emails.partials.bouton', ['lien' => $lien, 'libelle' => 'Corriger ma demande'])
+    @include('emails.partials.bouton', ['lien' => $lien, 'libelle' => 'Corriger ma demande', 'boutonSeul' => true])
 @endsection

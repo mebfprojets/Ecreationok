@@ -35,6 +35,7 @@ use App\Http\Controllers\PieceJointeController;
 // Ajout BARRO
 Route::get('/show/demande', [DemandeController::class,'liste'])->name('demande.liste');
 Route::get('/detail/demande/{id}', [DemandeController::class,'detail'])->name('demande.detail');
+Route::get('/ma-demande/{jeton}', [DemandeController::class,'ouvrirDepuisEmail'])->name('demande.ouvrir');
 
 //Pour la page d'accueil
 //Route::get('/', [DemandeController::class,'test'])->name('test');

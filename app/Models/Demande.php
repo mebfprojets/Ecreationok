@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Crypt;
 
 class Demande extends Model
 {
@@ -25,6 +27,22 @@ class Demande extends Model
     public function estRejetee(): bool
     {
         return $this->paye == 1 && $this->etat == 2;
+    }
+
+    /** Lien à mettre dans les e-mails : un jeton chiffré y remplace l'identifiant de la demande. */
+    public function lienEmail(): string
+    {
+        return route('demande.ouvrir', rtrim(strtr(Crypt::encryptString((string) $this->id), '+/', '-_'), '='));
+    }
+
+    /** Identifiant de la demande contenu dans un jeton de lienEmail(), ou null si le jeton est invalide. */
+    public static function idDepuisJeton(string $jeton): ?int
+    {
+        try {
+            return (int) Crypt::decryptString(strtr($jeton, '-_', '+/'));
+        } catch (DecryptException $e) {
+            return null;
+        }
     }
 
     /**

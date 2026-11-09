@@ -42,7 +42,7 @@ abstract class NotificationDemande extends Mailable
             'numero' => $this->demande->numero_demande,
             'cefore' => self::nomCefore($ville),
             'date' => now()->format('d/m/Y à H:i'),
-            'lien' => route('demande.detail', $this->demande->id),
+            'lien' => $this->demande->lienEmail(),
         ];
     }
 

@@ -26,7 +26,7 @@
                                 <tr>
                                     @isset($message)
                                         <td style="padding-right:12px; vertical-align:middle;">
-                                            <img src="{{ $message->embed(public_path('frontend/images/logo-me.jpg')) }}" width="44" height="44" alt="MEBF" style="display:block; border-radius:6px; background:#ffffff;">
+                                            <img src="{{ $message->embed(public_path('frontend/images/CEFORE.jpg')) }}" width="84" height="56" alt="CEFORE" style="display:block; border-radius:6px; background:#ffffff;">
                                         </td>
                                     @endisset
                                     <td style="vertical-align:middle; color:#ffffff;">

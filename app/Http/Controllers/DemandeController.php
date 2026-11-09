@@ -931,6 +931,14 @@ public function laodpiecejointe(Request $request){
             return view('demande.liste', compact('demandes','c','nomsCefore'));
         }
 
+        /** Bouton des e-mails : retrouve la demande à partir du jeton. Le contrôle d'accès reste celui de la page détail. */
+        public function ouvrirDepuisEmail($jeton)
+        {
+            $id = Demande::idDepuisJeton($jeton);
+
+            return $id ? redirect()->route('demande.detail', $id) : redirect()->route('demande.liste');
+        }
+
         public function detail($id)
         {
             
