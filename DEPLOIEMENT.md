@@ -129,7 +129,8 @@ php artisan up
 2. Site public : accueil (ni bandeau de maintenance ni bouton « Vérifier un nom commercial » dans l'en-tête), page Contacts,
    inscription (code reçu par e-mail ; dans la base, `created_at` et `email_verified_at` du nouveau compte ont une heure, pas `00:00:00`),
    connexion, mot de passe oublié, formulaire « Enregistrement du promoteur » (pied de page en bas de l'écran, fenêtre de confirmation),
-   formulaire de demande jusqu'à l'étape 2 (bouton « Ajouter usager »).
+   formulaire de demande (bouton « Ajouter usager ») **enregistré jusqu'au bout avec une demande de test** : la page suivante s'affiche
+   et le fichier `signature.png` est créé dans `storage\app\public\files\<id du promoteur>\`.
 3. Espace agents : tableau de bord, une liste avec un filtre de période, détail d'une demande (aperçu des pièces,
    rubrique « Activité du promoteur » avec ses onglets Parcours, Connexions et E-mails), validation et rejet d'une demande de test (l'e-mail doit partir).
 4. Journal des erreurs : `storage\logs\laravel.log` ne doit pas contenir de nouvelle erreur.
@@ -158,6 +159,13 @@ Compléments du 8 novembre 2026 :
   ancien formulaire « personne morale » caché supprimé. La page s'affichait en mode dégradé (pied de page étiré, grande zone vide).
 - Formulaire de demande : les boutons « Ajouter usager » / « Créer Dirigeant » ouvrent de nouveau la fenêtre de création d'usager.
 - Table `users` : `created_at`, `updated_at` et `email_verified_at` sont de nouveau enregistrés avec l'heure (voir § 3.3).
+
+Correctifs du 9 novembre 2026 (aucune migration, aucune clé de `.env` à ajouter) :
+
+- **Enregistrement des demandes rétabli** : depuis l'ajout de la reprise de signature, toute création de demande échouait avec le message
+  « La demande n’a pas pu être enregistrée… » (erreur `must be of type App\Models\Usager, stdClass given` dans `storage\logs\laravel.log`).
+- Fichier de signature : de nouveau nommé `signature.png` dans `storage\app\public\files\<id du promoteur>\`
+  (au lieu de `signature-<date>-<aléatoire>.png`).
 
 ### 3.1 Migrations attendues (5)
 
@@ -204,6 +212,11 @@ passer temporairement `CSP_MODE=report`, puis `php artisan config:cache`, et sig
   (redéfinition de `getDateFormat()` en `'Y-d-m'`, supprimée) : tous les comptes existants sont à `00:00:00`.
   **Aucune migration** : la correction est dans le code et s'applique dès le `git pull`. Les nouveaux comptes et les
   mises à jour gardent l'heure ; les heures déjà perdues ne sont pas récupérables (les dates restent justes).
+- **Demandes refusées avant le correctif du 9 novembre** : l'échec survenait avant toute écriture de la demande ; rien n'est enregistré à moitié
+  et les pièces déposées sont conservées. Les promoteurs concernés doivent simplement renvoyer leur demande une fois le correctif déployé.
+- **Signature : un seul fichier par promoteur.** Le nom étant fixe, une nouvelle demande ou une reprise de signature remplace le fichier `signature.png`
+  précédent, et toutes les demandes du promoteur qui pointent vers ce fichier affichent la dernière signature.
+  Les fichiers déjà créés sous l'ancien nom (`signature-<date>-<aléatoire>.png`) restent valables : leur chemin est enregistré en base.
 - Dépendances : `composer.lock` contient des mises à jour mineures, donc `composer install` est nécessaire (§ 2.4).
 - Pages publiques retirées : les anciennes vues Jetstream et les modèles inutilisés ont été supprimés.
   Les adresses `/admin` et `/dash` n'existent plus (ANSSI Vul-004).

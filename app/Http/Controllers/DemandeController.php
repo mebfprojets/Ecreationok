@@ -295,7 +295,7 @@ class DemandeController extends Controller
                 .'Vérifiez le type de demande choisi ou contactez le CEFORE.');
         }
 
-        // Signature dessinée dans le formulaire : un fichier par signature (un promoteur peut avoir plusieurs demandes)
+        // Signature dessinée dans le formulaire : fichier signature.png dans le dossier du promoteur
         $signature = $this->enregistrerSignature($request->signed, $usager);
         $path = dirname($signature['chemin']).DIRECTORY_SEPARATOR;
         $type_doc = "Signature";
@@ -1700,10 +1700,12 @@ public function show_formalite_retour(Formalite $formalite){
 
     /**
      * Enregistre une signature dessinée (data URL PNG ou JPEG) dans storage/app/public/files/{usager}/,
-     * sous un nom propre à chaque signature. Lève DemandeRefuseeException si l'image n'est pas valide.
+     * sous le nom signature.png (une signature par promoteur : la dernière remplace la précédente).
+     * Lève DemandeRefuseeException si l'image n'est pas valide.
      * L'extension ne vient jamais du navigateur (sinon « data:image/php;base64,... » créerait un fichier .php).
+     * $usager : modèle Usager ou ligne brute de DB::table('usagers') (store() passe une ligne brute) ; seul l'id est utilisé.
      */
-    private function enregistrerSignature(?string $dataUrl, Usager $usager): array
+    private function enregistrerSignature(?string $dataUrl, object $usager): array
     {
         $refus = 'La signature n’a pas été reçue correctement. Signez à nouveau dans le cadre prévu, puis réessayez.';
         if (!preg_match('#^data:image/(png|jpe?g);base64,([A-Za-z0-9+/=\s]+)$#', (string) $dataUrl, $morceaux)) {
@@ -1719,7 +1721,7 @@ public function show_formalite_retour(Formalite $formalite){
         if (!is_dir($dossier)) {
             mkdir($dossier, 0755, true);
         }
-        $nom = 'signature-'.now()->format('YmdHis').'-'.\Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(6)).'.'.$type;
+        $nom = 'signature.'.$type;
         file_put_contents($dossier.$nom, $binaire);
 
         return ['chemin' => $dossier.$nom, 'url_local' => $usager->id.'/'.$nom, 'type' => $type];
