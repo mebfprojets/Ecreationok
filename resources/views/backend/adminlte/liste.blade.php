@@ -11,7 +11,7 @@
     {{-- Rempli page par page par DemandeController::liste_demande_donnees (recherche et tri côté serveur, même période) --}}
     <table id="tableau-liste-demandes" class="table table-bordered table-striped w-100"
            data-ajax-url="{{ route('list.donnees', ['etat' => $etat] + array_filter(['du' => $periode['du'], 'au' => $periode['au']])) }}"
-           data-tri="6,desc" data-non-triables="0,3,8,9">
+           data-tri="{{ $etat === 0 ? '6,desc' : '8,desc' }}" data-non-triables="{{ $etat === 0 ? '0,3,8,9' : '0,3,10,11' }}">
       <thead>
         <tr>
           <th>N°</th>
@@ -19,6 +19,10 @@
           <th>Promoteur</th>
           <th>Statut</th>
           <th>Nom commercial</th>
+          @if ($etat !== 0)
+            <th>N° RCCM</th>
+            <th>Date immatriculation</th>
+          @endif
           <th>Date création</th>
           <th>Date paiement</th>
           <th>Date validation</th>
@@ -29,7 +33,7 @@
       </thead>
     </table>
     <p class="small text-muted mt-2 mb-0"><i class="fas fa-info-circle me-1" aria-hidden="true"></i>
-      Les lignes surlignées ont déjà été rejetées une fois. La recherche porte aussi sur le nom de l’agent qui a validé.
+      Les lignes surlignées ont déjà été rejetées une fois. La recherche porte aussi sur le nom de l’agent qui a validé{{ $etat !== 0 ? ' et sur le numéro RCCM' : '' }}.
       Les exports (Excel, PDF…) portent sur les lignes affichées : choisissez « 100 lignes par page » ou une période avant d’exporter.</p>
   </div>
 </div>

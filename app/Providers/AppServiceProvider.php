@@ -3,8 +3,10 @@
 namespace App\Providers;
 use App\Http\Controllers\Controller;
 use App\Models\Demande;
+use App\Support\TransportMicrosoftGraph;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -33,6 +35,9 @@ class AppServiceProvider extends ServiceProvider
             URL::forceRootUrl(config('app.url'));
             URL::forceScheme('https');
         }
+
+        // MAIL_MAILER=graph : envoi des e-mails par Microsoft Graph
+        Mail::extend('graph', fn () => new TransportMicrosoftGraph(config('services.microsoft_graph')));
 
         // Menu de l'espace agents : nombre de demandes à payer, à valider et rejetées (mêmes critères que les listes),
         // limité au CEFORE de l'agent (le siège voit tout). Une seule requête groupée par page.

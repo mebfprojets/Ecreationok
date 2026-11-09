@@ -131,8 +131,11 @@ php artisan up
    connexion, mot de passe oublié, formulaire « Enregistrement du promoteur » (pied de page en bas de l'écran, fenêtre de confirmation),
    formulaire de demande (bouton « Ajouter usager ») **enregistré jusqu'au bout avec une demande de test** : la page suivante s'affiche
    et le fichier `signature.png` est créé dans `storage\app\public\files\<id du promoteur>\`.
-3. Espace agents : tableau de bord, une liste avec un filtre de période, détail d'une demande (aperçu des pièces,
-   rubrique « Activité du promoteur » avec ses onglets Parcours, Connexions et E-mails), validation et rejet d'une demande de test (l'e-mail doit partir).
+   Sur le détail d'une demande immatriculée, la carte « Mes formalités » affiche les dates en jj/mm/aaaa.
+3. Espace agents : tableau de bord, une liste avec un filtre de période, liste « Validées » (colonnes « N° RCCM » et « Date immatriculation »,
+   recherche par numéro RCCM), détail d'une demande (carte « Immatriculation » si un numéro est attribué, aperçu des pièces,
+   rubrique « Activité du promoteur » avec ses onglets Parcours, Connexions et E-mails), plein écran d'une pièce (« Suivante », case « À corriger »),
+   motif de correction après avoir coché d'autres pièces et rouvert la fenêtre, validation et rejet d'une demande de test (l'e-mail doit partir).
 4. Journal des erreurs : `storage\logs\laravel.log` ne doit pas contenir de nouvelle erreur.
 
 ### 2.10 En cas de problème
@@ -166,6 +169,17 @@ Correctifs du 9 novembre 2026 (aucune migration, aucune clé de `.env` à ajoute
   « La demande n’a pas pu être enregistrée… » (erreur `must be of type App\Models\Usager, stdClass given` dans `storage\logs\laravel.log`).
 - Fichier de signature : de nouveau nommé `signature.png` dans `storage\app\public\files\<id du promoteur>\`
   (au lieu de `signature-<date>-<aléatoire>.png`).
+- Espace agents, traitement d'une demande :
+  - « À corriger » : à chaque ouverture de « Demander une correction », le motif reprend les pièces cochées. Auparavant, seules celles de la
+    première ouverture étaient prises en compte. Les commentaires de l'agent sont conservés ; une pièce décochée dont la ligne porte
+    un commentaire reste dans le motif, à effacer à la main.
+  - Plein écran : boutons « Précédente » / « Suivante », position (« Pièce 3 / 7 »), case « À corriger » liée à celle de la liste,
+    message à la place de l'aperçu si le fichier d'une pièce est introuvable.
+- Espace agents, immatriculation (affichage seul : aucun écran ne saisit ces numéros, qui continuent d'arriver de l'extérieur) :
+  - Détail d'une demande : carte « Immatriculation » avec le numéro et la date du RCCM, de l'IFU, de la CNSS et du CPC s'il a été demandé
+    (« En attente » pour un numéro manquant). La carte n'apparaît que si au moins un numéro est attribué.
+  - Liste « Validées » : colonnes « N° RCCM » et « Date immatriculation », triables ; la recherche porte aussi sur le numéro RCCM.
+- Espace promoteur, détail d'une demande, carte « Mes formalités » : dates des numéros au format jj/mm/aaaa (au lieu de `2026-10-14`).
 
 ### 3.1 Migrations attendues (5)
 

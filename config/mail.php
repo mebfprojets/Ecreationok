@@ -70,6 +70,11 @@ return [
         'array' => [
             'transport' => 'array',
         ],
+
+        // Microsoft 365 par l'API Graph : voir App\Support\TransportMicrosoftGraph et config/services.php
+        'graph' => [
+            'transport' => 'graph',
+        ],
     ],
 
     /*

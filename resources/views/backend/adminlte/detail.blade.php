@@ -119,6 +119,30 @@
   {{-- ===== Informations ===== --}}
   <div class="col-xl-7">
 
+    {{-- Numéros et dates d'immatriculation, dès qu'un numéro a été attribué --}}
+    @php $numerosImmatriculation = $demandes->numerosFormalites(); @endphp
+    @if (collect($numerosImmatriculation)->pluck('numero')->filter()->isNotEmpty())
+      <div class="card mb-3">
+        <div class="card-header"><h3 class="card-title"><i class="fas fa-stamp me-2 text-secondary" aria-hidden="true"></i>Immatriculation</h3></div>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle mb-0">
+            <thead>
+              <tr><th scope="col" class="ps-3">Formalité</th><th scope="col">Numéro</th><th scope="col">Date</th></tr>
+            </thead>
+            <tbody>
+              @foreach ($numerosImmatriculation as $formalite => $numero)
+                <tr>
+                  <th scope="row" class="ps-3">{{ $formalite }}</th>
+                  <td>@if ($numero['numero']){{ $numero['numero'] }}@else<span class="badge text-bg-light border">En attente</span>@endif</td>
+                  <td>{{ $date($numero['date']) ?? '—' }}</td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
+      </div>
+    @endif
+
     <div class="card mb-3">
       <div class="card-header"><h3 class="card-title"><i class="fas fa-building me-2 text-secondary" aria-hidden="true"></i>Entreprise</h3></div>
       <div class="card-body">
@@ -322,11 +346,31 @@
   <div class="modal-dialog modal-fullscreen">
     <div class="modal-content">
       <div class="modal-header py-2">
-        <h5 class="modal-title" id="titre-apercu-plein"><i class="fas fa-paperclip me-2 text-secondary" aria-hidden="true"></i><span data-apercu-plein-titre></span></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        <h5 class="modal-title text-truncate" id="titre-apercu-plein"><i class="fas fa-paperclip me-2 text-secondary" aria-hidden="true"></i><span data-apercu-plein-titre></span></h5>
+        <div class="d-flex flex-wrap align-items-center justify-content-end gap-2 gap-md-3 ms-auto me-3">
+          @if ($peutTraiter)
+            <div class="form-check mb-0 small text-nowrap" title="Pièce à faire corriger par le promoteur">
+              <input class="form-check-input" type="checkbox" id="corriger-plein-ecran" data-apercu-plein-corriger>
+              <label class="form-check-label text-danger fw-semibold" for="corriger-plein-ecran">À corriger</label>
+            </div>
+          @endif
+          <span class="small text-muted text-nowrap" data-apercu-plein-position></span>
+          <div class="btn-group btn-group-sm" role="group" aria-label="Changer de pièce">
+            <button type="button" class="btn btn-outline-secondary" data-piece-precedente><i class="fas fa-chevron-left me-1" aria-hidden="true"></i>Précédente</button>
+            <button type="button" class="btn btn-outline-primary" data-piece-suivante>Suivante<i class="fas fa-chevron-right ms-1" aria-hidden="true"></i></button>
+          </div>
+        </div>
+        <button type="button" class="btn-close ms-0" data-bs-dismiss="modal" aria-label="Fermer"></button>
       </div>
       <div class="modal-body p-0">
         <iframe class="w-100 h-100 border-0" data-apercu-plein title="Pièce jointe en plein écran"></iframe>
+        <div class="d-flex align-items-center justify-content-center text-center h-100 p-4 d-none" data-apercu-plein-absente>
+          <div>
+            <i class="fas fa-file-excel fa-2x mb-2 text-danger" aria-hidden="true"></i>
+            <div class="fw-semibold">Le fichier de cette pièce est introuvable sur le serveur.</div>
+            <div class="small text-muted mt-1">Passez à la pièce suivante, ou demandez au promoteur de la joindre à nouveau.</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

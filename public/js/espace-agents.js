@@ -43,7 +43,7 @@
     /* Page de traitement d'une demande (backend/adminlte/detail) */
     function initialiserTraitementDemande() {
         var $motif = $('#motif_rejet');
-        var texteAuto = '';   // dernier texte généré à partir des pièces cochées
+        var ENTETE_MOTIF = 'Merci de corriger les pièces suivantes :';
 
         // Visionneuse : un clic sur une pièce l'affiche à côté des informations
         $(document).on('click', '[data-piece-url], [data-piece-absente]', function () {
@@ -65,15 +65,29 @@
             var actuelle = $pieces.index($('.active-piece').find('[data-piece-url], [data-piece-absente]'));
             var suivante = $pieces.eq((actuelle + sens + $pieces.length) % $pieces.length);
             suivante.trigger('click');
+            if ($('#modal-apercu-plein').hasClass('show')) { afficherPleinEcran(); }
         }
         $(document).on('click', '[data-piece-precedente]', function () { changerDePiece(-1); });
         $(document).on('click', '[data-piece-suivante]', function () { changerDePiece(1); });
 
-        // Plein écran : on affiche la pièce actuellement dans l'aperçu ; on vide la fenêtre en la fermant
-        $('#modal-apercu-plein').on('show.bs.modal', function () {
-            $('[data-apercu-plein]').attr('src', String($('[data-visionneuse]').attr('src')).split('#')[0] + '#zoom=page-fit');
-            $('[data-apercu-plein-titre]').text($('[data-visionneuse-titre]').text());
-        }).on('hidden.bs.modal', function () {
+        // Plein écran : affiche la pièce active de la liste (ou un message si son fichier est introuvable)
+        function afficherPleinEcran() {
+            var $pieces = $('[data-piece-url], [data-piece-absente]');
+            var $active = $('.active-piece').find('[data-piece-url], [data-piece-absente]');
+            var url = $active.data('piece-url');
+            $('[data-apercu-plein]').toggleClass('d-none', !url);
+            $('[data-apercu-plein-absente]').toggleClass('d-none', !!url);
+            if (url) { $('[data-apercu-plein]').attr('src', url + '#zoom=page-fit'); }
+            $('[data-apercu-plein-titre]').text($active.data('piece-titre'));
+            $('[data-apercu-plein-position]').text('Pièce ' + ($pieces.index($active) + 1) + ' / ' + $pieces.length);
+            $('[data-apercu-plein-corriger]').prop('checked', $('.active-piece .piece-a-corriger').prop('checked') === true);
+        }
+        // La case du plein écran pilote celle de la pièce dans la liste (compteur et motif en dépendent)
+        $(document).on('change', '[data-apercu-plein-corriger]', function () {
+            $('.active-piece .piece-a-corriger').prop('checked', this.checked).trigger('change');
+        });
+        // On vide la fenêtre en la fermant
+        $('#modal-apercu-plein').on('show.bs.modal', afficherPleinEcran).on('hidden.bs.modal', function () {
             $('[data-apercu-plein]').attr('src', 'about:blank');
         });
 
@@ -95,15 +109,41 @@
         }
         $motif.on('input', compterMotif);
 
-        // À l'ouverture de la fenêtre de correction : motif pré-rempli avec les pièces cochées
-        // (sans écraser ce que l'agent a déjà écrit lui-même)
-        $('#modal-confirm-rejet').on('show.bs.modal', function () {
-            var pieces = piecesSignalees();
-            var actuel = $.trim($motif.val() || '');
-            if (pieces.length && (actuel === '' || actuel === texteAuto)) {
-                texteAuto = 'Merci de corriger les pièces suivantes :\n' + pieces.map(function (p) { return '- ' + p + ' : '; }).join('\n');
-                $motif.val(texteAuto);
+        // Accorde le motif avec les pièces cochées, sans perdre ce que l'agent a écrit :
+        // ajoute les pièces nouvellement cochées, retire celles décochées dont la ligne est restée sans commentaire
+        function synchroniserMotif() {
+            var cochees = piecesSignalees();
+            var toutes = $('.piece-a-corriger').map(function () { return $(this).data('libelle'); }).get();
+            var aDesPieces = function (l) { return /^- /.test(l); };
+            var lignes = ($motif.val() || '').split('\n').filter(function (ligne) {
+                var vide = toutes.filter(function (p) { return $.trim(ligne) === '- ' + p + ' :'; })[0];
+                return vide === undefined || cochees.indexOf(vide) !== -1;
+            });
+            var aAjouter = cochees.filter(function (p, i) {
+                return cochees.indexOf(p) === i && !lignes.some(function (l) { return l.indexOf('- ' + p + ' :') === 0; });
+            }).map(function (p) { return '- ' + p + ' : '; });
+
+            var entete = lignes.indexOf(ENTETE_MOTIF);
+            if (aAjouter.length && entete === -1) {
+                // Texte déjà écrit par l'agent : la liste des pièces vient à la suite
+                var texte = $.trim(lignes.join('\n'));
+                lignes = (texte ? texte.split('\n').concat(['']) : []).concat([ENTETE_MOTIF], aAjouter);
+            } else if (aAjouter.length) {
+                var fin = entete + 1;
+                while (fin < lignes.length && aDesPieces(lignes[fin])) { fin++; }
+                lignes = lignes.slice(0, fin).concat(aAjouter, lignes.slice(fin));
+            } else if (entete !== -1 && !aDesPieces(lignes[entete + 1] || '')) {
+                lignes.splice(entete, 1);   // plus aucune pièce sous l'en-tête
             }
+            // Lignes vides en début et en fin ; l'espace après « : » reste pour écrire le commentaire
+            while (lignes.length && !$.trim(lignes[0])) { lignes.shift(); }
+            while (lignes.length && !$.trim(lignes[lignes.length - 1])) { lignes.pop(); }
+            $motif.val(lignes.join('\n'));
+        }
+
+        // À chaque ouverture de la fenêtre de correction, le motif reprend les pièces cochées
+        $('#modal-confirm-rejet').on('show.bs.modal', function () {
+            synchroniserMotif();
             compterMotif();
         }).on('shown.bs.modal', function () {
             $motif.trigger('focus');

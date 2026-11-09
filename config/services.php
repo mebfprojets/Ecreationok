@@ -30,6 +30,13 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    // Envoi des e-mails par Microsoft Graph (MAIL_MAILER=graph). Valeurs à renseigner uniquement dans le fichier .env.
+    'microsoft_graph' => [
+        'tenant_id' => env('MS_TENANT_ID'),
+        'client_id' => env('MS_CLIENT_ID'),
+        'client_secret' => env('MS_CLIENT_SECRET'),
+    ],
+
     // API du Fichier national RCCM (vérification de la disponibilité des noms commerciaux).
     // Les identifiants se renseignent uniquement dans le fichier .env, jamais dans le code.
     'fnrccm' => [

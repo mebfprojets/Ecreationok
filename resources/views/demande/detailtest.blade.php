@@ -153,13 +153,14 @@
             <div class="ed-carte-corps">
                 <div class="ed-pieces">
                     @foreach ($types_formalites as $types_formalite)
+                        @php $elementFormalite = getelementformalite($demandes->id, $types_formalite->id); @endphp
                         <div class="ed-piece">
                             <i class="fas fa-file-signature icone text-success" aria-hidden="true"></i>
                             <div class="nom">
                                 {{ getlibelle($types_formalite->id) }}
                                 <div class="ed-meta mt-1">
-                                    <span>N° {{ getelementformalite($demandes->id, $types_formalite->id)['numero'] ?: '—' }}</span>
-                                    <span>{{ getelementformalite($demandes->id, $types_formalite->id)['date'] ?: '' }}</span>
+                                    <span>N° {{ $elementFormalite['numero'] ?: '—' }}</span>
+                                    <span>{{ $elementFormalite['date'] ? \Carbon\Carbon::parse($elementFormalite['date'])->format('d/m/Y') : '' }}</span>
                                 </div>
                             </div>
                             @if (getpieceformalite($demandes->id, $types_formalite->id) != 0)

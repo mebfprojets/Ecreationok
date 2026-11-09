@@ -1326,15 +1326,20 @@ public function laodpiecejointe(Request $request){
             if (!Auth::user()->can('lister.demande')) {
                 abort(403);
             }
-            $p = $this->parametresTableau($request, [1 => 'numero_demande', 2 => 'legal_rep_name', 4 => 'commercial_name', 5 => 'created_at',
-                6 => 'date_paiement', 7 => 'Date_etat_validation', 10 => 'organisation_code'], 'date_paiement');
+            // « Validées » : deux colonnes d'immatriculation (N° RCCM et sa date) après le nom commercial
+            $validees = $request->etat != 0;
+            $p = $this->parametresTableau($request, $validees
+                ? [1 => 'numero_demande', 2 => 'legal_rep_name', 4 => 'commercial_name', 5 => 'RCCM', 6 => 'DateRCCM', 7 => 'created_at',
+                    8 => 'date_paiement', 9 => 'Date_etat_validation', 12 => 'organisation_code']
+                : [1 => 'numero_demande', 2 => 'legal_rep_name', 4 => 'commercial_name', 5 => 'created_at',
+                    6 => 'date_paiement', 7 => 'Date_etat_validation', 10 => 'organisation_code'], 'date_paiement');
 
             $base = $this->dansPeriode($this->demandesVisibles(), $this->periodeTableau($request))
-                ->where('paye', 1)->where('etat', $request->etat == 0 ? 0 : 1);
+                ->where('paye', 1)->where('etat', $validees ? 1 : 0);
             $total = (clone $base)->count();
             if ($p['motif']) {
-                $base->where(function ($q) use ($p) {
-                    foreach (['numero_demande', 'legal_rep_name', 'commercial_name', 'organisation_code'] as $champ) {
+                $base->where(function ($q) use ($p, $validees) {
+                    foreach (array_merge(['numero_demande', 'legal_rep_name', 'commercial_name', 'organisation_code'], $validees ? ['RCCM'] : []) as $champ) {
                         $q->orWhere($champ, 'like', $p['motif']);
                     }
                     // Nom de l'agent qui a validé
@@ -1346,19 +1351,23 @@ public function laodpiecejointe(Request $request){
 
             $demandes = $base->orderBy($p['tri'], $p['sens'])->orderBy('id', 'desc')->skip($p['debut'])->take($p['longueur'])
                 ->get(['id', 'numero_demande', 'legal_rep_name', 'paye', 'commercial_name', 'created_at', 'date_paiement',
-                    'Date_etat_validation', 'User_ayant_valide', 'objet_social', 'organisation_code', 'motif']);
+                    'Date_etat_validation', 'User_ayant_valide', 'objet_social', 'organisation_code', 'motif', 'RCCM', 'DateRCCM']);
             // Agents validateurs de la page : une seule requête (au lieu d'une par ligne)
             $validateurs = User::whereIn('id', $demandes->pluck('User_ayant_valide')->filter()->unique())->get(['id', 'name', 'prenom'])->keyBy('id');
             $date = fn ($v) => $v ? date('d-m-Y à H:i', strtotime($v)) : null;
 
-            $lignes = $demandes->values()->map(function ($d, $i) use ($p, $validateurs, $date) {
+            $lignes = $demandes->values()->map(function ($d, $i) use ($p, $validateurs, $date, $validees) {
                 $validateur = $validateurs->get($d->User_ayant_valide);
-                return [
+                $immatriculation = !$validees ? [] : (trim((string) $d->RCCM) === ''
+                    ? ['<span class="badge text-bg-light border">En attente</span>', '—']
+                    : [e($d->RCCM), $d->DateRCCM ? date('d-m-Y', strtotime($d->DateRCCM)) : '—']);
+                return array_merge([
                     $p['debut'] + $i + 1,
                     e($d->numero_demande),
                     e($d->legal_rep_name),
                     $d->paye == 1 ? 'Payé' : ($d->paye == 2 ? 'Attente validation du paiement' : 'Non payé'),
                     e($d->commercial_name),
+                ], $immatriculation, [
                     $date($d->created_at) ?? '—',
                     $date($d->date_paiement) ?? '—',
                     $date($d->Date_etat_validation) ?? 'Aucune date',
@@ -1368,7 +1377,7 @@ public function laodpiecejointe(Request $request){
                     // Demande déjà rejetée une fois (motif renseigné) : ligne surlignée ; la ligne entière ouvre le détail
                     'DT_RowClass' => $d->motif !== null ? 'table-warning' : '',
                     'DT_RowAttr' => ['data-href' => route('detail.demande', $d->id), 'tabindex' => 0, 'title' => 'Ouvrir le détail de la demande'],
-                ];
+                ]);
             });
 
             return response()->json([
