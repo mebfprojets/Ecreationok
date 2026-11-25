@@ -7,9 +7,25 @@ use App\Models\UsagerConjoint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class UsagerController extends Controller
 {
+    /**
+     * Formats du N° de pièce d'identité (mêmes règles côté navigateur : public/frontend/js/front-personal.js).
+     * Le type n'est pas enregistré : il se déduit du numéro (17 chiffres = NIP de CNIB, 8 caractères = passeport).
+     */
+    private const FORMATS_PIECE_IDENTITE = [
+        'cnib' => [
+            'motif' => '/^[0-9]{17}$/',
+            'message' => 'Le NIP de la CNIB doit comporter exactement 17 chiffres, sans lettre.',
+        ],
+        'passeport' => [
+            'motif' => '/^[A-Z0-9]{8}$/',
+            'message' => 'Le numéro de passeport doit comporter exactement 8 caractères : lettres et chiffres uniquement.',
+        ],
+    ];
+
     public function __construct()
     {
         //$this->middleware('auth', ['except' => ['verifier_nom_commercial']]);
@@ -107,9 +123,20 @@ class UsagerController extends Controller
         // ou ajout d'un conjoint / associé / dirigeant depuis une fenêtre (appel AJAX).
         $estAjax = $request->ajax() || $request->expectsJson();
 
+        // N° de pièce saisi sans espaces et en majuscules (« b1234 567 » -> « B1234567 »)
+        if ($request->filled('numero_piece')) {
+            $request->merge(['numero_piece' => mb_strtoupper(preg_replace('/\s+/u', '', (string) $request->numero_piece))]);
+        }
+
         $request->validate([
-            'numero_piece' => ['required_without:numero_ifu', 'nullable', 'string', 'max:50', function ($attribut, $valeur, $echec) {
-                $numero = mb_strtoupper(trim((string) $valeur));
+            'type_piece_identite' => ['required_with:numero_piece', 'nullable', Rule::in(array_keys(self::FORMATS_PIECE_IDENTITE))],
+            'numero_piece' => ['required_without:numero_ifu', 'nullable', 'string', 'max:50', function ($attribut, $valeur, $echec) use ($request) {
+                $numero = (string) $valeur;
+                $format = self::FORMATS_PIECE_IDENTITE[$request->type_piece_identite] ?? null;
+                if ($numero !== '' && $format && ! preg_match($format['motif'], $numero)) {
+                    $echec($format['message']);
+                    return;
+                }
                 if ($numero !== '' && Usager::whereRaw('UPPER(LTRIM(RTRIM(CIN))) = ?', [$numero])->exists()) {
                     $echec('Un promoteur est enregistré dans la base avec les mêmes informations.');
                 }
@@ -121,6 +148,8 @@ class UsagerController extends Controller
             'piece_jointe_m' => 'nullable|'.self::REGLE_FICHIER,
             'piece_jointe_c' => 'nullable|'.self::REGLE_FICHIER,
         ], [
+            'type_piece_identite.required_with' => 'Choisissez le type de pièce d’identité (CNIB ou passeport).',
+            'type_piece_identite.in' => 'Le type de pièce d’identité doit être CNIB ou passeport.',
             'numero_piece.required_without' => 'Le numéro de la pièce d’identité est obligatoire.',
             'numero_piece.max' => 'Le numéro de la pièce d’identité est trop long (50 caractères au maximum).',
             'nom_usager.max' => 'Le nom est trop long (255 caractères au maximum).',

@@ -294,7 +294,8 @@
   <!--  -->
   <script src="{{asset('vendor/jquery-ui-1.14.1/jquery-ui.min.js')}}"></script>
   <script src="{{asset('backend/js/signature.js')}}"></script>
-  <script src="{{asset('frontend/js/front-personal.js')}}"></script>
+  {{-- asset_version : le navigateur recharge le fichier après chaque modification (contrôle du N° de pièce d'identité) --}}
+  <script src="{{asset_version('frontend/js/front-personal.js')}}"></script>
   <script src="{{asset('backend/js/loaddata.js')}}"></script>
   <script nonce="{{ $cspNonce ?? '' }}">$(function(){ Login.init(); });</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha384-duAtk5RV7s42V6Zuw+tRBFcqD8RjRKw6RFnxmxIj1lUGAQJyum/vtcUQX8lqKQjp" crossorigin="anonymous"></script>

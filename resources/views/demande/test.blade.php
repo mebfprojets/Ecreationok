@@ -332,10 +332,21 @@
                         </div> 
                     <div class="col-lg-6">
                         <div class="mb-3">
-                            <label class="form-label" for="val_username">N° Pièce d'identitié (<font color="red">*</font>)</label>
-                            <input type="text" id="" name="numero_piece" class="form-control"  placeholder="Numéro NIP de la CNIB ou N°Passport .." value="{{old('numero_piece')}}" required>
+                            <label class="form-label" for="type_piece_identite_fenetre">Type de pièce d'identité (<font color="red">*</font>)</label>
+                            <select id="type_piece_identite_fenetre" name="type_piece_identite" class="form-control" style="width: 100%;" required>
+                                <option value="">Choisir le type de pièce</option>
+                                <option value="cnib">CNIB</option>
+                                <option value="passeport">Passeport</option>
+                            </select>
                         </div>
-                    </div> 
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label class="form-label" for="numero_piece_fenetre">N° Pièce d'identité (<font color="red">*</font>)</label>
+                            <input type="text" id="numero_piece_fenetre" name="numero_piece" class="form-control uppercase numeroPieceIdentite" autocomplete="off" placeholder="Choisissez d’abord le type de pièce" required>
+                            <small class="form-text text-muted">CNIB : NIP de 17 chiffres. Passeport : 8 lettres ou chiffres.</small>
+                        </div>
+                    </div>
                     </div>
                  </fieldset> <br><br><br>  
                  <fieldset style="width:100%;  margin-top:30px;">

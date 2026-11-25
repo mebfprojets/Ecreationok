@@ -128,7 +128,8 @@ php artisan up
 
 2. Site public : accueil (ni bandeau de maintenance ni bouton « Vérifier un nom commercial » dans l'en-tête), page Contacts,
    inscription (code reçu sur une adresse extérieure, Gmail par exemple, hors indésirables et avec le logo CEFORE ; `envois_mail` indique `envoye` ; dans la base, `created_at` et `email_verified_at` du nouveau compte ont une heure, pas `00:00:00`),
-   connexion, mot de passe oublié, formulaire « Enregistrement du promoteur » (pied de page en bas de l'écran, fenêtre de confirmation),
+   connexion, mot de passe oublié, formulaire « Enregistrement du promoteur » (pied de page en bas de l'écran, fenêtre de confirmation ;
+   « Type de pièce d'identité » sur CNIB : 16 chiffres affichent un message d'erreur, 17 chiffres sont acceptés ; sur Passeport, 8 caractères maximum),
    formulaire de demande (bouton « Ajouter usager ») **enregistré jusqu'au bout avec une demande de test** : la page suivante s'affiche
    et le fichier `signature.png` est créé dans `storage\app\public\files\<id du promoteur>\`.
    Sur le détail d'une demande immatriculée, la carte « Mes formalités » affiche les dates en jj/mm/aaaa.
@@ -193,6 +194,19 @@ Envoi des e-mails par Microsoft 365 (9 novembre 2026, aucune migration, **clés 
 - Motif : le compte MailerSend est au plan gratuit et refusait les envois (`450 … 429 Too many requests`), ce qui bloquait les créations de compte.
 - L'authentification se fait par l'application Entra (identifiant + secret client) : elle n'est pas concernée par la double authentification des comptes.
 - Fichiers concernés : `app/Support/TransportMicrosoftGraph.php` (nouveau), `app/Providers/AppServiceProvider.php`, `config/mail.php`, `config/services.php`, `.env.example`.
+
+Correctifs du 11 novembre 2026 (aucune migration, aucune clé de `.env` à ajouter) :
+
+- Numéro de pièce d'identité contrôlé à la création d'un usager : formulaire « Enregistrement du promoteur » et fenêtres de création d'usager
+  (boutons « Ajouter usager » / « Créer Dirigeant » du formulaire de demande, « Créer un conjoint »).
+  - Nouveau champ obligatoire « Type de pièce d'identité » (CNIB ou Passeport) avant le numéro.
+  - CNIB : NIP de **17 chiffres exactement**, sans lettre. Passeport : **8 caractères exactement**, lettres et chiffres uniquement.
+  - Les espaces sont retirés et les lettres mises en majuscules pendant la saisie ; le numéro est enregistré ainsi dans `usagers.CIN`.
+  - Message en français si le format est faux, dans le navigateur et sur le serveur (`app/Http/Controllers/UsagerController.php`).
+- Le type de pièce n'est pas enregistré : il se déduit du numéro (17 chiffres = CNIB, 8 caractères = passeport). Aucune colonne ajoutée.
+- Fichiers concernés : `UsagerController.php`, `public/frontend/js/front-personal.js`, `resources/views/usager/create.blade.php`,
+  `resources/views/demande/test.blade.php`, `resources/views/partials/frontend/footer.blade.php` (le script est désormais chargé avec un numéro de version,
+  pour que les navigateurs prennent le nouveau fichier).
 
 ### 3.1 Migrations attendues (5)
 
@@ -278,6 +292,12 @@ passer temporairement `CSP_MODE=report`, puis `php artisan config:cache`, et sig
 - **Boutons des e-mails de demande** : le jeton est chiffré avec `APP_KEY`. Si cette clé change, les boutons des e-mails déjà envoyés mènent à « Mes demandes » au lieu de la demande.
   Les liens des anciens e-mails (`/detail/demande/<id>`) restent valables. Après le clic, la barre d'adresse affiche l'identifiant, comme partout dans l'application ;
   l'accès reste contrôlé sur la page de détail.
+- **Pièce d'identité, passeports étrangers** : la règle « 8 caractères » bloque tout passeport d'une autre longueur (certains pays en délivrent de 9 caractères).
+  Le promoteur voit « Le numéro de passeport doit comporter exactement 8 caractères… » et ne peut pas s'enregistrer. Si des promoteurs étrangers le signalent,
+  la règle se trouve dans `UsagerController::FORMATS_PIECE_IDENTITE` et, pour le navigateur, dans `public/frontend/js/front-personal.js` (les deux à modifier ensemble).
+- **Pièce d'identité, données existantes** : le contrôle ne s'applique qu'aux nouveaux usagers. Les numéros déjà enregistrés ne sont ni vérifiés ni modifiés.
+  Une page de formulaire ouverte avant le déploiement n'a pas le champ « Type de pièce » : l'envoi est refusé avec « Choisissez le type de pièce d’identité » ;
+  il suffit de recharger la page.
 - Dépendances : `composer.lock` contient des mises à jour mineures, donc `composer install` est nécessaire (§ 2.4).
 - Pages publiques retirées : les anciennes vues Jetstream et les modèles inutilisés ont été supprimés.
   Les adresses `/admin` et `/dash` n'existent plus (ANSSI Vul-004).
