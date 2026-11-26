@@ -51,43 +51,7 @@ class DemandeController extends Controller
 
     public function index()
     {
-        return view('index', ['statistiques' => $this->statistiquesAccueil()]);
-    }
-
-    /**
-     * Chiffres de l'année en cours affichés sur la page d'accueil : demandes payées, par type et pour le mois en cours.
-     * Une requête groupée (et non le chargement de toutes les demandes), gardée 10 minutes en cache.
-     */
-    private function statistiquesAccueil(): array
-    {
-        $annee = now()->year;
-
-        return \Illuminate\Support\Facades\Cache::remember('accueil.statistiques.'.$annee, now()->addMinutes(10), function () use ($annee) {
-            $parMois = Demande::where('paye', 1)
-                ->where('created_at', '>=', $annee.'-01-01T00:00:00')   // format ISO : indépendant de la langue de SQL Server
-                ->where('created_at', '<', ($annee + 1).'-01-01T00:00:00')
-                ->groupBy(DB::raw('MONTH(created_at)'))
-                ->get([
-                    DB::raw('MONTH(created_at) AS mois'),
-                    DB::raw('COUNT(*) AS total'),
-                    DB::raw("SUM(CASE WHEN company_type = 'EI' THEN 1 ELSE 0 END) AS individuelles"),
-                    DB::raw('SUM(CASE WHEN etat = 1 THEN 1 ELSE 0 END) AS validees'),
-                ])->keyBy('mois');
-
-            $total = (int) $parMois->sum('total');
-            $individuelles = (int) $parMois->sum('individuelles');
-
-            return [
-                'annee' => $annee,
-                'total' => $total,
-                'individuelles' => $individuelles,
-                'societaires' => $total - $individuelles,   // sociétés et GIE
-                'validees' => (int) $parMois->sum('validees'),
-                'mois_en_cours' => (int) optional($parMois->get(now()->month))->total,
-                'nom_mois' => now()->locale('fr')->isoFormat('MMMM'),
-                'mis_a_jour' => now(),
-            ];
-        });
+        return view('index', ['statistiques' => \App\Support\StatistiquesAccueil::calculer()]);
     }
 
     /**
@@ -213,6 +177,54 @@ class DemandeController extends Controller
     }
 
     /**
+     * Montant de la demande : tarif de la table montant_demandes selon le type de demande (M1/G1 société, P1 entreprise
+     * individuelle) et le CPC, moins le coût de l'IFU pour les provinces où il n'est pas facturé.
+     *
+     * @return array{0: int|float, 1: int|float, 2: int} [montant, montant_total, avecCPC]
+     */
+    private function calculerMontant(Request $request): array
+    {
+        $montant_demande = null;
+        if (isset($request->ccp_es)) {
+            $avecCPC = 1;
+            if ($request->type_request == 'M1' || $request->type_request == 'G1') {
+                $montant_demande = DB::table('montant_demandes')->where('type', 'M1')->where('avecCPC', 1)->first();
+            }
+        } else {
+            $avecCPC = 0;
+            if ($request->type_request == 'M1' || $request->type_request == 'G1') {
+                $montant_demande = DB::table('montant_demandes')->where('type', 'M1')->where('avecCPC', 0)->first();
+            } elseif ($request->type_request == 'P1') {
+                $montant_demande = DB::table('montant_demandes')->where('type', 'P1')->first();
+                $avecCPC = 1;
+            }
+        }
+        if (! $montant_demande) {
+            throw new DemandeRefuseeException('Le tarif correspondant à ce type de demande est introuvable. '
+                .'Vérifiez le type de demande choisi ou contactez le CEFORE.');
+        }
+
+        $montant = $montant_demande->montant;
+        $montant_total = $montant_demande->montant_total;
+
+        // IFU non facturé pour les provinces du paramètre 19 (BAZEGA, GANZOURGOU : CEFORE OUA) : son coût
+        // (config/tarifs.php) est retiré de la colonne montant, puis les 2 % de frais sont recalculés sur ce montant
+        // et ajoutés (ex. entreprise individuelle : 46 500 - 5 000 = 41 500, + 2 % = 42 330 à payer), arrondi au franc.
+        // Avant, la remise était lue par env(), qui renvoie null quand la configuration est en cache (production) :
+        // l'IFU restait facturé.
+        $provinces_sans_ifu = Valeur::where('parametre_id', 19)->pluck('code')->map(fn ($code) => trim((string) $code))->all();
+        if (in_array(trim((string) $request->province_entreprise), $provinces_sans_ifu, true)) {
+            $ifu = $request->type_request == 'P1'
+                ? config('tarifs.ifu_non_facture.personne_physique')
+                : config('tarifs.ifu_non_facture.personne_morale');
+            $montant = $montant - $ifu;
+            $montant_total = (int) round($montant + $montant * 2 / 100);
+        }
+
+        return [$montant, $montant_total, $avecCPC];
+    }
+
+    /**
      * Création de la demande (appelée dans une transaction par store()).
      * Lève DemandeRefuseeException avec un message destiné à l'usager quand une donnée est incohérente.
      */
@@ -238,62 +250,7 @@ class DemandeController extends Controller
             throw new DemandeRefuseeException('Une entreprise existe déjà avec les mêmes informations.');
         }
 
-        // Vérification du montant CPC
-        $list_code = [];
-        $provinces_ss_ifus= Valeur::where('parametre_id',19)->get();
-        foreach($provinces_ss_ifus as $province){
-            $list_code[]=$province->code;
-        }
-        $ccp=$request->ccp_es;
-        //dd($ccp);
-       if(isset($ccp)){
-        //dd($request->ccp_es);
-        //dd('vrai');
-        $avecCPC=1;
-        if($request->type_request=='M1' || $request->type_request=='G1'){
-           $montant_demande= DB::table('montant_demandes')->where('type','M1')->where('avecCPC',1)->first();
-            //dd($montant_demande->montant);
-            $montant=$montant_demande->montant;
-            $montant_total=$montant_demande->montant_total;
-            if(in_array($request['province_entreprise'],$list_code)){
-                $montant= $montant - env('montant_societaire_ss_ifu');
-                $frais=$montant*2/100;
-                $montant_total= $montant + $frais;
-                //$montant_total= $montant_total - env('montant_societaire_ss_ifu');
-            }
-        }
-   }
-   else{
-    $avecCPC=0;
-    if($request->type_request=='M1' || $request->type_request=='G1'){
-        $montant_demande= DB::table('montant_demandes')->where('type','M1')->where('avecCPC',0)->first();
-        $montant=$montant_demande->montant;
-        $montant_total=$montant_demande->montant_total;
-        if(in_array($request['province_entreprise'],$list_code)){
-            $montant= $montant - env('montant_societaire_ss_ifu');
-            $frais=$montant*2/100;
-            $montant_total= $montant + $frais;
-            //$montant_total= $montant_total - env('montant_societaire_ss_ifu');
-        }    
-     }
-     elseif($request->type_request=='P1'){
-        $montant_demande= DB::table('montant_demandes')->where('type','P1')->first();
-         $avecCPC=1;
-         $montant=$montant_demande->montant;
-            $montant_total=$montant_demande->montant_total;
-            if(in_array($request['province_entreprise'],$list_code)){
-                $montant= $montant - env('montant_individuel_ss_ifu');
-                $frais=$montant*2/100;
-                $montant_total= $montant + $frais;
-                //$montant_total= $montant_total - env('montant_societaire_ss_ifu');
-            }
-     }
-
-   }
-        if (! isset($montant, $montant_total)) {
-            throw new DemandeRefuseeException('Le tarif correspondant à ce type de demande est introuvable. '
-                .'Vérifiez le type de demande choisi ou contactez le CEFORE.');
-        }
+        [$montant, $montant_total, $avecCPC] = $this->calculerMontant($request);
 
         // Signature dessinée dans le formulaire : fichier signature.png dans le dossier du promoteur
         $signature = $this->enregistrerSignature($request->signed, $usager);

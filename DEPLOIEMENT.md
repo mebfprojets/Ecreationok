@@ -129,11 +129,14 @@ php artisan up
 2. Site public : accueil (ni bandeau de maintenance ni bouton « Vérifier un nom commercial » dans l'en-tête), page Contacts,
    inscription (code reçu sur une adresse extérieure, Gmail par exemple, hors indésirables et avec le logo CEFORE ; `envois_mail` indique `envoye` ; dans la base, `created_at` et `email_verified_at` du nouveau compte ont une heure, pas `00:00:00`),
    connexion, mot de passe oublié, formulaire « Enregistrement du promoteur » (pied de page en bas de l'écran, fenêtre de confirmation ;
-   « Type de pièce d'identité » sur CNIB : 16 chiffres affichent un message d'erreur, 17 chiffres sont acceptés ; sur Passeport, 8 caractères maximum),
+   « Type de pièce d'identité » sur CNIB : 16 chiffres affichent un message d'erreur, 17 chiffres sont acceptés ; sur Passeport, de 6 à 12 lettres ou chiffres ;
+   situation « Marié » puis « Créer un conjoint » : les listes « Genre » et « Civilité » se déroulent et le conjoint s'enregistre),
    formulaire de demande (bouton « Ajouter usager ») **enregistré jusqu'au bout avec une demande de test** : la page suivante s'affiche
    et le fichier `signature.png` est créé dans `storage\app\public\files\<id du promoteur>\`.
+   Demande de test d'entreprise individuelle dans la province du BAZEGA ou du GANZOURGOU : montant total à payer **42 330 FCFA** (47 380 ailleurs).
    Sur le détail d'une demande immatriculée, la carte « Mes formalités » affiche les dates en jj/mm/aaaa.
-3. Espace agents : tableau de bord, une liste avec un filtre de période, liste « Validées » (colonnes « N° RCCM » et « Date immatriculation »,
+   L'adresse `/login`, ouverte directement, affiche l'accueil avec la fenêtre « Se connecter » ouverte (et non une erreur 500).
+3. Espace agents : tableau de bord, liste « Comptes des promoteurs » (colonne « Créé le » avec l'heure pour les comptes récents), une liste avec un filtre de période, liste « Validées » (colonnes « N° RCCM » et « Date immatriculation »,
    recherche par numéro RCCM), détail d'une demande (carte « Immatriculation » si un numéro est attribué, aperçu des pièces,
    rubrique « Activité du promoteur » avec ses onglets Parcours, Connexions et E-mails), plein écran d'une pièce (« Suivante », case « À corriger »),
    motif de correction après avoir coché d'autres pièces et rouvert la fenêtre, validation et rejet d'une demande de test (l'e-mail doit partir,
@@ -200,13 +203,43 @@ Correctifs du 11 novembre 2026 (aucune migration, aucune clé de `.env` à ajout
 - Numéro de pièce d'identité contrôlé à la création d'un usager : formulaire « Enregistrement du promoteur » et fenêtres de création d'usager
   (boutons « Ajouter usager » / « Créer Dirigeant » du formulaire de demande, « Créer un conjoint »).
   - Nouveau champ obligatoire « Type de pièce d'identité » (CNIB ou Passeport) avant le numéro.
-  - CNIB : NIP de **17 chiffres exactement**, sans lettre. Passeport : **8 caractères exactement**, lettres et chiffres uniquement.
+  - CNIB : NIP de **17 chiffres exactement**, sans lettre. Passeport : **de 6 à 12 caractères**, lettres et chiffres uniquement
+    (au lieu de 8 exactement le 11 novembre : certains passeports étrangers en ont 9).
   - Les espaces sont retirés et les lettres mises en majuscules pendant la saisie ; le numéro est enregistré ainsi dans `usagers.CIN`.
   - Message en français si le format est faux, dans le navigateur et sur le serveur (`app/Http/Controllers/UsagerController.php`).
-- Le type de pièce n'est pas enregistré : il se déduit du numéro (17 chiffres = CNIB, 8 caractères = passeport). Aucune colonne ajoutée.
+- Le type de pièce n'est pas enregistré : il se déduit du numéro (17 chiffres = CNIB, sinon passeport). Aucune colonne ajoutée.
 - Fichiers concernés : `UsagerController.php`, `public/frontend/js/front-personal.js`, `resources/views/usager/create.blade.php`,
   `resources/views/demande/test.blade.php`, `resources/views/partials/frontend/footer.blade.php` (le script est désormais chargé avec un numéro de version,
   pour que les navigateurs prennent le nouveau fichier).
+
+Correctifs du 26 novembre 2026 (aucune migration ; clés de `.env` facultatives, voir § 3.2 et § 3.3) :
+
+- **IFU non facturé pour les provinces du BAZEGA et du GANZOURGOU** (rattachées au CEFORE OUA, liste du paramètre 19
+  « Localités dont le IFU n'est pas pris en compte ») : le coût de l'IFU est retiré de la colonne `montant` du tarif (`montant_demandes`),
+  puis les 2 % sont recalculés et ajoutés, arrondis au franc.
+
+  | Demande | Total habituel | BAZEGA / GANZOURGOU |
+  |---|---|---|
+  | Entreprise individuelle (IFU 5 000) | 47 380 | 46 500 − 5 000 = 41 500, + 2 % = **42 330** |
+  | Société sans CPC (IFU 7 500) | 65 540 | 64 500 − 7 500 = 57 000, + 2 % = **58 140** |
+  | Société avec CPC (IFU 7 500) | 83 430 | 81 761 − 7 500 = 74 261, + 2 % = **75 746** |
+
+  La règle existait, mais lisait les montants de l'IFU par `env()`, qui ne renvoie rien une fois la configuration en cache (§ 2.7) :
+  en production, l'IFU restait facturé. Les montants sont désormais dans `config/tarifs.php` (calcul : `DemandeController::calculerMontant()`).
+- Fenêtres de création d'usager (« Créer un conjoint », « Ajouter usager », « Créer Dirigeant ») :
+  - la liste « Civilité » de la fenêtre « Créer un conjoint » ne se déroulait pas (liste Select2 ouverte derrière la fenêtre) : le conjoint ne pouvait pas être enregistré ;
+  - la liste « Genre » affiche « Choisir le genre » (elle paraissait vide) ; le genre choisi est enregistré. Avant, il était ignoré et déduit de la civilité :
+    un conjoint « Docteur », « Professeur », « Officier » ou « Autres » était enregistré au féminin ;
+  - le conjoint rattaché au promoteur est enregistré « Marié(e) » (il l'était « Célibataire »).
+- Espace agents, « Comptes des promoteurs » : la colonne « Créé le » affiche l'heure (« 09/11/2026 à 19:29 »). Les comptes créés avant le
+  correctif du 8 novembre n'ont que la date : leur heure n'a jamais été enregistrée.
+- L'adresse `/login` ouverte directement renvoyait une erreur 500 (« Undefined variable $statistiques ») ; elle affiche l'accueil et ouvre la fenêtre de connexion.
+- Commandes d'essai pour le poste de développement (`php artisan essai:compte`, `essai:voir`, `essai:supprimer`) : **refusées en production**, rien à faire sur le serveur.
+  Aucun e-mail n'est envoyé aux adresses `@essai.test` qu'elles utilisent.
+- Fichiers concernés : `app/Http/Controllers/DemandeController.php`, `UsagerController.php`, `UserController.php`, `config/tarifs.php` (nouveau),
+  `.env.example`, `app/Providers/AppServiceProvider.php`, `app/Support/StatistiquesAccueil.php` et `app/Support/DonneesEssai.php` (nouveaux),
+  `app/Console/Commands/Essai*.php` (nouveaux), `resources/views/usager/create.blade.php`, `resources/views/demande/test.blade.php`,
+  `resources/views/layouts/frontend.blade.php`.
 
 ### 3.1 Migrations attendues (5)
 
@@ -238,6 +271,8 @@ Correctifs du 11 novembre 2026 (aucune migration, aucune clé de `.env` à ajout
 | `SESSION_INACTIVITE_AGENTS` | `30` (minutes) | valeur par défaut : 30 |
 | `AUTH_REMEMBER_MINUTES` | `10080` (7 jours) | valeur par défaut : 7 jours |
 | `MAINTENANCE_BANNER` | à supprimer | sans effet : le bandeau n'existe plus |
+| `montant_individuel_ss_ifu` | `5000` (facultative, valeur par défaut) | coût de l'IFU retiré des entreprises individuelles du BAZEGA et du GANZOURGOU |
+| `montant_societaire_ss_ifu` | `7500` (facultative, valeur par défaut) | **une valeur supérieure au montant de la demande (ex. `75000`) donne un total négatif** : à vérifier (§ 3.3) |
 
 `CSP_MODE=enforce` a été testé sur l'ensemble des pages en local. Si une page devait se bloquer en production,
 passer temporairement `CSP_MODE=report`, puis `php artisan config:cache`, et signaler la page.
@@ -292,9 +327,21 @@ passer temporairement `CSP_MODE=report`, puis `php artisan config:cache`, et sig
 - **Boutons des e-mails de demande** : le jeton est chiffré avec `APP_KEY`. Si cette clé change, les boutons des e-mails déjà envoyés mènent à « Mes demandes » au lieu de la demande.
   Les liens des anciens e-mails (`/detail/demande/<id>`) restent valables. Après le clic, la barre d'adresse affiche l'identifiant, comme partout dans l'application ;
   l'accès reste contrôlé sur la page de détail.
-- **Pièce d'identité, passeports étrangers** : la règle « 8 caractères » bloque tout passeport d'une autre longueur (certains pays en délivrent de 9 caractères).
-  Le promoteur voit « Le numéro de passeport doit comporter exactement 8 caractères… » et ne peut pas s'enregistrer. Si des promoteurs étrangers le signalent,
+- **Pièce d'identité, passeports** : de 6 à 12 lettres ou chiffres. Si un passeport valide est refusé (« Le numéro de passeport doit comporter de 6 à 12 caractères… »),
   la règle se trouve dans `UsagerController::FORMATS_PIECE_IDENTITE` et, pour le navigateur, dans `public/frontend/js/front-personal.js` (les deux à modifier ensemble).
+- **IFU du BAZEGA et du GANZOURGOU, montants** : avant `php artisan config:cache` (§ 2.7), vérifier dans le `.env` de production les clés
+  `montant_individuel_ss_ifu` et `montant_societaire_ss_ifu`. Absentes, elles valent 5 000 et 7 500. **Une valeur comme `75000` pour les sociétés
+  donnerait un montant négatif** (le tarif d'une société sans CPC est de 64 500) : la corriger à `7500`. Sans `config:cache`, la nouvelle
+  `config/tarifs.php` n'est pas prise en compte.
+- **IFU du BAZEGA et du GANZOURGOU, demandes existantes** : seules les nouvelles demandes bénéficient de la remise ; les demandes déjà créées gardent leur montant,
+  payé ou non. Pour les retrouver :
+
+  ```sql
+  SELECT id, numero_demande, request_type, province_code, montant, montant_total, paye, created_at
+  FROM demandes WHERE province_code IN ('4', '9') ORDER BY id DESC;
+  ```
+
+- **IFU, liste des provinces** : elle vient du paramètre 19 (table `valeurs`, codes `4` et `9`). Ajouter ou retirer une province s'y fait sans changer le code.
 - **Pièce d'identité, données existantes** : le contrôle ne s'applique qu'aux nouveaux usagers. Les numéros déjà enregistrés ne sont ni vérifiés ni modifiés.
   Une page de formulaire ouverte avant le déploiement n'a pas le champ « Type de pièce » : l'envoi est refusé avec « Choisissez le type de pièce d’identité » ;
   il suffit de recharger la page.

@@ -108,7 +108,11 @@ class UserController extends Controller
             ->map(fn ($u) => [
                 e(trim($u->prenom.' '.$u->name)),
                 e($u->email).($u->email_verified_at ? ' <i class="fas fa-check-circle text-success" title="Adresse vérifiée" aria-hidden="true"></i>' : ''),
-                $u->created_at ? $u->created_at->format('d/m/Y') : '—',
+                // Date et heure de création ; les comptes créés avant le correctif du 08/11/2026 n'ont que la date
+                // (heure enregistrée à 00:00:00) : on n'affiche alors pas une heure qui n'a jamais été connue.
+                $u->created_at
+                    ? ($u->created_at->format('H:i:s') === '00:00:00' ? $u->created_at->format('d/m/Y') : $u->created_at->format('d/m/Y à H:i'))
+                    : '—',
                 $u->NomRaisonSociale ? e(trim($u->NomRaisonSociale.' '.$u->us_prenom)) : '<span class="text-muted">Aucun</span>',
                 (int) $u->nb_demandes,
             ]);

@@ -13,7 +13,7 @@ class UsagerController extends Controller
 {
     /**
      * Formats du N° de pièce d'identité (mêmes règles côté navigateur : public/frontend/js/front-personal.js).
-     * Le type n'est pas enregistré : il se déduit du numéro (17 chiffres = NIP de CNIB, 8 caractères = passeport).
+     * Le type n'est pas enregistré : il se déduit du numéro (17 chiffres = NIP de CNIB, 6 à 12 lettres ou chiffres = passeport).
      */
     private const FORMATS_PIECE_IDENTITE = [
         'cnib' => [
@@ -21,8 +21,8 @@ class UsagerController extends Controller
             'message' => 'Le NIP de la CNIB doit comporter exactement 17 chiffres, sans lettre.',
         ],
         'passeport' => [
-            'motif' => '/^[A-Z0-9]{8}$/',
-            'message' => 'Le numéro de passeport doit comporter exactement 8 caractères : lettres et chiffres uniquement.',
+            'motif' => '/^[A-Z0-9]{6,12}$/',
+            'message' => 'Le numéro de passeport doit comporter de 6 à 12 caractères : lettres et chiffres uniquement.',
         ],
     ];
 
@@ -141,6 +141,7 @@ class UsagerController extends Controller
                     $echec('Un promoteur est enregistré dans la base avec les mêmes informations.');
                 }
             }],
+            'genre_usager' => 'nullable|in:1,2',
             'nom_usager' => 'nullable|string|max:255',
             'prenom_usager' => 'nullable|string|max:255',
             'email_usager' => 'nullable|email|max:255',
@@ -148,6 +149,7 @@ class UsagerController extends Controller
             'piece_jointe_m' => 'nullable|'.self::REGLE_FICHIER,
             'piece_jointe_c' => 'nullable|'.self::REGLE_FICHIER,
         ], [
+            'genre_usager.in' => 'Le genre choisi n’est pas valide.',
             'type_piece_identite.required_with' => 'Choisissez le type de pièce d’identité (CNIB ou passeport).',
             'type_piece_identite.in' => 'Le type de pièce d’identité doit être CNIB ou passeport.',
             'numero_piece.required_without' => 'Le numéro de la pièce d’identité est obligatoire.',
@@ -181,11 +183,15 @@ class UsagerController extends Controller
             $user=null;
         }
 
-        if( $request->civilite=="M." || $request->civilite=="MR" || $request->civilite=="EL HADJ"){
-            $genre=2;
-        }
-        else{
-            $genre=1;
+        // Genre : celui choisi dans la fenêtre de création d'usager (conjoint, associé, dirigeant) ; à défaut
+        // (formulaire du promoteur, qui n'a pas ce champ), déduit de la civilité. Avant, le choix était ignoré :
+        // un conjoint « Docteur », « Professeur » ou « Autres » était enregistré au féminin.
+        if (in_array((string) $request->genre_usager, ['1', '2'], true)) {
+            $genre = (int) $request->genre_usager;
+        } elseif ($request->civilite == "M." || $request->civilite == "MR" || $request->civilite == "EL HADJ") {
+            $genre = 2;
+        } else {
+            $genre = 1;
         }
 
             if($request->situation_matrimoniale==null){
@@ -286,6 +292,11 @@ class UsagerController extends Controller
                         'date_mariage'=>$request->date_mariage,
                         'lieu_mariage'=>$request->lieu_mariage
                     ]);
+                    // Le conjoint est marié lui aussi : la fenêtre « Créer un conjoint » n'a pas ce champ et l'enregistrait
+                    // « Célibataire » (valeur par défaut de store()).
+                    Usager::where('id', $conjoint)
+                        ->where(fn ($q) => $q->whereNull('SituationMatrimoniale')->orWhere('SituationMatrimoniale', '<>', 2))
+                        ->update(['SituationMatrimoniale' => 2]);
                 }
             }
         }

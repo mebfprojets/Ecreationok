@@ -11,7 +11,7 @@ $('#personne_morale').click(function(){
 
 /*
  * N° de pièce d'identité du promoteur (formulaires usager) : NIP de la CNIB = 17 chiffres,
- * passeport = 8 lettres ou chiffres. Mêmes règles côté serveur (UsagerController::FORMATS_PIECE_IDENTITE).
+ * passeport = 6 à 12 lettres ou chiffres. Mêmes règles côté serveur (UsagerController::FORMATS_PIECE_IDENTITE).
  */
 var FORMATS_PIECE_IDENTITE = {
     cnib: {
@@ -19,8 +19,8 @@ var FORMATS_PIECE_IDENTITE = {
         message: 'Le NIP de la CNIB doit comporter exactement 17 chiffres, sans lettre.'
     },
     passeport: {
-        motif: /^[A-Z0-9]{8}$/, longueur: 8, clavier: 'text', exemple: 'N° du passeport : 8 caractères',
-        message: 'Le numéro de passeport doit comporter exactement 8 caractères : lettres et chiffres uniquement.'
+        motif: /^[A-Z0-9]{6,12}$/, longueur: 12, clavier: 'text', exemple: 'N° du passeport : 6 à 12 caractères',
+        message: 'Le numéro de passeport doit comporter de 6 à 12 caractères : lettres et chiffres uniquement.'
     }
 };
 

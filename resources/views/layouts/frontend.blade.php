@@ -265,9 +265,10 @@
   </div>
 @yield('modal_parpage')
 @include('partials.frontend.footer')
-@if (session('ouvrir_connexion') && !Auth::check())
+@if ((session('ouvrir_connexion') || request()->routeIs('login')) && !Auth::check())
 <script nonce="{{ $cspNonce ?? '' }}">
-    // Session expirée pour inactivité : la fenêtre de connexion s'ouvre directement
+    // Session expirée pour inactivité, ou page /login (visiteur renvoyé vers la connexion, par exemple depuis le bouton
+    // d'un e-mail) : la fenêtre de connexion s'ouvre directement
     $(function () { $('#modal-login').modal('show'); });
 </script>
 @endif

@@ -57,6 +57,12 @@ La base locale contient de vraies données. Pour vérifier une modification :
 - page testée dans le navigateur avec une session temporaire : la supprimer ensuite ;
 - ne pas afficher de données personnelles (noms, e-mails, téléphones) dans les sorties.
 
+Parcours complets (promoteur, conjoint, demande) : données d'essai, refusées en production.
+- `php artisan essai:compte [--fiche] [--conjoint]` : compte `essaiN@essai.test` déjà vérifié (mot de passe affiché) ;
+- `php artisan essai:voir` : ce qui a été enregistré (fiches, conjoints, demandes, montants, dirigeants, pièces) ;
+- `php artisan essai:supprimer` : retire comptes `@essai.test`, personnes dont le nom commence par `ESSAI`, leurs demandes, pièces, paiements, journaux et fichiers.
+Aucun e-mail n'est envoyé aux adresses `@essai.test` : il est écrit dans `storage/logs` (`AppServiceProvider`). Règles dans `app/Support/DonneesEssai.php`.
+
 Le dossier `tests/` ne contient que les tests Jetstream d'origine, non maintenus.
 
 ## Déploiement

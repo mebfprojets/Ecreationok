@@ -283,12 +283,13 @@
                         </div>
                         <div class="col-lg-6">
                             <div class="mb-3">
-                            <label class="form-label" for="example-chosen" >Genre</label>
-                            <select id="genre" name="genre_usager" class="form-control" data-placeholder="Choisir le genre" style="width: 100%;" required="Ce champ est obligatoire" title="Ce champ est obligatoire" required>
-                                    <option></option>
-                                    <option value="1" {{ old('genre') == 1 ? 'selected' : '' }}>Féminin</option>
-                                    <option value="2" {{ old('genre') == 2 ? 'selected' : '' }}>Masculin</option>
-                                </select>    
+                            <label class="form-label" for="genre">Genre (<font color="red">*</font>)</label>
+                            {{-- Option vide avec texte : sans Select2, data-placeholder ne s'affiche pas et la liste semblait vide --}}
+                            <select id="genre" name="genre_usager" class="form-control" style="width: 100%;" title="Ce champ est obligatoire" required>
+                                    <option value="">Choisir le genre</option>
+                                    <option value="1">Féminin</option>
+                                    <option value="2">Masculin</option>
+                                </select>
                             <!-- <input type="text" name="prenom_usager" class="form-control" id="progress-basicpill-vatno-input" >                                                                    -->
                             </div>
                         </div>
@@ -308,9 +309,9 @@
                         </div> --}}
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label" for="val_username">Civilités</label>
-                                <select id="single-select-field" name="civilite" class="form-control"  data-placeholder="Selectionnez la civilité" style="width: 100%;" required="Ce champ est obligatoire" title="Ce champ est obligatoire">
-                                <option></option>
+                                <label class="form-label" for="civilite_fenetre">Civilité (<font color="red">*</font>)</label>
+                                <select id="civilite_fenetre" name="civilite" class="form-control" style="width: 100%;" title="Ce champ est obligatoire" required>
+                                <option value="">Choisir la civilité</option>
                                     @foreach ($civilites as $civilite )
                                            <option value="{{ $civilite->code }}">{{ $civilite->libelle }}</option>
                                     @endforeach
@@ -344,7 +345,7 @@
                         <div class="mb-3">
                             <label class="form-label" for="numero_piece_fenetre">N° Pièce d'identité (<font color="red">*</font>)</label>
                             <input type="text" id="numero_piece_fenetre" name="numero_piece" class="form-control uppercase numeroPieceIdentite" autocomplete="off" placeholder="Choisissez d’abord le type de pièce" required>
-                            <small class="form-text text-muted">CNIB : NIP de 17 chiffres. Passeport : 8 lettres ou chiffres.</small>
+                            <small class="form-text text-muted">CNIB : NIP de 17 chiffres. Passeport : 6 à 12 lettres ou chiffres.</small>
                         </div>
                     </div>
                     </div>
